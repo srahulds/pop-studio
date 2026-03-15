@@ -87,25 +87,33 @@
 
 <section class="hero">
     <div class="hero-gradient"></div>
+    <div class="hero-grid-overlay"></div>
     <div class="hero-content">
-        <div class="s-label">Now Accepting Applications</div>
+        <div class="hero-eyebrow"><span></span> Now Accepting Creators</div>
         <h1>Where Content<br>Meets <i>Commerce.</i></h1>
-        <button class="btn-flame" id="heroAuthBtn" onclick="handleAuthClick()">Join the Studio →</button>
+        <p class="hero-desc">POP is the lifestyle payments and rewards platform for a new generation. We're partnering with <strong>India's finest creators</strong> to tell our story.<br><br><strong>You create. We pay. No middlemen.</strong></p>
+        <div class="hero-actions">
+            <button class="btn-flame" id="heroAuthBtn" onclick="handleAuthClick()"><span>You ✕ POP</span> →</button>
+        </div>
     </div>
 </section>
 
 <div class="marquee">
     <div class="marquee-track">
-        <div class="marquee-item">UPI Payments</div>
-        <div class="marquee-item">POPCard RuPay</div>
-        <div class="marquee-item">POPShop</div>
-        <div class="marquee-item">POPCoins</div>
-        <div class="marquee-item">Nike</div>
-        <div class="marquee-item">Puma</div>
-        <div class="marquee-item">UPI Payments</div>
-        <div class="marquee-item">POPCard RuPay</div>
-        <div class="marquee-item">POPShop</div>
-        <div class="marquee-item">POPCoins</div>
+        <div class="marquee-item"><span class="marquee-dot"></span> UPI Payments</div>
+        <div class="marquee-item"><span class="marquee-dot"></span> POPCard RuPay</div>
+        <div class="marquee-item"><span class="marquee-dot"></span> POPShop</div>
+        <div class="marquee-item"><span class="marquee-dot"></span> POPCoins</div>
+        <div class="marquee-item"><span class="marquee-dot"></span> Nike</div>
+        <div class="marquee-item"><span class="marquee-dot"></span> Puma</div>
+        <div class="marquee-item"><span class="marquee-dot"></span> Studio Live</div>
+        <div class="marquee-item"><span class="marquee-dot"></span> UPI Payments</div>
+        <div class="marquee-item"><span class="marquee-dot"></span> POPCard RuPay</div>
+        <div class="marquee-item"><span class="marquee-dot"></span> POPShop</div>
+        <div class="marquee-item"><span class="marquee-dot"></span> POPCoins</div>
+        <div class="marquee-item"><span class="marquee-dot"></span> Nike</div>
+        <div class="marquee-item"><span class="marquee-dot"></span> Puma</div>
+        <div class="marquee-item"><span class="marquee-dot"></span> Studio Live</div>
     </div>
 </div>
 
@@ -115,39 +123,146 @@
     <div class="eco-grid">
         <div class="eco-card">
             <div class="eco-num">01</div>
-            <h3>POP UPI</h3>
-            <p>Fast. Fluid. A UPI experience designed for the modern user.</p>
-        </div>
-        <div class="eco-card">
-            <div class="eco-num">02</div>
-            <h3>POP Shop</h3>
-            <p>Curated brands. Seamless shopping, natively integrated.</p>
-        </div>
-        <div class="eco-card">
-            <div class="eco-num">03</div>
-            <h3>POP Coins</h3>
-            <p>A reward currency you actually want to use.</p>
-        </div>
-    </div>
-</section>
+                </div>
+            </div>
 
-<section class="section-pad" id="campaigns">
-    <div class="reveal" style="margin-bottom:60px">
-        <div class="s-label">Live Opportunities</div>
-        <h2 style="font-family:'Playfair Display'; font-size:48px;">Take <i>your</i> pick.</h2>
-    </div>
-    <div class="camp-grid" id="dynamic-campaign-grid">
-        <div style="grid-column: 1/-1; padding: 40px; text-align: center; color: var(--smoke);">Loading live campaigns...</div>
-    </div>
-</section>
+            <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+            <script>
+                // Scroll & Reveal
+                window.addEventListener('scroll',()=>{document.getElementById('mainNav').classList.toggle('scrolled',window.scrollY>60)});
+                const obs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting){x.target.classList.add('vis');obs.unobserve(x.target)}})},{threshold:0.1});
+                document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
 
-<section class="section-pad reveal" id="rewards">
-    <div class="s-label">Rewards</div>
-    <h2 style="font-family:'Playfair Display'; font-size:48px; margin-bottom:40px;">Transparent.<br><i>No negotiations.</i></h2>
-    <div class="r-table">
-        <div class="r-row"><span>Base</span><span style="color:var(--flame)">Guaranteed</span><span>₹3,000</span></div>
-        <div class="r-row"><span>100K Views</span><span>+₹7,000</span><span>₹10,000</span></div>
-        <div class="r-row max"><span>1M Views</span><span>+₹70,000</span><span>₹1,00,000</span></div>
+                function toggleMobileMenu() {
+                    document.getElementById('mobMenu').classList.toggle('show');
+                    document.body.style.overflow = document.getElementById('mobMenu').classList.contains('show') ? 'hidden' : '';
+                }
+
+                let isLoggedIn = false; 
+                let pendingOptInCampaign = null;
+
+                function handleAuthClick(view = 'login') {
+                    if (isLoggedIn) { window.location.href = 'dashboard.html'; return; }
+                    document.getElementById('authOverlay').classList.add('show');
+                    switchAuthView(view);
+                }
+
+                function handleOptIn(campaignTitle) {
+                    if (isLoggedIn) {
+                        alert(`Successfully opted into: ${campaignTitle}!`);
+                    } else {
+                        pendingOptInCampaign = campaignTitle;
+                        document.getElementById('authOverlay').classList.add('show');
+                        switchAuthView('login');
+                    }
+                }
+
+                function closeAuthModal() {
+                    document.getElementById('authOverlay').classList.remove('show');
+                    pendingOptInCampaign = null;
+                }
+
+                function switchAuthView(view) {
+                    document.getElementById('authLoginState').style.display = view === 'login' ? 'block' : 'none';
+                    document.getElementById('authSignupState').style.display = view === 'signup' ? 'block' : 'none';
+                    document.getElementById('authOTPState').style.display = view === 'otp' ? 'block' : 'none';
+                }
+
+                document.getElementById('authOverlay').addEventListener('click', (e) => {
+                    if (e.target === document.getElementById('authOverlay')) closeAuthModal();
+                });
+            </script>
+
+            <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+            <script>
+                try {
+                    // Make sure your URL and Key have single quotes around them!
+                    // Example: const supabaseUrl = 'https://xyz.supabase.co';
+                    const supabaseUrl = 'https://fxuinuxyjhjxygdhskfn.supabase.co'; 
+                    const supabaseKey = 'sb_publishable_Mgh-fEqB3IVF4iTvV0-rjw_GkfftY_5';
+    
+                    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+                    async function signInWithGoogle() {
+                        const { data, error } = await supabase.auth.signInWithOAuth({
+                            provider: 'google',
+                            options: {
+                                redirectTo: window.location.origin + '/dashboard.html'
+                            }
+                        });
+
+                        if (error) {
+                            console.error("Error logging in with Google:", error.message);
+                            alert("Could not connect to Google. Please try again.");
+                        }
+                    }
+    
+                    // Attach the function globally so the button can find it
+                    window.signInWithGoogle = signInWithGoogle;
+
+                    // Session check and dynamic content
+                    async function checkSession() {
+                        const { data } = await supabase.auth.getUser();
+                        const user = data.user;
+                        isLoggedIn = !!user;
+                        if (isLoggedIn) {
+                            const name = user.user_metadata.full_name || user.email.split('@')[0];
+                            document.getElementById('navAuthBtn').textContent = `${name} ✕ POP`;
+                            document.getElementById('navAuthBtn').onclick = () => window.location.href = 'dashboard.html';
+                            document.getElementById('heroAuthBtn').textContent = "Go to Dashboard →";
+                            document.getElementById('heroAuthBtn').onclick = () => window.location.href = 'dashboard.html';
+                        }
+                    }
+
+                    async function loadCampaignData() {
+                        const grid = document.getElementById('dynamic-campaign-grid');
+                        try {
+                            const { data: campaigns } = await supabase.from('campaigns').select('*').eq('status', 'active');
+                            if (!campaigns || campaigns.length === 0) {
+                                grid.innerHTML = `<div style=\"grid-column:1/-1; padding:60px; border:1px dashed var(--ghost); border-radius:24px; text-align:center; opacity:0.6;\">No active briefs.</div>`;
+                                return;
+                            }
+                            grid.innerHTML = campaigns.map(c => `
+                                <div class=\"camp-card reveal\">
+                                    <div class=\"c-meta\"><span class=\"c-days\">${c.days_left ? c.days_left + ' Days Left' : ''}</span></div>
+                                    <h3 class=\"c-title\">${c.title}</h3>
+                                    <p style=\"font-size:14px; color:var(--smoke); margin-bottom:20px;\">${c.description}</p>
+                                    <div class=\"c-participants\">${c.participants ? c.participants + ' Creators Joined' : ''}</div>
+                                    <button class=\"c-action-btn\" onclick=\"handleOptIn('${c.title.replace(/'/g, "\\'")}')\">Opt In →</button>
+                                </div>
+                            `).join('');
+                        } catch (err) {
+                            grid.innerHTML = `<div style=\"grid-column:1/-1; padding:60px; color:var(--smoke);\">Error loading campaigns.</div>`;
+                        }
+                    }
+
+                    async function loadBrands() {
+                        const brandsWrap = document.getElementById('dynamic-brands');
+                        try {
+                            const { data: brands, error } = await supabase.from('brands').select('*').order('name');
+                            if (error || !brands || brands.length === 0) {
+                                brandsWrap.innerHTML = `<span style=\"color:var(--smoke);font-size:15px;\">No brands found.</span>`;
+                                return;
+                            }
+                            brandsWrap.innerHTML = brands.map(b => `<span class=\"brand-pill\">${b.name}</span>`).join('');
+                        } catch (err) {
+                            brandsWrap.innerHTML = `<span style=\"color:var(--smoke);font-size:15px;\">Error loading brands.</span>`;
+                        }
+                    }
+
+                    document.addEventListener('DOMContentLoaded', () => {
+                        checkSession();
+                        loadCampaignData();
+                        loadBrands();
+                    });
+
+                } catch (err) {
+                    console.error("Supabase Setup Error:", err.message);
+                }
+            </script>
+            <div class="r-row"><div class="r-tier">500K Views</div><div class="r-bonus">+₹20,000</div><div class="r-total">₹30,000</div></div>
+            <div class="r-row max"><div class="r-tier">1M Views</div><div class="r-bonus">+₹70,000</div><div class="r-total">₹1,00,000</div></div>
+        </div>
     </div>
 </section>
 
@@ -191,31 +306,88 @@
                     <button class="btn-flame" style="padding:12px; font-size:12px;" onclick="window.location.href='dashboard.html'">Opt In →</button>
                 </div>
             `).join('');
-            triggerReveal();
-        } catch (err) { grid.innerHTML = `<div>Error loading campaigns.</div>`; }
-    }
+            <script>
+                // Scroll & Reveal
+                window.addEventListener('scroll',()=>{document.getElementById('mainNav').classList.toggle('scrolled',window.scrollY>60)});
+                const obs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting){x.target.classList.add('vis');obs.unobserve(x.target)}})},{threshold:0.1});
+                document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
 
-    async function initiateGoogleLogin() {
-        await popStudioClient.auth.signInWithOAuth({
-            provider: 'google',
-            options: { redirectTo: 'https://srahulds.github.io/pop-studio/dashboard.html' }
-        });
-    }
+                // Supabase integration
+                const popUrl = 'https://fxuinuxyjhjxygdhskfn.supabase.co';
+                const popKey = 'sb_publishable_Mgh-fEqB3IVF4iTvV0-rjw_GkfftY_5';
+                const popStudioClient = window.supabase.createClient(popUrl, popKey);
+                let isLoggedIn = false;
+                let user = null;
 
-    function handleAuthClick() { document.getElementById('authOverlay').classList.add('show'); }
-    function handleAuthClose() { document.getElementById('authOverlay').classList.remove('show'); }
+                async function checkSession() {
+                    const { data } = await popStudioClient.auth.getUser();
+                    user = data.user;
+                    isLoggedIn = !!user;
+                    if (isLoggedIn) {
+                        const name = user.user_metadata.full_name || user.email.split('@')[0];
+                        document.getElementById('navAuthBtn').textContent = `${name} ✕ POP`;
+                        document.getElementById('navAuthBtn').onclick = () => window.location.href = 'dashboard.html';
+                        document.getElementById('heroAuthBtn').textContent = "Go to Dashboard →";
+                        document.getElementById('heroAuthBtn').onclick = () => window.location.href = 'dashboard.html';
+                    }
+                }
 
-    const revealObserver = new IntersectionObserver(entries => {
-        entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('vis'); });
-    }, {threshold: 0.1});
+                async function loadBrands() {
+                    const brandsWrap = document.getElementById('dynamic-brands');
+                    try {
+                        const { data: brands, error } = await popStudioClient.from('brands').select('*').order('name');
+                        if (error || !brands || brands.length === 0) {
+                            brandsWrap.innerHTML = `<span style="color:var(--smoke);font-size:15px;">No brands found.</span>`;
+                            return;
+                        }
+                        brandsWrap.innerHTML = brands.map(b => `<span class="brand-pill">${b.name}</span>`).join('');
+                    } catch (err) {
+                        brandsWrap.innerHTML = `<span style="color:var(--smoke);font-size:15px;">Error loading brands.</span>`;
+                    }
+                }
 
-    function triggerReveal() { document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el)); }
+                function toggleMobileMenu() {
+                    document.getElementById('mobMenu').classList.toggle('show');
+                    document.body.style.overflow = document.getElementById('mobMenu').classList.contains('show') ? 'hidden' : '';
+                }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        checkCurrentSession();
-        loadCampaignData();
-        triggerReveal();
-    });
-</script>
-</body>
-</html>
+                let pendingOptInCampaign = null;
+                function handleAuthClick(view = 'login') {
+                    if (isLoggedIn) { window.location.href = 'dashboard.html'; return; }
+                    document.getElementById('authOverlay').classList.add('show');
+                    if (typeof switchAuthView === 'function') switchAuthView(view);
+                }
+
+                function handleOptIn(campaignTitle) {
+                    if (isLoggedIn) {
+                        alert(`Successfully opted into: ${campaignTitle}!`);
+                    } else {
+                        pendingOptInCampaign = campaignTitle;
+                        document.getElementById('authOverlay').classList.add('show');
+                        if (typeof switchAuthView === 'function') switchAuthView('login');
+                    }
+                }
+
+                function closeAuthModal() {
+                    document.getElementById('authOverlay').classList.remove('show');
+                    pendingOptInCampaign = null;
+                }
+
+                function switchAuthView(view) {
+                    const login = document.getElementById('authLoginState');
+                    const signup = document.getElementById('authSignupState');
+                    const otp = document.getElementById('authOTPState');
+                    if (login) login.style.display = view === 'login' ? 'block' : 'none';
+                    if (signup) signup.style.display = view === 'signup' ? 'block' : 'none';
+                    if (otp) otp.style.display = view === 'otp' ? 'block' : 'none';
+                }
+
+                document.getElementById('authOverlay').addEventListener('click', (e) => {
+                    if (e.target === document.getElementById('authOverlay')) closeAuthModal();
+                });
+
+                document.addEventListener('DOMContentLoaded', () => {
+                    checkSession();
+                    loadBrands();
+                });
+            </script>
