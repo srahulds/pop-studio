@@ -106,6 +106,11 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 .skeleton{background:linear-gradient(90deg,rgba(255,255,255,0.04) 25%,rgba(255,255,255,0.08) 50%,rgba(255,255,255,0.04) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:8px}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 
+/* Creator filter tabs */
+.creator-filter-btn{padding:8px 18px;border-radius:100px;font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;border:1px solid rgba(255,255,255,0.1);background:transparent;color:var(--smoke);font-family:'Outfit',sans-serif;transition:all 0.2s}
+.creator-filter-btn:hover{border-color:var(--flame);color:var(--flame)}
+.creator-filter-btn.active{background:rgba(255,82,0,0.1);border-color:rgba(255,82,0,0.3);color:var(--flame)}
+
 @media(max-width:1024px){
   aside{transform:translateX(-100%);transition:transform 0.3s cubic-bezier(0.4,0,0.2,1)}
   aside.open{transform:translateX(0)}
@@ -134,7 +139,8 @@ tr:hover td{background:rgba(255,255,255,0.02)}
   <div class="brand-sub">POP Creators — Admin</div>
   <div class="nav-links">
     <a class="nav-link active" onclick="navTo('home')">Platform Overview</a>
-    <a class="nav-link" onclick="navTo('review')" id="reviewNavLink">Approval Queue <span class="nav-badge" id="queueBadge">…</span></a>
+    <a class="nav-link" onclick="navTo('creators')" id="creatorsNavLink">Creators <span class="nav-badge" id="creatorsBadge">…</span></a>
+    <a class="nav-link" onclick="navTo('review')" id="reviewNavLink">Content Queue <span class="nav-badge" id="queueBadge">…</span></a>
   </div>
   <div class="user-foot">
     <div class="avatar-sm">A</div>
@@ -254,8 +260,55 @@ tr:hover td{background:rgba(255,255,255,0.02)}
       </table>
     </div>
   </div>
+  <!-- ── CREATORS ──────────────────────────────────────────── -->
+  <div id="view-creators" class="view-section">
+    <div class="header">
+      <div>
+        <div class="breadcrumb">Creator Management</div>
+        <h1>All <i>Creators.</i></h1>
+      </div>
+    </div>
+
+    <!-- Filter tabs -->
+    <div style="display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap">
+      <button class="creator-filter-btn active" onclick="filterCreators('all')" id="filter-all">All</button>
+      <button class="creator-filter-btn" onclick="filterCreators('pending')" id="filter-pending">Pending <span id="pendingCount" style="opacity:0.6"></span></button>
+      <button class="creator-filter-btn" onclick="filterCreators('approved')" id="filter-approved">Approved</button>
+      <button class="creator-filter-btn" onclick="filterCreators('blocked')" id="filter-blocked">Blocked</button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Creator</th><th>Instagram</th><th>Phone</th><th>Email</th><th>Joined</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody id="creatorsBody">
+          <tr><td colspan="7"><div class="skeleton" style="height:20px;margin:4px 0"></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 
 </main>
+
+<!-- PAYOUT APPROVAL MODAL -->
+<div class="modal-overlay" id="payoutModal">
+  <div class="modal-box" style="max-width:440px">
+    <button class="modal-x" onclick="closePayoutModal()">✕</button>
+    <h3 style="font-family:'Playfair Display',serif;font-size:24px;margin-bottom:8px">Approve <i>Content.</i></h3>
+    <p style="font-size:13px;color:var(--smoke);margin-bottom:24px">Set the payout amount for this submission.</p>
+    <div id="payoutContentPreview" style="padding:12px 16px;background:rgba(255,255,255,0.02);border:1px solid var(--ghost);border-radius:12px;margin-bottom:20px;font-size:13px;color:var(--smoke)"></div>
+    <div class="f-group">
+      <label class="f-label">Payout Amount (₹)</label>
+      <input type="number" class="f-input" id="payoutAmount" placeholder="3000" value="3000">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+      <button style="padding:10px;background:rgba(255,255,255,0.03);border:1px solid var(--ghost);border-radius:100px;color:var(--smoke);cursor:pointer;font-size:11px;font-family:'Outfit',sans-serif" onclick="document.getElementById('payoutAmount').value=3000">₹3,000 Base</button>
+      <button style="padding:10px;background:rgba(255,255,255,0.03);border:1px solid var(--ghost);border-radius:100px;color:var(--smoke);cursor:pointer;font-size:11px;font-family:'Outfit',sans-serif" onclick="document.getElementById('payoutAmount').value=10000">₹10,000 (100K)</button>
+      <button style="padding:10px;background:rgba(255,255,255,0.03);border:1px solid var(--ghost);border-radius:100px;color:var(--smoke);cursor:pointer;font-size:11px;font-family:'Outfit',sans-serif" onclick="document.getElementById('payoutAmount').value=30000">₹30,000 (500K)</button>
+      <button style="padding:10px;background:rgba(255,255,255,0.03);border:1px solid var(--ghost);border-radius:100px;color:var(--smoke);cursor:pointer;font-size:11px;font-family:'Outfit',sans-serif" onclick="document.getElementById('payoutAmount').value=100000">₹1,00,000 (1M)</button>
+    </div>
+    <button class="btn-flame" style="width:100%;justify-content:center;margin-top:20px" onclick="confirmContentApproval()">Approve & Set Payout</button>
+  </div>
+</div>
 
 <!-- NEW CAMPAIGN MODAL -->
 <div class="modal-overlay" id="campModal">
@@ -280,7 +333,17 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase-config.js"></script>
+<script>
+const SUPABASE_URL  = 'https://fxuinuxyjhjxygdhskfn.supabase.co';
+const SUPABASE_ANON = 'sb_publishable_Mgh-fEqB3IVF4iTvV0-rjw_GkfftY_5';
+function getSupabase() {
+  if (window._popClient) return window._popClient;
+  window._popClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
+    auth: { storageKey: 'pop-studio-auth' }
+  });
+  return window._popClient;
+}
+</script>
 <script>
 const sb = getSupabase();
 let activeCampaignId   = null;
@@ -300,6 +363,10 @@ function navTo(viewId) {
     document.querySelector('.nav-link[onclick="navTo(\'home\')"]').classList.add('active');
   } else if (viewId === 'review') {
     document.querySelector('#reviewNavLink').classList.add('active');
+    loadQueue();
+  } else if (viewId === 'creators') {
+    document.querySelector('#creatorsNavLink').classList.add('active');
+    loadCreators();
   }
 }
 
@@ -342,6 +409,13 @@ async function loadOverview() {
   // Badge
   const total = (pendingApps || 0) + (pendingContent || 0);
   document.getElementById('queueBadge').textContent = total;
+
+  // Creators pending badge
+  const { count: pendingCreators } = await sb
+    .from('creators')
+    .select('id', { count: 'exact', head: true })
+    .eq('status', 'pending');
+  document.getElementById('creatorsBadge').textContent = pendingCreators || 0;
 
   // Campaign directory
   if (campaigns?.length) {
@@ -535,7 +609,7 @@ async function loadQueue() {
         <td><a href="${sub.content_url}" target="_blank" style="color:var(--flame);text-decoration:none;font-weight:500">Review Link ↗</a></td>
         <td><span class="st-badge wait">Pending</span></td>
         <td><div style="display:flex;gap:8px">
-          <button class="btn-g" onclick="reviewContent('${sub.id}','approved')">Approve</button>
+          <button class="btn-g" onclick="openPayoutModal('${sub.id}','${sub.content_url}','${(sub.creators?.full_name||'Creator').replace(/'/g,"\\'")}')">Approve + Payout</button>
           <button class="btn-r" onclick="reviewContent('${sub.id}','rejected')">Reject</button>
         </div></td>
       </tr>`).join('')
@@ -549,14 +623,121 @@ async function reviewApp(appId, decision) {
   await loadOverview();
 }
 
-async function reviewContent(subId, decision) {
-  const update = { status: decision };
-  if (decision === 'approved') update.payout_amount = 3000; // base guaranteed payout
+// ── Content approval with payout modal ───────────────────────
+let pendingContentApproval = null;
 
-  const { error } = await sb.from('submissions').update(update).eq('id', subId);
+function openPayoutModal(subId, contentUrl, creatorName) {
+  pendingContentApproval = subId;
+  document.getElementById('payoutContentPreview').innerHTML = `
+    <div style="margin-bottom:4px;font-weight:500;color:#fff">${creatorName}</div>
+    <a href="${contentUrl}" target="_blank" style="color:var(--flame);text-decoration:none;font-size:12px">${contentUrl} ↗</a>`;
+  document.getElementById('payoutAmount').value = 3000;
+  document.getElementById('payoutModal').classList.add('show');
+}
+
+function closePayoutModal() {
+  document.getElementById('payoutModal').classList.remove('show');
+  pendingContentApproval = null;
+}
+
+async function confirmContentApproval() {
+  if (!pendingContentApproval) return;
+  const amount = parseInt(document.getElementById('payoutAmount').value) || 3000;
+  const { error } = await sb.from('submissions')
+    .update({ status: 'approved', payout_amount: amount })
+    .eq('id', pendingContentApproval);
   if (error) { alert('Error: ' + error.message); return; }
+  closePayoutModal();
   await loadQueue();
   await loadOverview();
+}
+
+async function reviewContent(subId, decision) {
+  if (decision === 'rejected') {
+    const { error } = await sb.from('submissions').update({ status: 'rejected' }).eq('id', subId);
+    if (error) { alert('Error: ' + error.message); return; }
+    await loadQueue();
+    await loadOverview();
+  }
+  // 'approved' handled by payout modal
+}
+
+// ── Creators ──────────────────────────────────────────────────
+let allCreators = [];
+let currentFilter = 'all';
+
+async function loadCreators() {
+  document.getElementById('creatorsBody').innerHTML =
+    '<tr><td colspan="7"><div class="skeleton" style="height:20px;margin:4px 0"></div></td></tr>';
+
+  const { data, error } = await sb
+    .from('creators')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error || !data) {
+    document.getElementById('creatorsBody').innerHTML =
+      '<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--smoke)">Error loading creators.</td></tr>';
+    return;
+  }
+
+  allCreators = data;
+
+  // Update pending badge
+  const pendingCount = data.filter(c => c.status === 'pending').length;
+  document.getElementById('pendingCount').textContent = pendingCount ? `(${pendingCount})` : '';
+  document.getElementById('creatorsBadge').textContent = pendingCount || 0;
+
+  renderCreatorsTable(currentFilter);
+}
+
+function filterCreators(filter) {
+  currentFilter = filter;
+  document.querySelectorAll('.creator-filter-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('filter-' + filter).classList.add('active');
+  renderCreatorsTable(filter);
+}
+
+function renderCreatorsTable(filter) {
+  const filtered = filter === 'all' ? allCreators : allCreators.filter(c => c.status === filter);
+
+  if (!filtered.length) {
+    document.getElementById('creatorsBody').innerHTML =
+      `<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--smoke)">No ${filter === 'all' ? '' : filter} creators.</td></tr>`;
+    return;
+  }
+
+  document.getElementById('creatorsBody').innerHTML = filtered.map(c => {
+    const badge = c.status === 'approved' ? 'ok' : c.status === 'blocked' ? 'no' : 'wait';
+    const joined = c.created_at ? new Date(c.created_at).toLocaleDateString('en-IN') : '—';
+    return `<tr>
+      <td>
+        <div class="td-strong">${c.full_name || '—'}</div>
+        <div style="font-size:11px;color:var(--ash);margin-top:2px">${joined}</div>
+      </td>
+      <td>
+        <a href="https://www.instagram.com/${c.instagram_handle||''}" target="_blank"
+           style="color:var(--flame);text-decoration:none;font-weight:500">
+          @${c.instagram_handle || '—'} ↗
+        </a>
+      </td>
+      <td style="font-size:13px;color:var(--smoke)">${c.phone || '—'}</td>
+      <td style="font-size:12px;color:var(--smoke)">${c.email || '—'}</td>
+      <td><span class="st-badge ${badge}">${c.status || 'pending'}</span></td>
+      <td>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          ${c.status !== 'approved' ? `<button class="btn-g" onclick="setCreatorStatus('${c.id}','approved')">Approve</button>` : ''}
+          ${c.status !== 'blocked'  ? `<button class="btn-r" onclick="setCreatorStatus('${c.id}','blocked')">Block</button>` : `<button class="btn-outline" style="padding:6px 14px;font-size:10px" onclick="setCreatorStatus('${c.id}','pending')">Unblock</button>`}
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+async function setCreatorStatus(creatorId, status) {
+  const { error } = await sb.from('creators').update({ status }).eq('id', creatorId);
+  if (error) { alert('Error: ' + error.message); return; }
+  await loadCreators();
 }
 
 // ── New Campaign ──────────────────────────────────────────────
@@ -565,6 +746,10 @@ function closeModal() { document.getElementById('campModal').classList.remove('s
 
 document.getElementById('campModal').addEventListener('click', e => {
   if (e.target === document.getElementById('campModal')) closeModal();
+});
+
+document.getElementById('payoutModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('payoutModal')) closePayoutModal();
 });
 
 async function publishCampaign() {
@@ -595,11 +780,7 @@ async function publishCampaign() {
 // ── Init ──────────────────────────────────────────────────────
 async function init() {
   await loadOverview();
-  // Pre-load queue data so badge is ready
   await loadQueue();
-
-  // Wire review nav to also (re)load queue on navigate
-  document.querySelector('#reviewNavLink').addEventListener('click', loadQueue);
 }
 
 init();
