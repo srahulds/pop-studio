@@ -432,7 +432,15 @@ window.fbAsyncInit = function() {
 }(document, 'script', 'facebook-jssdk'));
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase-config.js"></script>
+<script>
+const SUPABASE_URL  = 'https://fxuinuxyjhjxygdhskfn.supabase.co';
+const SUPABASE_ANON = 'sb_publishable_Mgh-fEqB3IVF4iTvV0-rjw_GkfftY_5';
+function getSupabase() {
+  if (window._popClient) return window._popClient;
+  window._popClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+  return window._popClient;
+}
+</script>
 <script>
 const FB_APP_ID   = '773886042126764';
 const sb          = getSupabase();
@@ -464,7 +472,31 @@ async function initAuth() {
   if (session?.user) {
     currentUser = session.user;
     updateNavForUser(session.user);
+
+    // Already logged in — if there's a returnTo, go there immediately
+    const returnTo = localStorage.getItem('pop_return_to');
+    if (returnTo) {
+      localStorage.removeItem('pop_return_to');
+      window.location.href = returnTo;
+      return;
+    }
+  } else {
+    // Not logged in — if we came here from all-campaigns to log in, auto-open the modal
+    const returnTo = localStorage.getItem('pop_return_to');
+    if (returnTo) {
+      // Poll until FB SDK is ready, then auto-open modal
+      const tryOpenModal = () => {
+        if (typeof FB !== 'undefined') {
+          document.getElementById('authOverlay').classList.add('show');
+          showStep('stepEntry');
+        } else {
+          setTimeout(tryOpenModal, 200);
+        }
+      };
+      setTimeout(tryOpenModal, 300);
+    }
   }
+
   sb.auth.onAuthStateChange((_event, session) => {
     currentUser = session?.user || null;
     if (currentUser) updateNavForUser(currentUser);
@@ -576,9 +608,9 @@ async function checkExistingAccount(email, fbUser) {
     }, { onConflict: 'id' });
 
     // Check for returnTo
-    const returnTo = sessionStorage.getItem('pop_return_to');
+    const returnTo = localStorage.getItem('pop_return_to');
     if (returnTo) {
-      sessionStorage.removeItem('pop_return_to');
+      localStorage.removeItem('pop_return_to');
       closeAuthModal();
       window.location.href = returnTo;
     } else {
@@ -766,12 +798,14 @@ async function completeSignup() {
     if (currentUser) updateNavForUser(currentUser);
 
     // Check if we need to return somewhere specific after login
-    const returnTo = sessionStorage.getItem('pop_return_to');
+    const returnTo = localStorage.getItem('pop_return_to');
     if (returnTo) {
-      sessionStorage.removeItem('pop_return_to');
+      localStorage.removeItem('pop_return_to');
+      // Update success button to reflect destination
+      const successBtn = document.querySelector('#stepSuccess .f-submit');
+      if (successBtn) successBtn.textContent = 'Back to Campaigns →';
       showStep('stepSuccess');
-      // Auto-redirect after 1.5s
-      setTimeout(() => window.location.href = returnTo, 1500);
+      setTimeout(() => window.location.href = returnTo, 1200);
     } else {
       showStep('stepSuccess');
     }
@@ -784,9 +818,9 @@ async function completeSignup() {
 }
 
 function goAfterLogin() {
-  const returnTo = sessionStorage.getItem('pop_return_to');
+  const returnTo = localStorage.getItem('pop_return_to');
   if (returnTo) {
-    sessionStorage.removeItem('pop_return_to');
+    localStorage.removeItem('pop_return_to');
     window.location.href = returnTo;
   } else {
     window.location.href = 'dashboard.html';

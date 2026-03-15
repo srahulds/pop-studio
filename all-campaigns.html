@@ -227,21 +227,33 @@ let currentUser  = null;
 let pendingOptIn = null;
 
 async function init() {
-  sb.auth.onAuthStateChange(async (event, session) => {
-    if (session?.user && !currentUser) {
-      currentUser = session.user;
-      updateNavForUser(session.user);
-      await renderAll();
-      await handleReturnFromLogin();
-    }
-  });
+  // Get session first — synchronously before setting up listener
   const { data: { session } } = await sb.auth.getSession();
+
   if (session?.user) {
     currentUser = session.user;
     updateNavForUser(session.user);
   }
+
+  // Render once — with or without user
   await renderAll();
+
+  // Handle return from login (pending opt-in)
   if (currentUser) await handleReturnFromLogin();
+
+  // Listen for future auth changes (sign in / sign out) but don't re-render on INITIAL_SESSION
+  sb.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'SIGNED_IN' && session?.user && !currentUser) {
+      currentUser = session.user;
+      updateNavForUser(session.user);
+      await renderAll();
+      await handleReturnFromLogin();
+    } else if (event === 'SIGNED_OUT') {
+      currentUser = null;
+      document.getElementById('navRight').innerHTML = `<button class="nav-apply" id="navAuthBtn" onclick="handleAuthClick()">You ✕ POP</button>`;
+      await renderAll();
+    }
+  });
 }
 
 function updateNavForUser(user) {
@@ -450,11 +462,10 @@ async function applyToCampaign(campaignId, campaignTitle) {
 }
 
 function goToFBLogin() {
-  // Store pending opt-in and return URL in sessionStorage so homepage can pick it up after login
   if (pendingOptIn) {
-    sessionStorage.setItem('pop_pending_optin', JSON.stringify(pendingOptIn));
+    localStorage.setItem('pop_pending_optin', JSON.stringify(pendingOptIn));
   }
-  sessionStorage.setItem('pop_return_to', 'all-campaigns.html');
+  localStorage.setItem('pop_return_to', 'all-campaigns.html');
   window.location.href = 'pop-studio.html';
 }
 
@@ -476,13 +487,13 @@ document.getElementById('authOverlay').addEventListener('click', e => {
 
 // Handle return from login — check sessionStorage for pending opt-in
 async function handleReturnFromLogin() {
-  const returnTo = sessionStorage.getItem('pop_return_to');
-  const pending  = sessionStorage.getItem('pop_pending_optin');
+  const returnTo = localStorage.getItem('pop_return_to');
+  const pending  = localStorage.getItem('pop_pending_optin');
 
   if (returnTo === 'all-campaigns.html' && currentUser) {
-    sessionStorage.removeItem('pop_return_to');
+    localStorage.removeItem('pop_return_to');
     if (pending) {
-      sessionStorage.removeItem('pop_pending_optin');
+      localStorage.removeItem('pop_pending_optin');
       const campaign = JSON.parse(pending);
       await applyToCampaign(campaign.id, campaign.title);
     }
