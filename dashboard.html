@@ -118,15 +118,32 @@ const sb = getSupabase();
 let currentUser = null;
 
 async function init() {
-  const { data: { user }, error } = await sb.auth.getUser();
-  if (error || !user) {
-    window.location.href = 'pop-studio.html';
-    return;
-  }
-  currentUser = user;
+  // onAuthStateChange fires when OAuth redirect lands and processes the token
+  sb.auth.onAuthStateChange(async (event, session) => {
+    if (session?.user) {
+      currentUser = session.user;
+      await setupUser(session.user);
+    } else if (event === 'SIGNED_OUT' || !session) {
+      window.location.href = 'pop-studio.html';
+    }
+  });
 
+  // Also check immediately for an existing session (non-OAuth logins)
+  const { data: { session } } = await sb.auth.getSession();
+  if (session?.user && !currentUser) {
+    currentUser = session.user;
+    await setupUser(session.user);
+  } else if (!session) {
+    // Give onAuthStateChange 3 seconds to process OAuth token before redirecting
+    setTimeout(() => {
+      if (!currentUser) window.location.href = 'pop-studio.html';
+    }, 3000);
+  }
+}
+
+async function setupUser(user) {
   // Display name + avatar
-  const fullName = user.user_metadata?.full_name || user.email.split('@')[0];
+  const fullName = user.user_metadata?.full_name || user.user_metadata?.name || user.email.split('@')[0];
   document.getElementById('userName').textContent = fullName;
   const initials = fullName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
   document.getElementById('userAvatar').textContent = initials;
@@ -265,7 +282,7 @@ async function submitContent(applicationId, campaignId) {
   });
 
   if (error) {
-    alert(error.code === '23505' ? 'You've already submitted for this campaign.' : 'Error submitting. Please try again.');
+    alert(error.code === '23505' ? "You've already submitted for this campaign." : 'Error submitting. Please try again.');
     btn.disabled = false;
     btn.textContent = 'Submit';
   } else {
