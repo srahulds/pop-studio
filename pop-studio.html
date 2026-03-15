@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>POP Creators — Where Content Meets Commerce</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://connect.facebook.net">
+<link rel="dns-prefetch" href="https://connect.facebook.net">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700&family=Outfit:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -408,16 +409,35 @@ footer{padding:60px 56px 40px;border-top:1px solid rgba(255,255,255,0.04);displa
   </div>
 </div>
 
-<!-- Facebook SDK -->
+<!-- Facebook SDK — loaded early for faster popup response -->
 <div id="fb-root"></div>
-<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
+<script>
+window.fbAsyncInit = function() {
+  FB.init({ appId: '773886042126764', cookie: true, xfbml: false, version: 'v19.0' });
+  // Pre-check login status silently on page load so FB popup is faster
+  FB.getLoginStatus(function(response) {
+    if (response.status === 'connected') {
+      FB.api('/me', { fields: 'id,name,email' }, function(me) {
+        if (me && !me.error) window._fbPreloaded = me;
+      });
+    }
+  });
+};
+(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = 'https://connect.facebook.net/en_US/sdk.js';
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));
+</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
 <script>
 const FB_APP_ID   = '773886042126764';
 const sb          = getSupabase();
 let currentUser   = null;
-let fbUserData    = null;  // { id, name, email }
+let fbUserData    = null;
 
 // ── Scroll & Reveal ──────────────────────────────────────────────
 window.addEventListener('scroll', () => {
@@ -433,17 +453,10 @@ function toggleMobileMenu() {
   document.body.style.overflow = document.getElementById('mobMenu').classList.contains('show') ? 'hidden' : '';
 }
 
-// ── Facebook SDK Init ────────────────────────────────────────────
-window.fbAsyncInit = function() {
-  FB.init({ appId: FB_APP_ID, cookie: true, xfbml: false, version: 'v19.0' });
-
-  // Check if user is already FB-logged in on page load
-  FB.getLoginStatus(response => {
-    if (response.status === 'connected') {
-      FB.api('/me', { fields: 'id,name,email' }, me => { fbUserData = me; });
-    }
-  });
-};
+// Use preloaded FB data if available
+function getPreloadedFBUser() {
+  return window._fbPreloaded || null;
+}
 
 // ── Supabase Auth State ──────────────────────────────────────────
 async function initAuth() {
@@ -507,13 +520,18 @@ function startFacebookAuth() {
     return;
   }
 
+  // If already connected to FB on this browser, skip popup entirely
+  const preloaded = window._fbPreloaded;
+  if (preloaded) {
+    fbUserData = preloaded;
+    checkExistingAccount(preloaded.email || `fb_${preloaded.id}@pop-studio.app`, preloaded);
+    return;
+  }
+
   btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg> Connecting…`;
   btn.disabled = true;
 
-  // FB.login MUST be called synchronously from a click handler
-  // Do NOT await or call async functions before this
   FB.login(function(response) {
-    // Always reset button first
     btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg> Continue with Facebook`;
     btn.disabled = false;
 
@@ -522,15 +540,14 @@ function startFacebookAuth() {
       return;
     }
 
-    // Fetch user details
     FB.api('/me', { fields: 'id,name,email' }, function(me) {
       if (!me || me.error) {
         showMsg('entryMsg', 'Could not fetch your profile. Please try again.');
         return;
       }
       fbUserData = me;
-      const derivedEmail = me.email || `fb_${me.id}@pop-studio.app`;
-      checkExistingAccount(derivedEmail, me);
+      window._fbPreloaded = me; // Cache so next time is instant
+      checkExistingAccount(me.email || `fb_${me.id}@pop-studio.app`, me);
     });
 
   }, { scope: 'public_profile,email' });
