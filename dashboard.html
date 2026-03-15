@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>POP Studio — Dashboard</title>
+<title>POP Creators — Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
 <style>
 :root { --flame: #FF5200; --ember:#FF7A33; --honey:#FFB547; --deep: #0A0A0A; --night: #111111; --slab:#1A1A1A; --smoke: rgba(255,255,255,0.5); --ash:rgba(255,255,255,0.25); --ghost: rgba(255,255,255,0.08); --glow:rgba(255,82,0,0.35); --success:#22C55E; }
@@ -87,7 +87,7 @@ nav.scrolled{padding:12px 48px;background:rgba(10,10,10,0.97)}
 <nav id="mainNav">
   <a href="pop-studio.html" class="nav-brand">
     <img src="pop_bw_logo_new.svg" alt="POP Logo" class="nav-logo">
-    <span class="nav-tag">Studio</span>
+    <span class="nav-tag">Creators</span>
   </a>
   <ul class="nav-mid">
     <li><a href="all-campaigns.html">All Campaigns</a></li>
@@ -143,27 +143,29 @@ const sb = getSupabase();
 let currentUser = null;
 
 async function init() {
-  // onAuthStateChange fires when OAuth redirect lands and processes the token
+  // First check for existing session immediately
+  const { data: { session } } = await sb.auth.getSession();
+
+  if (session?.user) {
+    currentUser = session.user;
+    await setupUser(session.user);
+    return;
+  }
+
+  // No session yet — listen for auth state change (handles page refresh / OAuth return)
   sb.auth.onAuthStateChange(async (event, session) => {
-    if (session?.user) {
+    if (event === 'SIGNED_IN' && session?.user && !currentUser) {
       currentUser = session.user;
       await setupUser(session.user);
-    } else if (event === 'SIGNED_OUT' || !session) {
+    } else if (event === 'SIGNED_OUT') {
       window.location.href = 'pop-studio.html';
     }
   });
 
-  // Also check immediately for an existing session (non-OAuth logins)
-  const { data: { session } } = await sb.auth.getSession();
-  if (session?.user && !currentUser) {
-    currentUser = session.user;
-    await setupUser(session.user);
-  } else if (!session) {
-    // Give onAuthStateChange 3 seconds to process OAuth token before redirecting
-    setTimeout(() => {
-      if (!currentUser) window.location.href = 'pop-studio.html';
-    }, 3000);
-  }
+  // If no session after 4 seconds, redirect to login
+  setTimeout(() => {
+    if (!currentUser) window.location.href = 'pop-studio.html';
+  }, 4000);
 }
 
 async function setupUser(user) {
