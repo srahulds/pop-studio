@@ -507,10 +507,13 @@ function startFacebookAuth() {
     return;
   }
 
-  btn.textContent = 'Connecting…';
+  btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg> Connecting…`;
   btn.disabled = true;
 
-  FB.login(response => {
+  // FB.login MUST be called synchronously from a click handler
+  // Do NOT await or call async functions before this
+  FB.login(function(response) {
+    // Always reset button first
     btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg> Continue with Facebook`;
     btn.disabled = false;
 
@@ -519,49 +522,42 @@ function startFacebookAuth() {
       return;
     }
 
-    // Fetch user details from Facebook
-    FB.api('/me', { fields: 'id,name,email' }, me => {
-      if (me.error) {
-        showMsg('entryMsg', 'Could not fetch your Facebook profile. Please try again.');
+    // Fetch user details
+    FB.api('/me', { fields: 'id,name,email' }, function(me) {
+      if (!me || me.error) {
+        showMsg('entryMsg', 'Could not fetch your profile. Please try again.');
         return;
       }
       fbUserData = me;
-
-      // Check if this FB user already has a POP account
       const derivedEmail = me.email || `fb_${me.id}@pop-studio.app`;
       checkExistingAccount(derivedEmail, me);
     });
-  }, { scope: 'public_profile,email', return_scopes: true });
+
+  }, { scope: 'public_profile,email' });
 }
 
 // Check if returning user — skip straight to dashboard
 async function checkExistingAccount(email, fbUser) {
-  // Try to find existing creator by fb_user_id or email
-  const { data: existing } = await sb
-    .from('creators')
-    .select('id, instagram_handle')
-    .eq('email', email)
-    .maybeSingle();
+  showStep('stepVerifying');
+  document.getElementById('verifyingText').textContent = 'Checking your account…';
 
-  if (existing) {
-    // Returning user — sign them in
-    showStep('stepVerifying');
-    document.getElementById('verifyingText').textContent = 'Welcome back! Signing you in…';
+  // Try signing in with their derived credentials
+  const password = `fb_${fbUser.id}_pop`;
+  const { data: signInData, error: signInErr } = await sb.auth.signInWithPassword({ email, password });
 
-    // Sign in using their stored credentials
-    const password = `fb_${fbUser.id}_pop`;
-    const { data, error } = await sb.auth.signInWithPassword({ email, password });
+  if (!signInErr && signInData?.user) {
+    // Returning user — session established
+    currentUser = signInData.user;
+    updateNavForUser(signInData.user);
 
-    if (error) {
-      // Account exists but password mismatch — show IG step to re-link
-      document.getElementById('fbUserName').textContent = fbUser.name;
-      document.getElementById('igHandleInput').value = existing.instagram_handle || '';
-      showStep('stepIG');
-      return;
-    }
+    // Update creator row with latest FB data
+    await sb.from('creators').upsert({
+      id:         signInData.user.id,
+      full_name:  fbUser.name,
+      email,
+      fb_user_id: fbUser.id,
+    }, { onConflict: 'id' });
 
-    currentUser = data.user;
-    updateNavForUser(data.user);
     closeAuthModal();
     window.location.href = 'dashboard.html';
     return;
@@ -682,38 +678,53 @@ async function completeSignup() {
   btn.disabled = true;
 
   try {
-    const fbId    = fbUserData?.id || 'unknown';
-    const email   = fbUserData?.email || `fb_${fbId}@pop-studio.app`;
+    const fbId     = fbUserData?.id || 'unknown';
+    const email    = fbUserData?.email || `fb_${fbId}@pop-studio.app`;
     const password = `fb_${fbId}_pop`;
 
-    // Sign up
-    let userId;
-    const { data: signUpData, error: signUpErr } = await sb.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name:        fbUserData?.name || fullName,
-          instagram_handle: handle,
-          phone,
-          provider:         'facebook',
-          fb_user_id:       fbId
+    let userId, sessionUser;
+
+    // Try signing in first (returning user)
+    const { data: signInData, error: signInErr } = await sb.auth.signInWithPassword({ email, password });
+
+    if (!signInErr && signInData?.user) {
+      // Returning user — signed in successfully
+      userId      = signInData.user.id;
+      sessionUser = signInData.user;
+    } else {
+      // New user — sign up
+      const { data: signUpData, error: signUpErr } = await sb.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: 'https://srahulds.github.io/pop-studio/dashboard.html',
+          data: {
+            full_name:        fbUserData?.name || fullName,
+            instagram_handle: handle,
+            phone,
+            provider:         'facebook',
+            fb_user_id:       fbId
+          }
+        }
+      });
+
+      if (signUpErr) throw signUpErr;
+
+      userId      = signUpData.user?.id;
+      sessionUser = signUpData.user;
+
+      // If email confirmation is required, session will be null
+      // Sign in immediately after signup to get a live session
+      if (!signUpData.session) {
+        const { data: si2, error: si2Err } = await sb.auth.signInWithPassword({ email, password });
+        if (!si2Err && si2?.user) {
+          userId      = si2.user.id;
+          sessionUser = si2.user;
         }
       }
-    });
-
-    if (signUpErr && signUpErr.message?.includes('already registered')) {
-      // Returning user - sign in
-      const { data: signInData, error: signInErr } = await sb.auth.signInWithPassword({ email, password });
-      if (signInErr) throw new Error('Account exists but login failed. Please contact support.');
-      userId      = signInData.user.id;
-      currentUser = signInData.user;
-    } else if (signUpErr) {
-      throw signUpErr;
-    } else {
-      userId      = signUpData.user.id;
-      currentUser = signUpData.user;
     }
+
+    if (!userId) throw new Error('Could not create your account. Please try again.');
 
     // Upsert creator row
     await sb.from('creators').upsert({
@@ -726,7 +737,10 @@ async function completeSignup() {
       status:           'pending'
     }, { onConflict: 'id' });
 
-    updateNavForUser(currentUser);
+    currentUser = sessionUser;
+    if (currentUser) updateNavForUser(currentUser);
+
+    // Show success then redirect
     showStep('stepSuccess');
 
   } catch (err) {
