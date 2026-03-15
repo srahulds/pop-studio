@@ -7,49 +7,116 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root { --flame: #FF5200; --deep: #0A0A0A; --smoke: rgba(255,255,255,0.5); --ghost: rgba(255,255,255,0.08); }
-        body { background: var(--deep); color: #fff; font-family: 'Outfit', sans-serif; height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; overflow: hidden; }
-        .form-glass { width: 100%; max-width: 400px; padding: 40px; border-radius: 24px; background: rgba(255,255,255,0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); text-align: center; }
-        .nav-brand { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 32px; text-decoration: none; }
-        .nav-logo { height: 32px; width: 32px; border-radius: 8px; background: #fff; object-fit: contain; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: var(--deep); color: #fff; font-family: 'Outfit', sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+        body::after { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E"); pointer-events: none; z-index: 9999; opacity: 0.7; }
+
+        .wrap { width: 100%; max-width: 420px; position: relative; z-index: 10; }
+
+        /* Brand */
+        .brand { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 36px; }
+        .nav-logo { height: 36px; width: 36px; border-radius: 8px; background: #fff; object-fit: contain; }
+        .brand-name { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--flame); font-weight: 700; }
         .nav-tag { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--smoke); font-weight: 600; border: 1px solid rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 100px; }
-        .f-input { width: 100%; padding: 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); color: #fff; margin-bottom: 16px; text-align: center; outline: none; }
-        .f-submit { width: 100%; padding: 16px; border-radius: 100px; border: none; background: var(--flame); color: #fff; font-weight: 600; cursor: pointer; text-transform: uppercase; }
-        .links { display: none; flex-direction: column; gap: 12px; margin-top: 24px; text-align: left; }
+
+        /* Gate form */
+        .gate-box { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); border-radius: 24px; padding: 36px 32px; }
+        .gate-title { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 400; margin-bottom: 6px; text-align: center; }
+        .gate-title i { font-style: italic; color: var(--flame); }
+        .gate-sub { font-size: 13px; color: var(--smoke); text-align: center; margin-bottom: 28px; font-weight: 300; }
+        .f-input { width: 100%; padding: 14px 18px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); background: rgba(0,0,0,0.3); color: #fff; font-family: 'Outfit', sans-serif; font-size: 15px; text-align: center; outline: none; letter-spacing: 0.1em; transition: border-color 0.2s; margin-bottom: 14px; }
+        .f-input:focus { border-color: var(--flame); }
+        .f-input::placeholder { color: rgba(255,255,255,0.2); letter-spacing: 0.05em; }
+        .f-submit { width: 100%; padding: 14px; border-radius: 100px; border: none; background: var(--flame); color: #fff; font-weight: 600; cursor: pointer; text-transform: uppercase; font-family: 'Outfit', sans-serif; font-size: 12px; letter-spacing: 0.08em; transition: all 0.2s; }
+        .f-submit:hover { box-shadow: 0 0 24px rgba(255,82,0,0.4); transform: translateY(-1px); }
+        .error { color: #f87171; font-size: 13px; margin-top: 10px; text-align: center; display: none; }
+
+        /* Links */
+        .links { display: none; flex-direction: column; gap: 10px; }
         .links.show { display: flex; }
-        .link-card { padding: 16px; background: rgba(255,255,255,0.05); border-radius: 12px; text-decoration: none; color: #fff; border: 1px solid transparent; transition: 0.2s; display: flex; justify-content: space-between; align-items: center; }
-        .link-card:hover { border-color: var(--flame); background: rgba(255,82,0,0.05); }
-        .error { color: #ff4444; font-size: 13px; margin-top: 10px; display: none; }
+        .section-label { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.25); font-weight: 600; margin: 20px 0 10px; padding-left: 4px; }
+        .section-label:first-child { margin-top: 0; }
+        .link-card { padding: 16px 20px; background: rgba(255,255,255,0.03); border-radius: 14px; text-decoration: none; color: #fff; border: 1px solid rgba(255,255,255,0.06); transition: all 0.2s; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+        .link-card:hover { border-color: rgba(255,82,0,0.4); background: rgba(255,82,0,0.04); transform: translateX(3px); }
+        .link-card-left { display: flex; flex-direction: column; gap: 3px; }
+        .link-title { font-size: 14px; font-weight: 500; }
+        .link-desc { font-size: 11px; color: var(--smoke); font-weight: 300; }
+        .link-arrow { color: var(--flame); font-size: 16px; flex-shrink: 0; }
+
+        .divider { height: 1px; background: rgba(255,255,255,0.05); margin: 8px 0; }
     </style>
 </head>
 <body>
-        <nav style="position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:14px 0;background:rgba(10,10,10,0.92);backdrop-filter:blur(40px);border-bottom:1px solid rgba(255,255,255,0.04);">
-            <a href="index.html" style="color:#FF5200;text-decoration:none;margin:0 18px;font-weight:600;">Home</a>
-            <a href="dashboard.html" style="color:#fff;text-decoration:none;margin:0 18px;font-weight:600;">Dashboard</a>
-            <a href="all-campaigns.html" style="color:#fff;text-decoration:none;margin:0 18px;font-weight:600;">All Campaigns</a>
-            <a href="admin-login.html" style="color:#fff;text-decoration:none;margin:0 18px;font-weight:600;">Admin Login</a>
-            <a href="admin.html" style="color:#fff;text-decoration:none;margin:0 18px;font-weight:600;">Admin Control</a>
-            <a href="pop-studio.html" style="color:#fff;text-decoration:none;margin:0 18px;font-weight:600;">POP Studio</a>
-        </nav>
-        <div style="height:56px;"></div>
-        <div class="form-glass">
-        <div class="nav-brand">
+    <div class="wrap">
+        <div class="brand">
             <img src="pop_bw_logo_new.svg" alt="POP Logo" class="nav-logo">
-            <span class="nav-tag">Creators</span>
+            <span class="brand-name">POP</span>
+            <span class="nav-tag">Internal</span>
         </div>
-        <div id="gateForm">
-            <input type="password" class="f-input" id="gatePassword" placeholder="Enter Access Code">
-            <button class="f-submit" onclick="checkAccess()">Unlock Access</button>
-            <div class="error" id="gateError">Incorrect code.</div>
+
+        <!-- Gate -->
+        <div class="gate-box" id="gateForm">
+            <h2 class="gate-title">Enter <i>Access.</i></h2>
+            <p class="gate-sub">Internal testing portal. Authorised users only.</p>
+            <input type="password" class="f-input" id="gatePassword" placeholder="Access code"
+                   onkeydown="if(event.key==='Enter') checkAccess()">
+            <button class="f-submit" onclick="checkAccess()">Unlock</button>
+            <div class="error" id="gateError">Incorrect code. Try again.</div>
         </div>
+
+        <!-- Links shown after unlock -->
         <div class="links" id="gateLinks">
-            <a href="pop-studio.html" class="link-card">Public Landing <span>→</span></a>
-            <a href="dashboard.html" class="link-card">Creator Dashboard <span>→</span></a>
-            <a href="admin-login.html" class="link-card">Admin Gateway <span>→</span></a>
+
+            <div class="section-label">Creator Portal</div>
+
+            <a href="pop-studio.html" class="link-card">
+                <div class="link-card-left">
+                    <div class="link-title">Homepage</div>
+                    <div class="link-desc">Landing page + Facebook login + campaign preview</div>
+                </div>
+                <span class="link-arrow">→</span>
+            </a>
+
+            <a href="all-campaigns.html" class="link-card">
+                <div class="link-card-left">
+                    <div class="link-title">All Campaigns</div>
+                    <div class="link-desc">Browse and opt into active campaigns</div>
+                </div>
+                <span class="link-arrow">→</span>
+            </a>
+
+            <a href="dashboard.html" class="link-card">
+                <div class="link-card-left">
+                    <div class="link-title">Creator Dashboard</div>
+                    <div class="link-desc">Stats, campaign history, submission status</div>
+                </div>
+                <span class="link-arrow">→</span>
+            </a>
+
+            <div class="section-label">Admin Portal</div>
+
+            <a href="admin-login.html" class="link-card">
+                <div class="link-card-left">
+                    <div class="link-title">Admin Login</div>
+                    <div class="link-desc">Google OAuth — @popclub.co accounts only</div>
+                </div>
+                <span class="link-arrow">→</span>
+            </a>
+
+            <a href="admin.html" class="link-card">
+                <div class="link-card-left">
+                    <div class="link-title">Admin Control Panel</div>
+                    <div class="link-desc">Overview, creators, content queue, campaigns</div>
+                </div>
+                <span class="link-arrow">→</span>
+            </a>
+
         </div>
     </div>
 
     <script>
         const ACCESS_CODE = 'popstudio2026';
+
         function checkAccess() {
             const val = document.getElementById('gatePassword').value;
             if (val === ACCESS_CODE) {
@@ -60,6 +127,8 @@
                 document.getElementById('gateError').style.display = 'block';
             }
         }
+
+        // Auto-unlock if already granted
         if (localStorage.getItem('pop_access') === 'granted') {
             document.getElementById('gateForm').style.display = 'none';
             document.getElementById('gateLinks').classList.add('show');
