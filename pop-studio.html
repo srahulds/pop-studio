@@ -402,7 +402,7 @@ footer{padding:60px 56px 40px;border-top:1px solid rgba(255,255,255,0.04);displa
       <div style="font-size:56px;margin-bottom:20px">🎉</div>
       <h2 class="auth-title">You're <i>in.</i></h2>
       <p class="auth-sub" style="margin-bottom:28px">Welcome to POP Studio. Your application is under review — we'll be in touch within 48 hours.</p>
-      <button class="f-submit" onclick="window.location.href='dashboard.html'">Go to Dashboard →</button>
+      <button class="f-submit" onclick="goAfterLogin()">Go to Dashboard →</button>
     </div>
 
   </div>
@@ -558,8 +558,16 @@ async function checkExistingAccount(email, fbUser) {
       fb_user_id: fbUser.id,
     }, { onConflict: 'id' });
 
-    closeAuthModal();
-    window.location.href = 'dashboard.html';
+    // Check for returnTo
+    const returnTo = sessionStorage.getItem('pop_return_to');
+    if (returnTo) {
+      sessionStorage.removeItem('pop_return_to');
+      closeAuthModal();
+      window.location.href = returnTo;
+    } else {
+      closeAuthModal();
+      window.location.href = 'dashboard.html';
+    }
     return;
   }
 
@@ -740,13 +748,31 @@ async function completeSignup() {
     currentUser = sessionUser;
     if (currentUser) updateNavForUser(currentUser);
 
-    // Show success then redirect
-    showStep('stepSuccess');
+    // Check if we need to return somewhere specific after login
+    const returnTo = sessionStorage.getItem('pop_return_to');
+    if (returnTo) {
+      sessionStorage.removeItem('pop_return_to');
+      showStep('stepSuccess');
+      // Auto-redirect after 1.5s
+      setTimeout(() => window.location.href = returnTo, 1500);
+    } else {
+      showStep('stepSuccess');
+    }
 
   } catch (err) {
     btn.textContent = 'Join POP Studio →';
     btn.disabled    = false;
     showMsg('phoneMsg', err.message || 'Something went wrong. Please try again.');
+  }
+}
+
+function goAfterLogin() {
+  const returnTo = sessionStorage.getItem('pop_return_to');
+  if (returnTo) {
+    sessionStorage.removeItem('pop_return_to');
+    window.location.href = returnTo;
+  } else {
+    window.location.href = 'dashboard.html';
   }
 }
 

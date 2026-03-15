@@ -211,11 +211,11 @@ footer{padding:60px 56px 40px;border-top:1px solid rgba(255,255,255,0.04);displa
     <h2 class="auth-title">Join <i>POP.</i></h2>
     <p class="auth-sub">Connect with Facebook to opt into campaigns and track your performance.</p>
     <div class="msg-box" id="authMsg"></div>
-    <a href="pop-studio.html" class="btn-fb" style="display:flex;align-items:center;justify-content:center;gap:12px;text-decoration:none;margin-bottom:20px">
+    <button class="btn-fb" id="authFbBtn" onclick="goToFBLogin()">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
       Continue with Facebook
-    </a>
-    <div style="text-align:center;font-size:12px;color:var(--ash)">Already joined? <a href="pop-studio.html" style="color:var(--flame);text-decoration:none">Log in on the homepage →</a></div>
+    </button>
+    <div style="text-align:center;font-size:12px;color:var(--ash)">Already joined? <a onclick="goToFBLogin()" style="color:var(--flame);text-decoration:none;cursor:pointer">Log in →</a></div>
   </div>
 </div>
 
@@ -232,6 +232,7 @@ async function init() {
       currentUser = session.user;
       updateNavForUser(session.user);
       await renderAll();
+      await handleReturnFromLogin();
     }
   });
   const { data: { session } } = await sb.auth.getSession();
@@ -240,6 +241,7 @@ async function init() {
     updateNavForUser(session.user);
   }
   await renderAll();
+  if (currentUser) await handleReturnFromLogin();
 }
 
 function updateNavForUser(user) {
@@ -447,8 +449,18 @@ async function applyToCampaign(campaignId, campaignTitle) {
   }
 }
 
+function goToFBLogin() {
+  // Store pending opt-in and return URL in sessionStorage so homepage can pick it up after login
+  if (pendingOptIn) {
+    sessionStorage.setItem('pop_pending_optin', JSON.stringify(pendingOptIn));
+  }
+  sessionStorage.setItem('pop_return_to', 'all-campaigns.html');
+  window.location.href = 'pop-studio.html';
+}
+
 function closeAuth() {
   document.getElementById('authOverlay').classList.remove('show');
+  pendingOptIn = null;
 }
 
 async function logout() {
@@ -461,6 +473,21 @@ async function logout() {
 document.getElementById('authOverlay').addEventListener('click', e => {
   if (e.target === document.getElementById('authOverlay')) closeAuth();
 });
+
+// Handle return from login — check sessionStorage for pending opt-in
+async function handleReturnFromLogin() {
+  const returnTo = sessionStorage.getItem('pop_return_to');
+  const pending  = sessionStorage.getItem('pop_pending_optin');
+
+  if (returnTo === 'all-campaigns.html' && currentUser) {
+    sessionStorage.removeItem('pop_return_to');
+    if (pending) {
+      sessionStorage.removeItem('pop_pending_optin');
+      const campaign = JSON.parse(pending);
+      await applyToCampaign(campaign.id, campaign.title);
+    }
+  }
+}
 
 init();
 </script>

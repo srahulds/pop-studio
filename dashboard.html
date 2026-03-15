@@ -169,13 +169,10 @@ async function init() {
 }
 
 async function setupUser(user) {
-  // Display name + avatar
   const fullName = user.user_metadata?.full_name || user.user_metadata?.name || user.email.split('@')[0];
-  document.getElementById('userName').textContent = fullName;
   const initials = fullName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-  document.getElementById('userAvatar').textContent = initials;
 
-  // Populate nav right with user pill
+  // Populate nav right
   document.getElementById('navRight').innerHTML = `
     <div style="display:flex;align-items:center;gap:10px">
       <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--flame),var(--honey));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0">${initials}</div>
@@ -183,16 +180,21 @@ async function setupUser(user) {
       <button onclick="logout()" style="background:none;border:1px solid rgba(255,255,255,0.1);color:var(--smoke);padding:6px 14px;border-radius:100px;cursor:pointer;font-size:10px;text-transform:uppercase;letter-spacing:0.08em;font-family:'Outfit',sans-serif;transition:0.2s;white-space:nowrap" onmouseover="this.style.borderColor='var(--flame)';this.style.color='var(--flame)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.color='var(--smoke)'">Log out</button>
     </div>`;
 
-  // Sync creator row
-  await sb.from('creators').upsert({
-    id: user.id,
-    full_name: fullName,
-    email: user.email,
-    instagram_handle: user.user_metadata?.instagram_handle || null,
-    phone: user.user_metadata?.phone || null,
-    location: user.user_metadata?.location || null,
-  }, { onConflict: 'id' });
+  // Sync creator row — only fields we know exist
+  try {
+    await sb.from('creators').upsert({
+      id:               user.id,
+      full_name:        fullName,
+      email:            user.email,
+      instagram_handle: user.user_metadata?.instagram_handle || null,
+      phone:            user.user_metadata?.phone || null,
+    }, { onConflict: 'id' });
+  } catch(e) {
+    console.warn('Creator upsert failed:', e.message);
+    // Non-fatal — continue loading dashboard
+  }
 
+  // Load data in parallel
   await Promise.all([loadStats(), loadCampaigns()]);
 }
 
@@ -230,7 +232,6 @@ async function loadStats() {
 }
 
 async function loadCampaigns() {
-  // Get all applications for this creator with campaign details
   const { data: apps, error } = await sb
     .from('applications')
     .select(`
@@ -243,7 +244,13 @@ async function loadCampaigns() {
 
   const list = document.getElementById('campaignsList');
 
-  if (error || !apps?.length) {
+  if (error) {
+    console.error('loadCampaigns error:', error);
+    list.innerHTML = `<div class="empty-state"><p style="margin-bottom:12px">Could not load campaigns. Please refresh.</p></div>`;
+    return;
+  }
+
+  if (!apps?.length) {
     list.innerHTML = `
       <div class="empty-state">
         <p style="margin-bottom:12px">You haven't joined any campaigns yet.</p>
