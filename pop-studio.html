@@ -433,19 +433,16 @@ window.fbAsyncInit = function() {
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const SUPABASE_URL  = 'https://fxuinuxyjhjxygdhskfn.supabase.co';
-const SUPABASE_ANON = 'sb_publishable_Mgh-fEqB3IVF4iTvV0-rjw_GkfftY_5';
-function getSupabase() {
-  if (window._popClient) return window._popClient;
-  window._popClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-  return window._popClient;
-}
+const FB_APP_ID = '773886042126764';
+const sb = window.supabase.createClient(
+  'https://fxuinuxyjhjxygdhskfn.supabase.co',
+  'sb_publishable_Mgh-fEqB3IVF4iTvV0-rjw_GkfftY_5',
+  { auth: { storageKey: 'pop-studio-auth', autoRefreshToken: true, persistSession: true } }
+);
+let currentUser = null;
+let fbUserData  = null;
 </script>
 <script>
-const FB_APP_ID   = '773886042126764';
-const sb          = getSupabase();
-let currentUser   = null;
-let fbUserData    = null;
 
 // ── Scroll & Reveal ──────────────────────────────────────────────
 window.addEventListener('scroll', () => {

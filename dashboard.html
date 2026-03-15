@@ -138,48 +138,30 @@ nav.scrolled{padding:12px 48px;background:rgba(10,10,10,0.97)}
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const SUPABASE_URL  = 'https://fxuinuxyjhjxygdhskfn.supabase.co';
-const SUPABASE_ANON = 'sb_publishable_Mgh-fEqB3IVF4iTvV0-rjw_GkfftY_5';
-function getSupabase() {
-  if (window._popClient) return window._popClient;
-  window._popClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-  return window._popClient;
-}
-</script>
-<script>
-const sb = getSupabase();
+// Single Supabase client — creator portal uses 'pop-studio-auth' storage key
+const sb = window.supabase.createClient(
+  'https://fxuinuxyjhjxygdhskfn.supabase.co',
+  'sb_publishable_Mgh-fEqB3IVF4iTvV0-rjw_GkfftY_5',
+  { auth: { storageKey: 'pop-studio-auth', autoRefreshToken: true, persistSession: true } }
+);
 let currentUser = null;
 
 async function init() {
-  // Listen for ALL auth state changes first — before getSession
-  sb.auth.onAuthStateChange(async (event, session) => {
-    if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session?.user && !currentUser) {
-      currentUser = session.user;
-      await setupUser(session.user);
-    } else if (event === 'SIGNED_OUT') {
-      window.location.href = 'pop-studio.html';
-    }
-  });
-
-  // Also check session immediately for fast load
   const { data: { session } } = await sb.auth.getSession();
-  if (session?.user && !currentUser) {
-    currentUser = session.user;
-    await setupUser(session.user);
+
+  if (!session?.user) {
+    window.location.href = 'pop-studio.html';
     return;
   }
 
-  // If still no session after 6 seconds, redirect
-  setTimeout(() => {
-    if (!currentUser) window.location.href = 'pop-studio.html';
-  }, 6000);
+  currentUser = session.user;
+  await setupUser(session.user);
 }
 
 async function setupUser(user) {
   const fullName = user.user_metadata?.full_name || user.user_metadata?.name || user.email.split('@')[0];
   const initials = fullName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
 
-  // Populate nav right
   document.getElementById('navRight').innerHTML = `
     <div style="display:flex;align-items:center;gap:10px">
       <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--flame),var(--honey));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0">${initials}</div>
@@ -187,21 +169,18 @@ async function setupUser(user) {
       <button onclick="logout()" style="background:none;border:1px solid rgba(255,255,255,0.1);color:var(--smoke);padding:6px 14px;border-radius:100px;cursor:pointer;font-size:10px;text-transform:uppercase;letter-spacing:0.08em;font-family:'Outfit',sans-serif;transition:0.2s;white-space:nowrap" onmouseover="this.style.borderColor='var(--flame)';this.style.color='var(--flame)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.color='var(--smoke)'">Log out</button>
     </div>`;
 
-  // Sync creator row — only fields we know exist
-  try {
-    await sb.from('creators').upsert({
-      id:               user.id,
-      full_name:        fullName,
-      email:            user.email,
-      instagram_handle: user.user_metadata?.instagram_handle || null,
-      phone:            user.user_metadata?.phone || null,
-    }, { onConflict: 'id' });
-  } catch(e) {
-    console.warn('Creator upsert failed:', e.message);
-    // Non-fatal — continue loading dashboard
-  }
+  // Upsert creator row — non-fatal
+  sb.from('creators').upsert({
+    id: user.id,
+    full_name: fullName,
+    email: user.email,
+    instagram_handle: user.user_metadata?.instagram_handle || null,
+    phone: user.user_metadata?.phone || null,
+  }, { onConflict: 'id' }).then(({ error }) => {
+    if (error) console.warn('Creator upsert:', error.message);
+  });
 
-  // Load data in parallel
+  // Load data
   await Promise.all([loadStats(), loadCampaigns()]);
 }
 

@@ -220,37 +220,24 @@ footer{padding:60px 56px 40px;border-top:1px solid rgba(255,255,255,0.04);displa
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase-config.js"></script>
 <script>
-const sb = getSupabase();
+// Single client — same storage key as pop-studio.html and dashboard.html
+const sb = window.supabase.createClient(
+  'https://fxuinuxyjhjxygdhskfn.supabase.co',
+  'sb_publishable_Mgh-fEqB3IVF4iTvV0-rjw_GkfftY_5',
+  { auth: { storageKey: 'pop-studio-auth', autoRefreshToken: true, persistSession: true } }
+);
 let currentUser  = null;
 let pendingOptIn = null;
 
 async function init() {
-  // Set currentUser BEFORE rendering so cards are built correctly
   const { data: { session } } = await sb.auth.getSession();
   if (session?.user) {
     currentUser = session.user;
     updateNavForUser(session.user);
   }
-
-  // Now render with correct user state
   await renderAll();
   if (currentUser) await handleReturnFromLogin();
-
-  // Listen for future sign in/out only
-  sb.auth.onAuthStateChange(async (event, session) => {
-    if (event === 'SIGNED_IN' && session?.user && !currentUser) {
-      currentUser = session.user;
-      updateNavForUser(session.user);
-      await renderAll();
-      await handleReturnFromLogin();
-    } else if (event === 'SIGNED_OUT') {
-      currentUser = null;
-      document.getElementById('navRight').innerHTML = `<button class="nav-apply" id="navAuthBtn" onclick="handleAuthClick()">You ✕ POP</button>`;
-      await renderAll();
-    }
-  });
 }
 
 function updateNavForUser(user) {
