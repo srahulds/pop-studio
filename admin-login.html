@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>POP Studio — Admin Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root { --flame: #FF5200; --deep: #0A0A0A; --slab: #1A1A1A; --smoke: rgba(255,255,255,0.5); --ash: rgba(255,255,255,0.25); --glow: rgba(255,82,0,0.35); }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--deep);color:#fff;font-family:'Outfit',sans-serif;height:100vh;display:flex;align-items:center;justify-content:center;}
+body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:0.7}
+.login-box{background:var(--slab);border:1px solid rgba(255,255,255,0.08);padding:48px 40px;border-radius:24px;width:100%;max-width:400px;position:relative;z-index:10;box-shadow:0 24px 64px rgba(0,0,0,0.4)}
+.brand{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:32px;}
+.nav-logo{height:40px;width:40px;border-radius:8px;object-fit:cover;}
+.f-group{margin-bottom:16px;display:flex;flex-direction:column;gap:6px}
+.f-label{font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--ash);font-weight:600}
+.f-input{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);color:#fff;padding:14px 18px;font-family:'Outfit',sans-serif;font-size:14px;border-radius:12px;outline:none;transition:0.2s;}
+.f-input:focus{border-color:var(--flame);background:rgba(255,82,0,0.03)}
+.btn-flame{background:var(--flame);color:#fff;width:100%;padding:16px;font-weight:600;font-size:14px;letter-spacing:0.06em;text-transform:uppercase;border:none;cursor:pointer;border-radius:100px;font-family:'Outfit',sans-serif;margin-top:16px;transition:0.3s;}
+.btn-flame:hover{box-shadow:0 0 32px var(--glow);transform:translateY(-2px)}
+</style>
+</head>
+<body>
+  <nav style="position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:14px 0;background:rgba(10,10,10,0.92);backdrop-filter:blur(40px);border-bottom:1px solid rgba(255,255,255,0.04);">
+    <a href="index.html" style="color:#fff;text-decoration:none;margin:0 18px;font-weight:600;">Home</a>
+    <a href="dashboard.html" style="color:#fff;text-decoration:none;margin:0 18px;font-weight:600;">Dashboard</a>
+    <a href="all-campaigns.html" style="color:#fff;text-decoration:none;margin:0 18px;font-weight:600;">All Campaigns</a>
+    <a href="admin-login.html" style="color:#FF5200;text-decoration:none;margin:0 18px;font-weight:600;">Admin Login</a>
+    <a href="admin.html" style="color:#fff;text-decoration:none;margin:0 18px;font-weight:600;">Admin Control</a>
+    <a href="pop-studio.html" style="color:#fff;text-decoration:none;margin:0 18px;font-weight:600;">POP Studio</a>
+  </nav>
+  <div style="height:56px;"></div>
+  <div class="login-box">
+    <div class="brand">
+      <img src="pop_bw_logo_new.svg" alt="POP Logo" class="nav-logo">
+      <span style="font-family:'Playfair Display',serif;font-size:32px;font-weight:700;color:var(--flame);">Studio</span>
+    </div>
+    <div style="text-align:center;color:var(--smoke);font-size:13px;margin-bottom:32px;text-transform:uppercase;letter-spacing:0.1em">Admin Gateway</div>
+    
+    <div class="f-group">
+      <label class="f-label">Admin Email</label>
+      <input type="email" class="f-input" placeholder="admin@pop.in" id="adminEmail">
+    </div>
+    <div class="f-group">
+      <label class="f-label">Password</label>
+      <input type="password" class="f-input" placeholder="••••••••" id="adminPass">
+    </div>
+    <button class="btn-flame" onclick="adminLogin()">Authenticate</button>
+  </div>
+
+  <script>
+    function adminLogin() {
+      // Dummy logic for now. Will connect to Supabase admin table later.
+      const email = document.getElementById('adminEmail').value;
+      if(email.includes('@pop')) {
+        window.location.href = 'admin.html';
+      } else {
+        alert('Unauthorized email domain.');
+      }
+    }
+  </script>
+</body>
+</html>
