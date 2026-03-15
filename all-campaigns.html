@@ -227,21 +227,18 @@ let currentUser  = null;
 let pendingOptIn = null;
 
 async function init() {
-  // Get session first — synchronously before setting up listener
+  // Set currentUser BEFORE rendering so cards are built correctly
   const { data: { session } } = await sb.auth.getSession();
-
   if (session?.user) {
     currentUser = session.user;
     updateNavForUser(session.user);
   }
 
-  // Render once — with or without user
+  // Now render with correct user state
   await renderAll();
-
-  // Handle return from login (pending opt-in)
   if (currentUser) await handleReturnFromLogin();
 
-  // Listen for future auth changes (sign in / sign out) but don't re-render on INITIAL_SESSION
+  // Listen for future sign in/out only
   sb.auth.onAuthStateChange(async (event, session) => {
     if (event === 'SIGNED_IN' && session?.user && !currentUser) {
       currentUser = session.user;
@@ -353,7 +350,7 @@ function buildAvailableCard(c) {
       <p>${c.description || ''}</p>
       <div class="c-participants">${count} Creators Joined</div>
       <button class="c-action-btn" onclick="handleOptIn('${c.id}','${c.title.replace(/'/g,"\\'")}')">
-        ${currentUser ? 'Opt In →' : 'Log in to Opt In →'}
+        Opt In →
       </button>
     </div>`;
 }
