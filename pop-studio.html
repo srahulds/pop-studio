@@ -20,8 +20,7 @@ body{background:var(--deep);color:#fff;font-family:'Outfit',sans-serif;overflow-
 body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:0.7}
 ::selection{background:var(--flame);color:#fff}
 
-/* NAV */
-nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:18px 56px;background:rgba(10,10,10,0.8);backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px);border-bottom:1px solid rgba(255,255,255,0.04);transition:all 0.3s}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:18px 56px;background:rgba(10,10,10,0.8);backdrop-filter:blur(40px);border-bottom:1px solid rgba(255,255,255,0.04);transition:all 0.3s}
 nav.scrolled{padding:12px 56px;background:rgba(10,10,10,0.95)}
 .nav-brand{display:flex;align-items:center;gap:12px;text-decoration:none;}
 .nav-logo{height:32px;width:32px;border-radius:8px;object-fit:cover;box-shadow:0 4px 12px rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1);background:#fff}
@@ -34,7 +33,6 @@ nav.scrolled{padding:12px 56px;background:rgba(10,10,10,0.95)}
 .nav-apply:hover{box-shadow:0 0 32px var(--glow);transform:translateY(-1px)}
 .hamburger{display:none;background:transparent;border:none;color:#fff;font-size:24px;cursor:pointer;}
 
-/* MOB MENU */
 .mob-menu-overlay{position:fixed;inset:0;background:rgba(10,10,10,0.98);backdrop-filter:blur(20px);z-index:999;display:flex;flex-direction:column;justify-content:center;align-items:center;opacity:0;pointer-events:none;transition:opacity 0.3s ease;}
 .mob-menu-overlay.show{opacity:1;pointer-events:auto;}
 .mob-menu-close{position:absolute;top:24px;right:24px;background:rgba(255,255,255,0.05);border:none;width:40px;height:40px;border-radius:50%;color:#fff;font-size:18px;cursor:pointer;}
@@ -42,9 +40,8 @@ nav.scrolled{padding:12px 56px;background:rgba(10,10,10,0.95)}
 .mob-menu-links a{font-family:'Playfair Display',serif;font-size:32px;color:#fff;text-decoration:none;transition:0.2s;}
 .mob-menu-links a:hover{color:var(--flame);}
 
-/* HERO */
 .hero{min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;padding:0 56px 80px;position:relative;overflow:hidden}
-.hero-gradient{position:absolute;inset:0;z-index:0;background:radial-gradient(ellipse 80% 60% at 70% 20%,rgba(255,82,0,0.12) 0%,transparent 60%),radial-gradient(ellipse 50% 50% at 20% 80%,rgba(255,122,51,0.06) 0%,transparent 50%),radial-gradient(ellipse 40% 40% at 90% 70%,rgba(255,181,71,0.04) 0%,transparent 50%)}
+.hero-gradient{position:absolute;inset:0;z-index:0;background:radial-gradient(ellipse 80% 60% at 70% 20%,rgba(255,82,0,0.12) 0%,transparent 60%),radial-gradient(ellipse 50% 50% at 20% 80%,rgba(255,122,51,0.06) 0%,transparent 50%)}
 .hero-grid-overlay{position:absolute;inset:0;z-index:0;background-image:linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.02) 1px,transparent 1px);background-size:80px 80px}
 .hero-content{position:relative;z-index:2;max-width:900px}
 .hero-eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:var(--ember);font-weight:500;margin-bottom:32px;opacity:0;animation:slideUp 0.8s 0.2s both}
@@ -54,99 +51,18 @@ nav.scrolled{padding:12px 56px;background:rgba(10,10,10,0.95)}
 .hero-desc{font-size:17px;color:var(--smoke);line-height:1.75;max-width:500px;margin-top:32px;font-weight:300;opacity:0;animation:slideUp 0.9s 0.5s both}
 .hero-desc strong{color:#fff;font-weight:500}
 .hero-actions{display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin-top:48px;opacity:0;animation:slideUp 0.9s 0.65s both}
-/* Unified Button Styles */
-.btn-flame, .btn-outline, .f-submit, .c-action-btn, .btn-ig {
-  min-height: 48px;
-  font-size: 15px;
-  border-radius: 100px;
-  padding: 16px 32px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  transition: all 0.3s;
-  outline: none;
-  box-sizing: border-box;
-}
-.btn-flame {
-  background: var(--flame);
-  color: #fff;
-  border: none;
-  text-transform: uppercase;
-  text-decoration: none;
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  gap: 12px;
-}
-.btn-flame:hover {
-  box-shadow: 0 0 48px var(--glow),0 16px 48px rgba(0,0,0,0.4);
-  transform: translateY(-2px);
-}
-.btn-outline {
-  background: transparent;
-  color: var(--smoke);
-  border: 1.5px solid rgba(255,255,255,0.12);
-  text-transform: uppercase;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-/* Make Google button full width in auth modal only */
-.auth-box .btn-outline {
-  width: 100%;
-}
-}
-.btn-outline:hover {
-  border-color: var(--flame);
-  color: var(--flame);
-  background: rgba(255,82,0,0.05);
-}
-.f-submit {
-  background: var(--flame);
-  color: #fff;
-  width: 100%;
-  border: none;
-  text-transform: uppercase;
-  margin-top: 8px;
-}
-.f-submit:hover {
-  box-shadow: 0 0 32px var(--glow);
-  transform: translateY(-2px);
-}
-.c-action-btn {
-  background: rgba(255,255,255,0.03);
-  border: 1.5px solid rgba(255,255,255,0.08);
-  color: #fff;
-  width: 100%;
-  text-transform: uppercase;
-}
-.c-action-btn:hover {
-  background: var(--flame);
-  border-color: var(--flame);
-  box-shadow: 0 0 20px var(--glow);
-}
-.btn-ig {
-  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-  color: #fff;
-  width: 100%;
-  margin-top: 24px;
-}
-.btn-ig:hover {
-  box-shadow: 0 0 24px rgba(220,39,67,0.4);
-  transform: translateY(-2px);
-}
+.btn-flame{background:var(--flame);color:#fff;padding:16px 32px;font-weight:600;font-size:15px;letter-spacing:0.06em;border:none;cursor:pointer;text-transform:uppercase;text-decoration:none;border-radius:100px;transition:all 0.3s;display:inline-flex;align-items:center;gap:12px;white-space:nowrap;}
+.btn-flame:hover{box-shadow:0 0 48px var(--glow),0 16px 48px rgba(0,0,0,0.4);transform:translateY(-2px)}
+.btn-outline{background:transparent;color:var(--smoke);font-size:12px;font-weight:600;letter-spacing:0.06em;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;border:1px solid rgba(255,255,255,0.12);padding:12px 24px;border-radius:100px;transition:all 0.25s;justify-content:center;cursor:pointer;}
+.btn-outline:hover{border-color:var(--flame);color:var(--flame);background:rgba(255,82,0,0.05)}
 @keyframes slideUp{from{opacity:0;transform:translateY(36px)}to{opacity:1;transform:translateY(0)}}
 
-/* MARQUEE */
 .marquee{padding:20px 0;overflow:hidden;white-space:nowrap;border-top:1px solid rgba(255,255,255,0.04);border-bottom:1px solid rgba(255,255,255,0.04);background:rgba(255,82,0,0.03)}
 .marquee-track{display:inline-flex;animation:scroll 30s linear infinite}
 .marquee-item{display:inline-flex;align-items:center;gap:24px;padding:0 40px;font-family:'Playfair Display',serif;font-size:16px;font-weight:400;font-style:italic;color:var(--smoke);letter-spacing:0.02em}
 .marquee-dot{width:4px;height:4px;background:var(--flame);border-radius:50%;flex-shrink:0}
 @keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
-/* SECTIONS */
 .reveal{opacity:0;transform:translateY(32px);transition:all 0.7s cubic-bezier(0.23,1,0.32,1)}.reveal.vis{opacity:1;transform:translateY(0)}
 .s-label{font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:var(--ember);font-weight:600;margin-bottom:20px;display:flex;align-items:center;gap:12px}
 .s-label::before{content:'';width:20px;height:1px;background:var(--ember)}
@@ -154,24 +70,17 @@ nav.scrolled{padding:12px 56px;background:rgba(10,10,10,0.95)}
 .s-title i{font-style:italic;color:var(--flame)}
 .section-pad{padding:120px 56px}
 
-/* ECOSYSTEM */
 .eco-desc{font-size:16px;color:var(--smoke);line-height:1.8;max-width:560px;font-weight:300;margin-bottom:56px}
 .eco-desc strong{color:#fff;font-weight:500}
 .eco-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,0.04);border-radius:20px;overflow:hidden}
 .eco-card{padding:44px 36px;background:var(--night);position:relative;transition:all 0.4s}
 .eco-card:hover{background:var(--slab)}
-.eco-card::after{content:'';position:absolute;bottom:0;left:36px;right:36px;height:1px;background:linear-gradient(90deg,transparent,var(--flame),transparent);opacity:0;transition:opacity 0.4s}
-.eco-card:hover::after{opacity:0.4}
 .eco-num{font-family:'Playfair Display',serif;font-size:72px;font-weight:700;color:rgba(255,82,0,0.07);line-height:1;margin-bottom:20px;transition:color 0.4s}
 .eco-card:hover .eco-num{color:rgba(255,82,0,0.15)}
 .eco-card h3{font-family:'Playfair Display',serif;font-size:24px;font-weight:600;margin-bottom:12px}
 .eco-card p{font-size:14px;color:var(--smoke);line-height:1.75;font-weight:300}
 
-/* CAMPAIGNS */
 .camp-header{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:24px;margin-bottom:56px}
-.btn-outline{background:transparent;color:var(--smoke);font-size:12px;font-weight:600;letter-spacing:0.06em;text-decoration:none;text-transform:uppercase;display:inline-flex;align-items:center;border:1px solid rgba(255,255,255,0.12);padding:12px 24px;border-radius:100px;transition:all 0.25s;justify-content:center;cursor:pointer;}
-.btn-outline:hover{border-color:var(--flame);color:var(--flame);background:rgba(255,82,0,0.05)}
-
 .camp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
 .camp-card{padding:32px 24px;background:var(--night);border-radius:20px;border:1px solid rgba(255,255,255,0.04);transition:all 0.3s;display:flex;flex-direction:column}
 .camp-card:hover{border-color:rgba(255,82,0,0.2);transform:translateY(-4px);background:var(--slab);box-shadow:0 12px 32px rgba(0,0,0,0.3)}
@@ -184,14 +93,13 @@ nav.scrolled{padding:12px 56px;background:rgba(10,10,10,0.95)}
 .c-action-btn{width:100%;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);color:#fff;padding:14px;border-radius:100px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;transition:all 0.2s}
 .c-action-btn:hover{background:var(--flame);border-color:var(--flame);box-shadow:0 0 20px var(--glow)}
 
-/* REWARDS */
 .rewards-grid{display:grid;grid-template-columns:1fr 1.5fr;gap:80px;align-items:start}
 .rewards-text p{font-size:15px;color:var(--smoke);line-height:1.8;font-weight:300;margin-bottom:16px}
 .rewards-text p strong{color:#fff;font-weight:500}
 .r-table{border-radius:20px;overflow:hidden;border:1px solid rgba(255,255,255,0.06);background:var(--night)}
 .r-head{display:grid;grid-template-columns:1.2fr 1fr 1fr;padding:16px 28px;background:rgba(255,82,0,0.06);border-bottom:1px solid rgba(255,255,255,0.04)}
 .r-head span{font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--ash);font-weight:600}
-.r-row{display:grid;grid-template-columns:1.2fr 1fr 1fr;padding:22px 28px;border-bottom:1px solid rgba(255,255,255,0.03);transition:background 0.2s;position:relative;align-items:center}
+.r-row{display:grid;grid-template-columns:1.2fr 1fr 1fr;padding:22px 28px;border-bottom:1px solid rgba(255,255,255,0.03);transition:background 0.2s;align-items:center}
 .r-row:last-child{border-bottom:none}
 .r-row:hover{background:rgba(255,255,255,0.02)}
 .r-row.max{background:rgba(255,82,0,0.04);border-left:3px solid var(--flame)}
@@ -199,12 +107,10 @@ nav.scrolled{padding:12px 56px;background:rgba(10,10,10,0.95)}
 .r-bonus{font-family:'Playfair Display',serif;font-size:20px;font-weight:600;color:var(--flame)}
 .r-total{font-size:13px;color:var(--smoke)}
 
-/* BRANDS */
 .brands-wrap{display:flex;flex-wrap:wrap;gap:12px;margin-top:40px}
 .brand-pill{padding:12px 28px;border-radius:100px;border:1px solid rgba(255,255,255,0.06);background:transparent;font-family:'Playfair Display',serif;font-size:15px;font-style:italic;color:var(--smoke);transition:all 0.3s;cursor:default}
 .brand-pill:hover{border-color:var(--flame);color:var(--flame);background:rgba(255,82,0,0.04)}
 
-/* PROCESS */
 .process-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;margin-top:56px}
 .p-card{padding:36px 28px 40px;border-radius:20px;background:var(--night);border:1px solid rgba(255,255,255,0.04);transition:all 0.4s;position:relative;overflow:hidden}
 .p-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--flame),var(--honey));transform:scaleX(0);transform-origin:left;transition:transform 0.4s}
@@ -226,33 +132,30 @@ nav.scrolled{padding:12px 56px;background:rgba(10,10,10,0.95)}
 .f-group{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
 .f-label{font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--ash);font-weight:600}
 .f-input{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);color:#fff;padding:14px 18px;font-family:'Outfit',sans-serif;font-size:14px;border-radius:12px;outline:none;transition:all 0.2s;font-weight:300}
-.f-input:focus{border-color:var(--flame);background:rgba(255,82,0,0.03);box-shadow:0 0 0 3px rgba(255,82,0,0.06)}
+.f-input:focus{border-color:var(--flame);background:rgba(255,82,0,0.03)}
 .f-input::placeholder{color:rgba(255,255,255,0.15)}
 .f-submit{background:var(--flame);color:#fff;width:100%;padding:16px;font-weight:600;font-size:14px;letter-spacing:0.06em;text-transform:uppercase;border:none;cursor:pointer;border-radius:100px;font-family:'Outfit',sans-serif;transition:all 0.3s;margin-top:8px}
 .f-submit:hover{box-shadow:0 0 32px var(--glow);transform:translateY(-2px)}
 .auth-switch{text-align:center;font-size:13px;color:var(--smoke);margin-top:20px;font-weight:300}
 .auth-switch a{color:var(--flame);font-weight:500;text-decoration:none;cursor:pointer}
+.divider{text-align:center;color:var(--ash);font-size:11px;text-transform:uppercase;letter-spacing:0.1em;margin:20px 0}
+.btn-google{background:rgba(255,255,255,0.05);color:#fff;width:100%;padding:14px;font-weight:600;font-size:13px;letter-spacing:0.04em;border:1px solid rgba(255,255,255,0.1);cursor:pointer;border-radius:100px;font-family:'Outfit',sans-serif;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:20px;}
+.btn-google:hover{border-color:rgba(255,255,255,0.25);background:rgba(255,255,255,0.08)}
+.msg-box{padding:12px 16px;border-radius:10px;font-size:13px;margin-bottom:16px;display:none}
+.msg-box.error{background:rgba(220,38,38,0.08);border:1px solid rgba(220,38,38,0.2);color:#f87171}
+.msg-box.success{background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);color:#4ade80}
 
-/* IG VALIDATION STATE */
-.ig-auth-state{text-align:center;padding:20px 0}
-.loader-spinner{width:48px;height:48px;border:3px solid rgba(255,82,0,0.2);border-top-color:var(--flame);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 24px}
-@keyframes spin{to{transform:rotate(360deg)}}
-.btn-ig{background:linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);color:#fff;width:100%;padding:16px;font-weight:600;font-size:14px;letter-spacing:0.06em;text-transform:uppercase;border:none;cursor:pointer;border-radius:100px;font-family:'Outfit',sans-serif;transition:all 0.3s;margin-top:24px}
-.btn-ig:hover{box-shadow:0 0 24px rgba(220,39,67,0.4);transform:translateY(-2px)}
-
-/* FOOTER */
 footer{padding:60px 56px 40px;border-top:1px solid rgba(255,255,255,0.04);display:flex;justify-content:space-between;align-items:center}
-.ft-logo{font-family:'Playfair Display',serif;font-size:20px;font-weight:600;letter-spacing:0.02em}
+.ft-logo{font-family:'Playfair Display',serif;font-size:20px;font-weight:600}
 .ft-links{display:flex;gap:28px;flex-wrap:wrap;}
 .ft-links a{font-size:13px;color:var(--smoke);text-decoration:none;transition:color 0.2s;font-weight:300}
 .ft-links a:hover{color:var(--flame)}
 .ft-copy{font-size:11px;color:var(--ash)}
 
-/* MOBILE RESPONSIVENESS */
 @media(max-width:1024px){
   .section-pad{padding:80px 32px}
-  nav, footer{padding-left:32px; padding-right:32px;}
-  .camp-grid{grid-template-columns:repeat(2,1fr)} 
+  nav,footer{padding-left:32px;padding-right:32px}
+  .camp-grid{grid-template-columns:repeat(2,1fr)}
   .eco-grid{grid-template-columns:repeat(2,1fr)}
   .rewards-grid{grid-template-columns:1fr;gap:40px}
   .process-grid{grid-template-columns:repeat(2,1fr)}
@@ -260,41 +163,22 @@ footer{padding:60px 56px 40px;border-top:1px solid rgba(255,255,255,0.04);displa
 @media(max-width:768px){
   .section-pad{padding:60px 20px}
   nav{padding:14px 20px}
-  nav.scrolled{padding:12px 20px}
-  .nav-mid{display:none} 
-  .hamburger{display:block;} 
-  .nav-apply{padding:8px 20px; font-size:11px;} 
-  
+  .nav-mid{display:none}
+  .hamburger{display:block}
   .hero{padding:120px 20px 60px}
-  .hero h1{font-size:clamp(44px, 12vw, 64px)}
-  .btn-flame, .btn-outline, .f-submit, .c-action-btn, .btn-ig{width:100%;justify-content:center;margin-bottom:12px;}
-  
-  .camp-grid, .eco-grid, .process-grid{grid-template-columns:1fr}
+  .camp-grid,.eco-grid,.process-grid{grid-template-columns:1fr}
   .camp-header{flex-direction:column;align-items:flex-start;gap:20px}
-  
-  .r-head span, .r-tier, .r-bonus, .r-total{font-size:14px;}
-  .r-row{padding:16px 20px;}
-  
-  .f-row{grid-template-columns:1fr!important}
-  .auth-box{padding:32px 20px; width: 98vw; max-width: 98vw; min-width: 0;}
-  
-  footer{flex-direction:column;gap:24px;text-align:center;padding:40px 20px}
-}
-  .r-head span, .r-tier, .r-bonus, .r-total{font-size:14px;}
-  .r-row{padding:16px 20px;}
-  
   .f-row{grid-template-columns:1fr}
-  .auth-box{padding:32px 20px; width: 95%;}
-  
+  .auth-box{padding:32px 20px}
   footer{flex-direction:column;gap:24px;text-align:center;padding:40px 20px}
-  .ft-links{justify-content:center;}
+  .ft-links{justify-content:center}
 }
 </style>
 </head>
 <body>
 
 <nav id="mainNav">
-  <a href="#" class="nav-brand" style="text-decoration:none">
+  <a href="pop-studio.html" class="nav-brand">
     <img src="pop_bw_logo_new.svg" alt="POP Logo" class="nav-logo">
     <span class="nav-tag">Studio</span>
   </a>
@@ -326,7 +210,7 @@ footer{padding:60px 56px 40px;border-top:1px solid rgba(255,255,255,0.04);displa
     <h1>Where Content<br>Meets <i>Commerce.</i></h1>
     <p class="hero-desc">POP is the lifestyle payments and rewards platform for a new generation. We're partnering with <strong>India's finest creators</strong> to tell our story.<br><br><strong>You create. We pay. No middlemen.</strong></p>
     <div class="hero-actions">
-      <button class="btn-flame" id="heroAuthBtn" onclick="handleAuthClick()"><span>You ✕ POP</span> <span style="font-size:18px;line-height:1;">→</span></button>
+      <button class="btn-flame" id="heroAuthBtn" onclick="handleAuthClick()"><span>You ✕ POP</span> <span style="font-size:18px;line-height:1">→</span></button>
     </div>
   </div>
 </section>
@@ -354,24 +238,12 @@ footer{padding:60px 56px 40px;border-top:1px solid rgba(255,255,255,0.04);displa
   <div class="reveal">
     <div class="s-label">All things POP</div>
     <h2 class="s-title">Three products.<br>One <i>story to tell.</i></h2>
-    <p class="eco-desc">Don’t just promote an app. Tell the story of an entire <strong>commerce ecosystem</strong>—where payments, shopping, and rewards seamlessly collide.</p>
+    <p class="eco-desc">Don't just promote an app. Tell the story of an entire <strong>commerce ecosystem</strong>—where payments, shopping, and rewards seamlessly collide.</p>
   </div>
   <div class="eco-grid reveal">
-    <div class="eco-card">
-      <div class="eco-num">01</div>
-      <h3>POP UPI</h3>
-      <p>Fast. Fluid. Surprisingly not boring. A UPI experience that sheds the clutter and just works—brilliantly designed for the modern user.</p>
-    </div>
-    <div class="eco-card">
-      <div class="eco-num">02</div>
-      <h3>POP Shop</h3>
-      <p>Curated for the discerning. A built-in marketplace featuring the internet's most coveted new-age brands. Seamless shopping, natively integrated.</p>
-    </div>
-    <div class="eco-card">
-      <div class="eco-num">03</div>
-      <h3>POP Coins</h3>
-      <p>A reward currency you actually want to use. No meaningless points—just unprecedented value and real purchasing power across the brands you love.</p>
-    </div>
+    <div class="eco-card"><div class="eco-num">01</div><h3>POP UPI</h3><p>Fast. Fluid. Surprisingly not boring. A UPI experience that sheds the clutter and just works—brilliantly designed for the modern user.</p></div>
+    <div class="eco-card"><div class="eco-num">02</div><h3>POP Shop</h3><p>Curated for the discerning. A built-in marketplace featuring the internet's most coveted new-age brands. Seamless shopping, natively integrated.</p></div>
+    <div class="eco-card"><div class="eco-num">03</div><h3>POP Coins</h3><p>A reward currency you actually want to use. No meaningless points—just unprecedented value and real purchasing power across the brands you love.</p></div>
   </div>
 </section>
 
@@ -381,13 +253,10 @@ footer{padding:60px 56px 40px;border-top:1px solid rgba(255,255,255,0.04);displa
       <div class="s-label">Live Campaigns</div>
       <h2 class="s-title">Take <i>your</i> pick.</h2>
     </div>
-    <div class="camp-header-right">
-      <a href="all-campaigns.html" class="btn-outline">View All Campaigns →</a>
-    </div>
+    <a href="all-campaigns.html" class="btn-outline">View All Campaigns →</a>
   </div>
-  
   <div class="camp-grid reveal" id="dynamic-campaign-grid">
-    <div style="grid-column: 1/-1; padding: 40px; text-align: center; color: var(--smoke);">Loading live campaigns...</div>
+    <div style="grid-column:1/-1;padding:60px;text-align:center;color:var(--smoke)">Loading live campaigns…</div>
   </div>
 </section>
 
@@ -424,7 +293,7 @@ footer{padding:60px 56px 40px;border-top:1px solid rgba(255,255,255,0.04);displa
     <h2 class="s-title">Four steps to your<br>first <i>payout.</i></h2>
   </div>
   <div class="process-grid reveal">
-    <div class="p-card"><div class="p-num">01</div><h3>Apply</h3><p>Fill the form below with your details, niche, and social handles. Our team reviews every application within 48 hours. We value authenticity over follower count.</p></div>
+    <div class="p-card"><div class="p-num">01</div><h3>Apply</h3><p>Fill the form below with your details, niche, and social handles. Our team reviews every application within 48 hours.</p></div>
     <div class="p-card"><div class="p-num">02</div><h3>Get Shortlisted</h3><p>Approved creators receive an email with dashboard access, campaign briefs, brand assets, and content guidelines.</p></div>
     <div class="p-card"><div class="p-num">03</div><h3>Create & Post</h3><p>Pick a live campaign. Create content on your terms, within the brief. Post it and submit the live link through your dashboard.</p></div>
     <div class="p-card"><div class="p-num">04</div><h3>Get Paid</h3><p>₹3,000 locked in from submission. Milestone bonuses flagged for instant UPI payout. Bonuses stack. No cap on campaigns.</p></div>
@@ -437,161 +306,242 @@ footer{padding:60px 56px 40px;border-top:1px solid rgba(255,255,255,0.04);displa
   <div class="ft-copy">© 2026 Poptech Growth Pvt. Ltd.</div>
 </footer>
 
+<!-- AUTH MODAL -->
 <div class="auth-overlay" id="authOverlay">
   <div class="auth-box">
     <button class="auth-close" onclick="closeAuthModal()">✕</button>
-    
+
+    <!-- LOGIN -->
     <div id="authLoginState">
       <h2 class="auth-title">Welcome <i>Back.</i></h2>
       <p class="auth-sub">Log in to your creator dashboard.</p>
-      
-      <button class="btn-outline" onclick="signInWithGoogle()">Continue with Google</button>
-      
-      <div style="text-align:center; color:var(--ash); font-size:11px; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:24px">Or use email</div>
-
-      <div class="f-group"><label class="f-label">Email</label><input class="f-input" type="email" placeholder="creator@email.com"></div>
-      <button class="f-submit" onclick="switchAuthView('otp')">Send Login OTP</button>
+      <div class="msg-box" id="loginMsg"></div>
+      <button class="btn-google" onclick="signInWithGoogle()">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
+        Continue with Google
+      </button>
+      <div class="divider">Or use email</div>
+      <div class="f-group"><label class="f-label">Email</label><input class="f-input" id="loginEmail" type="email" placeholder="creator@email.com"></div>
+      <div class="f-group"><label class="f-label">Password</label><input class="f-input" id="loginPassword" type="password" placeholder="••••••••"></div>
+      <button class="f-submit" onclick="signInWithEmail()">Log In</button>
       <div class="auth-switch">New to POP? <a onclick="switchAuthView('signup')">Signup as a creator</a></div>
     </div>
 
+    <!-- SIGNUP -->
     <div id="authSignupState" style="display:none">
       <h2 class="auth-title">Join <i>Studio.</i></h2>
-      <p class="auth-sub">Apply as a creator. Mandatory details required.</p>
-
-      <button class="btn-outline" onclick="signInWithGoogle()">Continue with Google</button>
-
-      <div style="text-align:center; color:var(--ash); font-size:11px; text-transform:uppercase; letter-spacing:0.1em; margin-bottom:24px">Or manual entry</div>
-
+      <p class="auth-sub">Apply as a creator. All fields required.</p>
+      <div class="msg-box" id="signupMsg"></div>
+      <button class="btn-google" onclick="signInWithGoogle()">
+        <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
+        Continue with Google
+      </button>
+      <div class="divider">Or manual entry</div>
       <div class="f-row">
-        <div class="f-group"><label class="f-label">Name</label><input class="f-input" id="suName" placeholder="Full Name"></div>
+        <div class="f-group"><label class="f-label">Full Name</label><input class="f-input" id="suName" placeholder="Your Name"></div>
         <div class="f-group"><label class="f-label">Email</label><input class="f-input" id="suEmail" type="email" placeholder="you@email.com"></div>
       </div>
       <div class="f-row">
         <div class="f-group"><label class="f-label">Instagram Handle</label><input class="f-input" id="suIG" placeholder="@username"></div>
         <div class="f-group"><label class="f-label">Phone</label><input class="f-input" id="suPhone" type="tel" placeholder="+91 XXXXX XXXXX"></div>
       </div>
-      <div class="f-group"><label class="f-label">Location</label><input class="f-input" id="suLoc" placeholder="City, State"></div>
-      <button class="f-submit" onclick="processSignup()">Send Verification OTP</button>
+      <div class="f-row">
+        <div class="f-group"><label class="f-label">Location</label><input class="f-input" id="suLoc" placeholder="City, State"></div>
+        <div class="f-group"><label class="f-label">Password</label><input class="f-input" id="suPassword" type="password" placeholder="Min 6 chars"></div>
+      </div>
+      <button class="f-submit" onclick="signUpWithEmail()">Create Account & Apply</button>
       <div class="auth-switch">Already a creator? <a onclick="switchAuthView('login')">Log in here</a></div>
     </div>
 
-    <div id="authOTPState" style="display:none; text-align:center;">
+    <!-- OTP / EMAIL VERIFY NOTICE -->
+    <div id="authOTPState" style="display:none;text-align:center">
+      <div style="font-size:48px;margin-bottom:24px">📬</div>
       <h2 class="auth-title">Check your <i>Email.</i></h2>
-      <p class="auth-sub" style="margin-bottom:32px">We sent a 6-digit secure code to your inbox.</p>
-      <div class="f-group" style="text-align:left;">
-        <input class="f-input" type="text" placeholder="------" style="text-align:center; font-size:24px; letter-spacing:0.5em; font-weight:600;" maxlength="6">
-      </div>
-      <button class="f-submit" onclick="verifyOTP()">Verify & Continue</button>
-      <div class="auth-switch"><a onclick="alert('OTP Resent!')">Resend Code</a></div>
+      <p class="auth-sub">We sent a confirmation link. Click it to activate your account, then come back to log in.</p>
+      <button class="f-submit" onclick="switchAuthView('login')">Back to Login</button>
     </div>
 
   </div>
 </div>
 
-
-<script>
-  // Scroll & Reveal
-  window.addEventListener('scroll',()=>{document.getElementById('mainNav').classList.toggle('scrolled',window.scrollY>60)});
-  const obs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting){x.target.classList.add('vis');obs.unobserve(x.target)}})},{threshold:0.1});
-  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
-
-  function toggleMobileMenu() {
-    document.getElementById('mobMenu').classList.toggle('show');
-    document.body.style.overflow = document.getElementById('mobMenu').classList.contains('show') ? 'hidden' : '';
-  }
-
-  let isLoggedIn = false; 
-  let pendingOptInCampaign = null;
-
-  function handleAuthClick(view = 'login') {
-    if (isLoggedIn) { window.location.href = 'dashboard.html'; return; }
-    document.getElementById('authOverlay').classList.add('show');
-    switchAuthView(view);
-  }
-
-  function handleOptIn(campaignTitle) {
-    if (isLoggedIn) {
-      alert(`Successfully opted into: ${campaignTitle}!`);
-    } else {
-      pendingOptInCampaign = campaignTitle;
-      document.getElementById('authOverlay').classList.add('show');
-      switchAuthView('login');
-    }
-  }
-
-  function closeAuthModal() {
-    document.getElementById('authOverlay').classList.remove('show');
-    pendingOptInCampaign = null;
-  }
-
-  function switchAuthView(view) {
-    document.getElementById('authLoginState').style.display = view === 'login' ? 'block' : 'none';
-    document.getElementById('authSignupState').style.display = view === 'signup' ? 'block' : 'none';
-    document.getElementById('authOTPState').style.display = view === 'otp' ? 'block' : 'none';
-  }
-
-  document.getElementById('authOverlay').addEventListener('click', (e) => {
-    if (e.target === document.getElementById('authOverlay')) closeAuthModal();
-  });
-</script>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
 <script>
-  try {
-    // Make sure your URL and Key have single quotes around them!
-    // Example: const supabaseUrl = 'https://xyz.supabase.co';
-    const supabaseUrl = 'https://fxuinuxyjhjxygdhskfn.supabase.co'; 
-    const supabaseKey = 'sb_publishable_Mgh-fEqB3IVF4iTvV0-rjw_GkfftY_5';
-    
-    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+// ── Scroll & Reveal ──────────────────────────────────────────────
+window.addEventListener('scroll', () => {
+  document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 60);
+});
+const obs = new IntersectionObserver(e => {
+  e.forEach(x => { if (x.isIntersecting) { x.target.classList.add('vis'); obs.unobserve(x.target); } });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 
-    async function signInWithGoogle() {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: window.location.origin + '/dashboard.html'
-        }
-      });
+function toggleMobileMenu() {
+  document.getElementById('mobMenu').classList.toggle('show');
+  document.body.style.overflow = document.getElementById('mobMenu').classList.contains('show') ? 'hidden' : '';
+}
 
-      if (error) {
-        console.error("Error logging in with Google:", error.message);
-        alert("Could not connect to Google. Please try again.");
-      }
-    }
-    
-    // Attach the function globally so the button can find it
-    window.signInWithGoogle = signInWithGoogle;
+// ── Auth State ───────────────────────────────────────────────────
+const sb = getSupabase();
+let currentUser = null;
 
-    // --- DYNAMIC CAMPAIGN LOADER ---
-    async function loadCampaignData() {
-      const grid = document.getElementById('dynamic-campaign-grid');
-      try {
-        const { data: campaigns } = await supabase.from('campaigns').select('*').eq('status', 'active');
-        if (!campaigns || campaigns.length === 0) {
-          grid.innerHTML = `<div style=\"grid-column:1/-1; padding:60px; border:1px dashed var(--ghost); border-radius:24px; text-align:center; opacity:0.6;\">No active briefs.</div>`;
-          return;
-        }
-        grid.innerHTML = campaigns.map(c => `
-          <div class=\"camp-card reveal\">
-            <div class=\"c-meta\"><span class=\"c-days\">${c.days_left ? c.days_left + ' Days Left' : ''}</span></div>
-            <h3 class=\"c-title\">${c.title}</h3>
-            <p>${c.description}</p>
-            <div class=\"c-participants\">${c.participants ? c.participants + ' Creators Joined' : ''}</div>
-            <button class=\"c-action-btn\" onclick=\"handleOptIn('${c.title.replace(/'/g, "\\'")}')\">Opt In →</button>
-          </div>
-        `).join('');
-      } catch (err) {
-        grid.innerHTML = `<div style=\"grid-column:1/-1; padding:60px; color:var(--smoke);\">Error loading campaigns.</div>`;
-      }
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      loadCampaignData();
-    });
-
-  } catch (err) {
-    console.error("Supabase Setup Error:", err.message);
+async function initAuth() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session?.user) {
+    currentUser = session.user;
+    updateNavForUser(session.user);
   }
+  sb.auth.onAuthStateChange((_event, session) => {
+    currentUser = session?.user || null;
+    if (currentUser) updateNavForUser(currentUser);
+  });
+}
+
+function updateNavForUser(user) {
+  const name = user.user_metadata?.full_name || user.email.split('@')[0];
+  const btn = document.getElementById('navAuthBtn');
+  btn.textContent = `@${name.split(' ')[0].toLowerCase()} → Dashboard`;
+  btn.onclick = () => window.location.href = 'dashboard.html';
+}
+
+function handleAuthClick() {
+  if (currentUser) { window.location.href = 'dashboard.html'; return; }
+  document.getElementById('authOverlay').classList.add('show');
+  switchAuthView('login');
+}
+
+function closeAuthModal() { document.getElementById('authOverlay').classList.remove('show'); }
+
+function switchAuthView(view) {
+  document.getElementById('authLoginState').style.display  = view === 'login'  ? 'block' : 'none';
+  document.getElementById('authSignupState').style.display = view === 'signup' ? 'block' : 'none';
+  document.getElementById('authOTPState').style.display    = view === 'otp'    ? 'block' : 'none';
+}
+
+document.getElementById('authOverlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('authOverlay')) closeAuthModal();
+});
+
+function showMsg(id, text, type = 'error') {
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.className = `msg-box ${type}`;
+  el.style.display = 'block';
+}
+
+// ── Google OAuth ─────────────────────────────────────────────────
+async function signInWithGoogle() {
+  const { error } = await sb.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.origin + '/dashboard.html' }
+  });
+  if (error) showMsg('loginMsg', error.message);
+}
+
+// ── Email Sign Up ────────────────────────────────────────────────
+async function signUpWithEmail() {
+  const name     = document.getElementById('suName').value.trim();
+  const email    = document.getElementById('suEmail').value.trim();
+  const ig       = document.getElementById('suIG').value.trim();
+  const phone    = document.getElementById('suPhone').value.trim();
+  const location = document.getElementById('suLoc').value.trim();
+  const password = document.getElementById('suPassword').value;
+
+  if (!name || !email || !ig || !phone || !location || !password) {
+    return showMsg('signupMsg', 'All fields are required.');
+  }
+
+  const { data, error } = await sb.auth.signUp({
+    email, password,
+    options: {
+      data: { full_name: name, instagram_handle: ig, phone, location }
+    }
+  });
+
+  if (error) return showMsg('signupMsg', error.message);
+
+  // Insert creator row (pending approval)
+  if (data.user) {
+    await sb.from('creators').upsert({
+      id: data.user.id,
+      full_name: name,
+      email,
+      instagram_handle: ig,
+      phone,
+      location,
+      status: 'pending'
+    });
+  }
+
+  switchAuthView('otp');
+}
+
+// ── Email Login ──────────────────────────────────────────────────
+async function signInWithEmail() {
+  const email    = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+
+  if (!email || !password) return showMsg('loginMsg', 'Enter your email and password.');
+
+  const { data, error } = await sb.auth.signInWithPassword({ email, password });
+  if (error) return showMsg('loginMsg', error.message);
+
+  closeAuthModal();
+  window.location.href = 'dashboard.html';
+}
+
+// ── Opt In ───────────────────────────────────────────────────────
+async function handleOptIn(campaignId, campaignTitle) {
+  if (!currentUser) {
+    document.getElementById('authOverlay').classList.add('show');
+    switchAuthView('login');
+    return;
+  }
+  const { error } = await sb.from('applications').insert({
+    campaign_id: campaignId,
+    creator_id: currentUser.id,
+    status: 'applied'
+  });
+  if (error && error.code === '23505') {
+    alert(`You've already applied to "${campaignTitle}".`);
+  } else if (error) {
+    alert('Something went wrong. Please try again.');
+  } else {
+    alert(`You're in! We'll review your application for "${campaignTitle}" within 48 hours.`);
+  }
+}
+
+// ── Load Campaigns ───────────────────────────────────────────────
+async function loadCampaigns() {
+  const grid = document.getElementById('dynamic-campaign-grid');
+  const { data: campaigns, error } = await sb
+    .from('campaigns')
+    .select('*')
+    .eq('status', 'active')
+    .limit(4);
+
+  if (error || !campaigns?.length) {
+    grid.innerHTML = `<div style="grid-column:1/-1;padding:60px;border:1px dashed var(--ghost);border-radius:24px;text-align:center;opacity:0.6">No active campaigns right now. Check back soon.</div>`;
+    return;
+  }
+
+  grid.innerHTML = campaigns.map(c => {
+    const daysLeft = Math.max(0, c.days_open - Math.floor((Date.now() - new Date(c.created_at)) / 86400000));
+    const participants = c.participants_count || 0;
+    return `
+      <div class="camp-card">
+        <div class="c-meta"><span class="c-days">${daysLeft} Days Left</span></div>
+        <h3>${c.title}</h3>
+        <p>${c.description || ''}</p>
+        <div class="c-participants">${participants} Creators Joined</div>
+        <button class="c-action-btn" onclick="handleOptIn('${c.id}','${c.title.replace(/'/g,"\\'")}')">Opt In →</button>
+      </div>
+    `;
+  }).join('');
+}
+
+initAuth();
+loadCampaigns();
 </script>
 </body>
 </html>

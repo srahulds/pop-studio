@@ -1,132 +1,285 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>POP Studio — Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
-    <style>
-        :root { --flame: #FF5200; --deep: #0A0A0A; --night: #111111; --smoke: rgba(255,255,255,0.5); --ghost: rgba(255,255,255,0.08); }
-        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-        body{background:var(--deep);color:#fff;font-family:'Outfit',sans-serif;min-height:100vh;}
-        
-        /* Nav */
-        nav{display:flex;align-items:center;justify-content:space-between;padding:16px 5%;background:rgba(10,10,10,0.8);backdrop-filter:blur(20px);border-bottom:1px solid var(--ghost);position:sticky;top:0;z-index:100;}
-        .nav-user{display:flex;align-items:center;gap:12px;}
-        .avatar{width:36px;height:36px;border-radius:50%;background:var(--flame);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:13px;}
-        .logout-btn{background:none;border:1px solid var(--ghost);color:var(--smoke);padding:6px 12px;border-radius:100px;cursor:pointer;font-size:10px;text-transform:uppercase;}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>POP Studio — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root { --flame: #FF5200; --ember:#FF7A33; --honey:#FFB547; --deep: #0A0A0A; --night: #111111; --slab:#1A1A1A; --smoke: rgba(255,255,255,0.5); --ash:rgba(255,255,255,0.25); --ghost: rgba(255,255,255,0.08); --glow:rgba(255,82,0,0.35); --success:#22C55E; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--deep);color:#fff;font-family:'Outfit',sans-serif;min-height:100vh;}
+body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:0.7}
 
-        /* Grid */
-        .container{max-width:1100px;margin:0 auto;padding:60px 5%;}
-        .s-label{font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--flame);margin-bottom:24px;display:block;}
-        .stats-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:1px;background:var(--ghost);border-radius:20px;overflow:hidden;margin-bottom:60px;}
-        .stat-card{background:var(--night);padding:30px;text-align:left;}
-        .stat-val{font-family:'Playfair Display',serif;font-size:40px;margin-bottom:4px;display:block;}
-        .stat-lab{font-size:11px;color:var(--smoke);text-transform:uppercase;letter-spacing:0.1em;}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:14px 0;background:rgba(10,10,10,0.92);backdrop-filter:blur(40px);border-bottom:1px solid rgba(255,255,255,0.04);}
+nav a{color:#fff;text-decoration:none;margin:0 18px;font-weight:600;font-size:13px;transition:color 0.2s}
+nav a:hover,nav a.active{color:var(--flame)}
 
-        /* Submissions */
-        .camp-card{background:var(--night);padding:32px;border-radius:20px;border:1px solid var(--ghost);margin-bottom:20px;}
-        .c-title{font-family:'Playfair Display',serif;font-size:24px;margin-bottom:8px;}
-        .status{display:inline-block;padding:4px 12px;border-radius:100px;font-size:10px;font-weight:700;background:rgba(255,82,0,0.1);color:var(--flame);text-transform:uppercase;margin-bottom:16px;}
-    </style>
+.container{max-width:1100px;margin:0 auto;padding:96px 5% 60px;}
+.page-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;margin-bottom:40px;}
+.page-title{font-family:'Playfair Display',serif;font-size:clamp(28px,4vw,40px);font-weight:400;}
+.page-title i{font-style:italic;color:var(--flame)}
+.user-pill{display:flex;align-items:center;gap:12px;}
+.avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--flame),var(--honey));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
+.logout-btn{background:none;border:1px solid var(--ghost);color:var(--smoke);padding:6px 14px;border-radius:100px;cursor:pointer;font-size:10px;text-transform:uppercase;letter-spacing:0.08em;font-family:'Outfit',sans-serif;transition:0.2s}
+.logout-btn:hover{border-color:var(--flame);color:var(--flame)}
+
+.s-label{font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--ember);margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.s-label::before{content:'';width:16px;height:1px;background:var(--ember)}
+
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--ghost);border-radius:20px;overflow:hidden;margin-bottom:56px;}
+.stat-card{background:var(--night);padding:28px 24px}
+.stat-val{font-family:'Playfair Display',serif;font-size:36px;margin-bottom:4px;display:block;}
+.stat-val.lit{background:linear-gradient(135deg,var(--flame),var(--honey));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat-lab{font-size:10px;color:var(--smoke);text-transform:uppercase;letter-spacing:0.12em;font-weight:500}
+
+/* Submissions */
+.camp-section{margin-bottom:56px}
+.camp-card{background:var(--night);padding:28px 32px;border-radius:20px;border:1px solid var(--ghost);margin-bottom:16px;}
+.camp-card-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:8px}
+.c-title{font-family:'Playfair Display',serif;font-size:20px}
+.status-badge{display:inline-block;padding:4px 12px;border-radius:100px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em}
+.status-badge.pending{background:rgba(255,82,0,0.1);color:var(--flame);border:1px solid rgba(255,82,0,0.2)}
+.status-badge.approved{background:rgba(34,197,94,0.08);color:var(--success);border:1px solid rgba(34,197,94,0.15)}
+.status-badge.rejected{background:rgba(220,38,38,0.05);color:#DC2626;border:1px solid rgba(220,38,38,0.1)}
+.status-badge.applied{background:rgba(255,181,71,0.08);color:var(--honey);border:1px solid rgba(255,181,71,0.15)}
+.camp-desc{color:var(--smoke);font-size:14px;margin-bottom:20px;line-height:1.6;font-weight:300}
+.submit-row{display:flex;gap:10px;}
+.submit-input{flex:1;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);padding:13px 18px;border-radius:100px;color:#fff;outline:none;font-family:'Outfit',sans-serif;font-size:13px;transition:0.2s}
+.submit-input:focus{border-color:var(--flame)}
+.submit-btn{background:var(--flame);color:#fff;border:none;padding:0 28px;border-radius:100px;font-weight:600;font-size:11px;cursor:pointer;letter-spacing:0.08em;text-transform:uppercase;font-family:'Outfit',sans-serif;transition:0.2s;white-space:nowrap}
+.submit-btn:hover{box-shadow:0 0 20px var(--glow)}
+.submit-btn:disabled{opacity:0.5;cursor:not-allowed}
+
+/* Submitted content row */
+.content-submitted{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:14px 20px}
+.content-link{color:var(--flame);text-decoration:none;font-size:13px;font-weight:500}
+.content-link:hover{text-decoration:underline}
+
+/* Empty states */
+.empty-state{padding:48px;border:1px dashed var(--ghost);border-radius:20px;text-align:center;color:var(--smoke)}
+.empty-state a{color:var(--flame);text-decoration:none;font-weight:500}
+
+/* Skeleton */
+.skeleton{background:linear-gradient(90deg,rgba(255,255,255,0.04) 25%,rgba(255,255,255,0.08) 50%,rgba(255,255,255,0.04) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:8px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+@media(max-width:768px){
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .submit-row{flex-direction:column}
+  .submit-btn{padding:14px}
+  .camp-card{padding:20px}
+}
+</style>
 </head>
 <body>
-    <nav style="position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:14px 0;background:rgba(10,10,10,0.92);backdrop-filter:blur(40px);border-bottom:1px solid rgba(255,255,255,0.04);">
-        <a href="index.html" style="color:#fff;text-decoration:none;margin:0 18px;font-weight:600;">Home</a>
-        <a href="dashboard.html" style="color:#FF5200;text-decoration:none;margin:0 18px;font-weight:600;">Dashboard</a>
-        <a href="all-campaigns.html" style="color:#fff;text-decoration:none;margin:0 18px;font-weight:600;">All Campaigns</a>
-        <a href="admin-login.html" style="color:#fff;text-decoration:none;margin:0 18px;font-weight:600;">Admin Login</a>
-        <a href="admin.html" style="color:#fff;text-decoration:none;margin:0 18px;font-weight:600;">Admin Control</a>
-        <a href="pop-studio.html" style="color:#fff;text-decoration:none;margin:0 18px;font-weight:600;">POP Studio</a>
-    </nav>
-    <div style="height:56px;"></div>
-    </span>
-  </a>
 
-  <div class="nav-user">
-    <div class="avatar" id="userAvatar">--</div>
-    <span id="userName" style="font-size:14px; color:var(--smoke); font-weight: 400;">Loading...</span>
-    <button class="logout-btn" onclick="logout()">Log out</button>
-  </div>
-</nav>
+<nav>
+  <a href="pop-studio.html">Home</a>
+  <a href="dashboard.html" class="active">Dashboard</a>
+  <a href="all-campaigns.html">All Campaigns</a>
+  <a href="admin-login.html">Admin Login</a>
+  <a href="admin.html">Admin Control</a>
 </nav>
 
 <div class="container">
-    <span class="s-label">Performance</span>
-    <div class="stats-grid">
-        <div class="stat-card"><span class="stat-val" id="statCamps">0</span><span class="stat-lab">Active</span></div>
-        <div class="stat-card"><span class="stat-val" id="statViews">0</span><span class="stat-lab">Views</span></div>
-        <div class="stat-card"><span class="stat-val" id="statEarned" style="color:var(--flame)">₹0</span><span class="stat-lab">Earned</span></div>
-        <div class="stat-card"><span class="stat-val" id="statPending">₹0</span><span class="stat-lab">Pending</span></div>
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Creator <i>Dashboard.</i></h1>
     </div>
+    <div class="user-pill">
+      <div class="avatar" id="userAvatar">--</div>
+      <span id="userName" style="font-size:14px;color:var(--smoke);font-weight:400">Loading…</span>
+      <button class="logout-btn" onclick="logout()">Log out</button>
+    </div>
+  </div>
 
-    <span class="s-label">Your Submissions</span>
-    <div class="camp-card">
-        <span class="status">Awaiting Submission</span>
-        <div class="c-title">The POPcard Rebrand</div>
-        <p style="color:var(--smoke);font-size:14px;margin-bottom:24px;line-height:1.6">Post your Reel and paste the link below to begin tracking.</p>
-        <div style="display:flex;gap:10px;">
-            <input type="text" placeholder="Instagram URL..." style="flex:1;background:#000;border:1px solid #333;padding:14px;border-radius:100px;color:#fff;outline:none;">
-            <button style="background:var(--flame);color:#fff;border:none;padding:0 30px;border-radius:100px;font-weight:600;font-size:12px;cursor:pointer;">SUBMIT</button>
-        </div>
+  <div class="s-label">Performance</div>
+  <div class="stats-grid">
+    <div class="stat-card"><span class="stat-val" id="statCamps">—</span><span class="stat-lab">Campaigns</span></div>
+    <div class="stat-card"><span class="stat-val" id="statViews">—</span><span class="stat-lab">Total Views</span></div>
+    <div class="stat-card"><span class="stat-val lit" id="statEarned">—</span><span class="stat-lab">Total Earned</span></div>
+    <div class="stat-card"><span class="stat-val" id="statPending">—</span><span class="stat-lab">Pending Payout</span></div>
+  </div>
+
+  <div class="camp-section">
+    <div class="s-label">Your Campaigns</div>
+    <div id="campaignsList">
+      <!-- Loading skeleton -->
+      <div class="camp-card"><div class="skeleton" style="height:24px;width:200px;margin-bottom:12px"></div><div class="skeleton" style="height:16px;margin-bottom:8px"></div><div class="skeleton" style="height:44px;border-radius:100px"></div></div>
     </div>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
+<script src="supabase-config.js"></script>
 <script>
-    // 1. SETTINGS - We use 'popSupabase' to avoid the "already declared" error
-    const popUrl = 'https://fxuinuxyjhjxygdhskfn.supabase.co';
-    const popKey = 'sb_publishable_Mgh-fEqB3IVF4iTvV0-rjw_GkfftY_5';
-    let popClient;
+const sb = getSupabase();
+let currentUser = null;
 
-    async function initDashboard() {
-        console.log("Initializing Dashboard...");
-        
-        try {
-            // 2. Initialize the client with a unique name
-            if (!popClient) {
-                popClient = window.supabase.createClient(popUrl, popKey);
-            }
+async function init() {
+  const { data: { user }, error } = await sb.auth.getUser();
+  if (error || !user) {
+    window.location.href = 'pop-studio.html';
+    return;
+  }
+  currentUser = user;
 
-            // 3. Get User Session
-            const { data: { user }, error } = await popClient.auth.getUser();
+  // Display name + avatar
+  const fullName = user.user_metadata?.full_name || user.email.split('@')[0];
+  document.getElementById('userName').textContent = fullName;
+  const initials = fullName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+  document.getElementById('userAvatar').textContent = initials;
 
-            if (error || !user) {
-                console.error("Auth failed:", error);
-                window.location.href = 'pop-studio.html';
-                return;
-            }
+  // Sync creator row
+  await sb.from('creators').upsert({
+    id: user.id,
+    full_name: fullName,
+    email: user.email,
+    instagram_handle: user.user_metadata?.instagram_handle || null,
+    phone: user.user_metadata?.phone || null,
+    location: user.user_metadata?.location || null,
+  }, { onConflict: 'id' });
 
-            // 4. Update the Name & Avatar
-            const fullName = user.user_metadata.full_name || user.email.split('@')[0];
-            console.log("Logged in as:", fullName);
+  await Promise.all([loadStats(), loadCampaigns()]);
+}
 
-            document.getElementById('userName').textContent = fullName;
-            
-            const initials = fullName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-            document.getElementById('userAvatar').textContent = initials;
+async function loadStats() {
+  // submissions aggregate
+  const { data: subs } = await sb
+    .from('submissions')
+    .select('views_tracked, payout_amount, status')
+    .eq('creator_id', currentUser.id);
 
-            // 5. Sync to Database (Upsert prevents duplicate errors)
-            await popClient.from('creators').upsert({ 
-                id: user.id, 
-                full_name: fullName, 
-                email: user.email 
-            });
+  const totalViews   = (subs || []).reduce((s, r) => s + (r.views_tracked || 0), 0);
+  const totalEarned  = (subs || []).filter(r => r.status === 'approved').reduce((s, r) => s + (r.payout_amount || 0), 0);
+  const pendingAmt   = (subs || []).filter(r => r.status === 'pending').reduce((s, r) => s + (r.payout_amount || 0), 0);
 
-        } catch (err) {
-            console.error("Critical Error:", err);
-            document.getElementById('userName').textContent = "Session Error";
-        }
+  // count approved applications
+  const { count: campCount } = await sb
+    .from('applications')
+    .select('id', { count: 'exact', head: true })
+    .eq('creator_id', currentUser.id)
+    .eq('status', 'approved');
+
+  document.getElementById('statCamps').textContent  = campCount ?? 0;
+  document.getElementById('statViews').textContent  = totalViews >= 100000 ? (totalViews / 100000).toFixed(1) + 'L' : totalViews >= 1000 ? (totalViews / 1000).toFixed(1) + 'K' : totalViews || '0';
+  document.getElementById('statEarned').textContent = '₹' + totalEarned.toLocaleString('en-IN');
+  document.getElementById('statPending').textContent = '₹' + pendingAmt.toLocaleString('en-IN');
+}
+
+async function loadCampaigns() {
+  // Get all applications for this creator with campaign details
+  const { data: apps, error } = await sb
+    .from('applications')
+    .select(`
+      id, status, applied_at,
+      campaigns ( id, title, description, status, days_open, created_at ),
+      submissions ( id, content_url, views_tracked, payout_amount, status )
+    `)
+    .eq('creator_id', currentUser.id)
+    .order('applied_at', { ascending: false });
+
+  const list = document.getElementById('campaignsList');
+
+  if (error || !apps?.length) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <p style="margin-bottom:12px">You haven't joined any campaigns yet.</p>
+        <a href="all-campaigns.html">Browse live campaigns →</a>
+      </div>`;
+    return;
+  }
+
+  list.innerHTML = apps.map(app => {
+    const c   = app.campaigns;
+    const sub = app.submissions?.[0];
+    const appStatusLabel = { applied: 'Awaiting Approval', approved: 'Approved', rejected: 'Rejected' }[app.status] || app.status;
+    const badgeClass = { applied: 'applied', approved: 'approved', rejected: 'rejected' }[app.status] || 'applied';
+
+    let actionHTML = '';
+
+    if (app.status === 'rejected') {
+      actionHTML = `<div style="color:var(--smoke);font-size:13px">Your application was not approved for this campaign.</div>`;
+    } else if (app.status === 'applied') {
+      actionHTML = `<div style="color:var(--smoke);font-size:13px">Your application is under review. We'll notify you within 48 hours.</div>`;
+    } else if (app.status === 'approved') {
+      if (!sub) {
+        // No submission yet — show input
+        actionHTML = `
+          <p class="camp-desc">Post your Reel and paste the link below to begin tracking.</p>
+          <div class="submit-row">
+            <input type="url" class="submit-input" id="urlInput_${app.id}" placeholder="https://www.instagram.com/p/...">
+            <button class="submit-btn" onclick="submitContent('${app.id}','${c.id}')">Submit</button>
+          </div>`;
+      } else {
+        // Already submitted
+        const subStatus = { pending: 'Under Review', approved: 'Live', rejected: 'Rejected' }[sub.status] || sub.status;
+        const subBadge  = { pending: 'applied', approved: 'approved', rejected: 'rejected' }[sub.status] || 'applied';
+        actionHTML = `
+          <div class="content-submitted">
+            <div>
+              <div style="font-size:11px;color:var(--ash);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px">Submitted Content</div>
+              <a href="${sub.content_url}" target="_blank" class="content-link">${sub.content_url}</a>
+            </div>
+            <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+              ${sub.views_tracked ? `<span style="font-size:13px;color:var(--smoke)">${(sub.views_tracked/1000).toFixed(1)}K views</span>` : ''}
+              ${sub.payout_amount ? `<span style="font-size:13px;color:var(--flame)">₹${sub.payout_amount.toLocaleString('en-IN')}</span>` : ''}
+              <span class="status-badge ${subBadge}">${subStatus}</span>
+            </div>
+          </div>`;
+      }
     }
 
-    async function logout() {
-        if (popClient) await popClient.auth.signOut();
-        window.location.href = 'pop-studio.html';
-    }
+    return `
+      <div class="camp-card">
+        <div class="camp-card-header">
+          <div class="c-title">${c?.title || 'Campaign'}</div>
+          <span class="status-badge ${badgeClass}">${appStatusLabel}</span>
+        </div>
+        ${actionHTML}
+      </div>`;
+  }).join('');
+}
 
-    // Start the process
-    initDashboard();
+async function submitContent(applicationId, campaignId) {
+  const input = document.getElementById(`urlInput_${applicationId}`);
+  const url   = input?.value.trim();
+
+  if (!url || !url.startsWith('http')) {
+    alert('Please enter a valid Instagram URL.');
+    return;
+  }
+
+  const btn = input.nextElementSibling;
+  btn.disabled = true;
+  btn.textContent = 'Submitting…';
+
+  const { error } = await sb.from('submissions').insert({
+    campaign_id:    campaignId,
+    creator_id:     currentUser.id,
+    application_id: applicationId,
+    content_url:    url,
+    status:         'pending',
+    payout_amount:  3000  // base payout guaranteed
+  });
+
+  if (error) {
+    alert(error.code === '23505' ? 'You've already submitted for this campaign.' : 'Error submitting. Please try again.');
+    btn.disabled = false;
+    btn.textContent = 'Submit';
+  } else {
+    await loadCampaigns();
+    await loadStats();
+  }
+}
+
+async function logout() {
+  await sb.auth.signOut();
+  window.location.href = 'pop-studio.html';
+}
+
+init();
 </script>
 </body>
 </html>
