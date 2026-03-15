@@ -339,7 +339,7 @@ const SUPABASE_ANON = 'sb_publishable_Mgh-fEqB3IVF4iTvV0-rjw_GkfftY_5';
 function getSupabase() {
   if (window._popClient) return window._popClient;
   window._popClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
-    auth: { storageKey: 'pop-studio-auth' }
+    auth: { storageKey: 'pop-admin-auth' }
   });
   return window._popClient;
 }
@@ -778,9 +778,58 @@ async function publishCampaign() {
 }
 
 // ── Init ──────────────────────────────────────────────────────
+const ALLOWED_DOMAIN = 'popclub.co';
+
 async function init() {
+  // ── Auth guard ──────────────────────────────────────────────
+  const { data: { session } } = await sb.auth.getSession();
+
+  if (!session?.user) {
+    window.location.href = 'admin-login.html';
+    return;
+  }
+
+  const email = session.user.email?.toLowerCase() || '';
+
+  if (!email.endsWith('@' + ALLOWED_DOMAIN)) {
+    await sb.auth.signOut();
+    window.location.href = 'admin-login.html';
+    return;
+  }
+
+  // Verify in admins table
+  const { data: adminRow } = await sb
+    .from('admins')
+    .select('name, role')
+    .eq('email', email)
+    .maybeSingle();
+
+  if (!adminRow) {
+    await sb.auth.signOut();
+    window.location.href = 'admin-login.html';
+    return;
+  }
+
+  // Show admin name in sidebar
+  document.querySelector('.user-foot').innerHTML = `
+    <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--flame),var(--honey));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:12px;flex-shrink:0">
+      ${adminRow.name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase()}
+    </div>
+    <div style="flex:1;min-width:0">
+      <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${adminRow.name}</div>
+      <div style="font-size:10px;color:var(--ash);text-transform:uppercase;letter-spacing:0.1em">${adminRow.role}</div>
+    </div>
+    <button onclick="adminLogout()" title="Log out" style="background:none;border:none;color:var(--ash);cursor:pointer;font-size:16px;padding:4px;transition:color 0.2s" onmouseover="this.style.color='var(--flame)'" onmouseout="this.style.color='var(--ash)'">↩</button>`;
+
+  // ── Load data ───────────────────────────────────────────────
   await loadOverview();
   await loadQueue();
+}
+
+async function adminLogout() {
+  await sb.auth.signOut();
+  sessionStorage.removeItem('pop_admin');
+  window.location.href = 'admin-login.html';
 }
 
 init();

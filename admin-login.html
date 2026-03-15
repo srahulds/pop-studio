@@ -3,62 +3,240 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>POP Studio — Admin Login</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>POP Admin — Login</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-:root { --flame: #FF5200; --deep: #0A0A0A; --slab: #1A1A1A; --smoke: rgba(255,255,255,0.5); --ash: rgba(255,255,255,0.25); --glow: rgba(255,82,0,0.35); }
+:root {
+  --flame: #FF5200; --honey: #FFB547;
+  --deep: #0A0A0A; --night: #111111; --slab: #1A1A1A;
+  --smoke: rgba(255,255,255,0.5); --ash: rgba(255,255,255,0.25);
+  --ghost: rgba(255,255,255,0.08); --glow: rgba(255,82,0,0.35);
+}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--deep);color:#fff;font-family:'Outfit',sans-serif;height:100vh;display:flex;align-items:center;justify-content:center;}
+body{background:var(--deep);color:#fff;font-family:'Outfit',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;}
 body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:0.7}
-.login-box{background:var(--slab);border:1px solid rgba(255,255,255,0.08);padding:48px 40px;border-radius:24px;width:100%;max-width:400px;position:relative;z-index:10;box-shadow:0 24px 64px rgba(0,0,0,0.4)}
-.brand{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:32px;}
-.nav-logo{height:40px;width:40px;border-radius:8px;object-fit:cover;}
-.f-group{margin-bottom:16px;display:flex;flex-direction:column;gap:6px}
+
+/* Subtle background glow */
+.bg-glow{position:fixed;width:600px;height:600px;background:radial-gradient(circle,rgba(255,82,0,0.06) 0%,transparent 60%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
+
+.login-wrap{position:relative;z-index:10;width:100%;max-width:400px;padding:20px}
+
+.brand{display:flex;align-items:center;gap:14px;justify-content:center;margin-bottom:40px}
+.nav-logo{height:44px;width:44px;border-radius:10px;object-fit:cover;border:1px solid rgba(255,255,255,0.1);background:#fff}
+.brand-text{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--flame)}
+.brand-sub{font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--ash);font-weight:600;margin-top:2px}
+
+.login-box{background:var(--slab);border:1px solid rgba(255,255,255,0.07);border-radius:24px;padding:40px 36px;box-shadow:0 32px 80px rgba(0,0,0,0.4)}
+
+.login-title{font-family:'Playfair Display',serif;font-size:26px;font-weight:400;margin-bottom:6px;text-align:center}
+.login-title i{font-style:italic;color:var(--flame)}
+.login-sub{font-size:13px;color:var(--smoke);text-align:center;margin-bottom:32px;font-weight:300;line-height:1.5}
+
+.btn-google{background:#fff;color:#1a1a1a;width:100%;padding:14px;font-weight:600;font-size:14px;border:none;cursor:pointer;border-radius:100px;font-family:'Outfit',sans-serif;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:20px}
+.btn-google:hover{box-shadow:0 4px 24px rgba(255,255,255,0.15);transform:translateY(-1px)}
+.btn-google:disabled{opacity:0.6;cursor:not-allowed;transform:none;box-shadow:none}
+
+.divider{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.divider-line{flex:1;height:1px;background:rgba(255,255,255,0.06)}
+.divider-text{font-size:11px;text-transform:uppercase;letter-spacing:0.1em;color:var(--ash)}
+
+.f-group{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
 .f-label{font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--ash);font-weight:600}
-.f-input{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);color:#fff;padding:14px 18px;font-family:'Outfit',sans-serif;font-size:14px;border-radius:12px;outline:none;transition:0.2s;}
+.f-input{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);color:#fff;padding:13px 16px;font-family:'Outfit',sans-serif;font-size:14px;border-radius:12px;outline:none;transition:all 0.2s;font-weight:300}
 .f-input:focus{border-color:var(--flame);background:rgba(255,82,0,0.03)}
-.btn-flame{background:var(--flame);color:#fff;width:100%;padding:16px;font-weight:600;font-size:14px;letter-spacing:0.06em;text-transform:uppercase;border:none;cursor:pointer;border-radius:100px;font-family:'Outfit',sans-serif;margin-top:16px;transition:0.3s;}
-.btn-flame:hover{box-shadow:0 0 32px var(--glow);transform:translateY(-2px)}
+.f-input::placeholder{color:rgba(255,255,255,0.15)}
+.btn-login{background:var(--flame);color:#fff;width:100%;padding:14px;font-weight:600;font-size:13px;letter-spacing:0.06em;text-transform:uppercase;border:none;cursor:pointer;border-radius:100px;font-family:'Outfit',sans-serif;transition:all 0.3s;margin-top:4px}
+.btn-login:hover{box-shadow:0 0 28px var(--glow);transform:translateY(-1px)}
+.btn-login:disabled{opacity:0.6;cursor:not-allowed;transform:none;box-shadow:none}
+
+.msg-box{padding:12px 16px;border-radius:10px;font-size:13px;margin-bottom:16px;display:none;line-height:1.5}
+.msg-box.error{background:rgba(220,38,38,0.08);border:1px solid rgba(220,38,38,0.2);color:#f87171}
+.msg-box.info{background:rgba(255,82,0,0.06);border:1px solid rgba(255,82,0,0.15);color:var(--flame)}
+
+.domain-note{text-align:center;font-size:12px;color:var(--ash);margin-top:20px;line-height:1.6}
+.domain-note strong{color:rgba(255,255,255,0.3)}
+
+/* Loading spinner */
+.spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
-  <nav style="position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:14px 0;background:rgba(10,10,10,0.92);backdrop-filter:blur(40px);border-bottom:1px solid rgba(255,255,255,0.04);">
-    <a href="index.html" style="color:#fff;text-decoration:none;margin:0 18px;font-weight:600;">Home</a>
-    <a href="dashboard.html" style="color:#fff;text-decoration:none;margin:0 18px;font-weight:600;">Dashboard</a>
-    <a href="all-campaigns.html" style="color:#fff;text-decoration:none;margin:0 18px;font-weight:600;">All Campaigns</a>
-    <a href="admin-login.html" style="color:#FF5200;text-decoration:none;margin:0 18px;font-weight:600;">Admin Login</a>
-    <a href="admin.html" style="color:#fff;text-decoration:none;margin:0 18px;font-weight:600;">Admin Control</a>
-    <a href="pop-studio.html" style="color:#fff;text-decoration:none;margin:0 18px;font-weight:600;">POP Studio</a>
-  </nav>
-  <div style="height:56px;"></div>
-  <div class="login-box">
-    <div class="brand">
-      <img src="pop_bw_logo_new.svg" alt="POP Logo" class="nav-logo">
-      <span style="font-family:'Playfair Display',serif;font-size:32px;font-weight:700;color:var(--flame);">Studio</span>
+
+<div class="bg-glow"></div>
+
+<div class="login-wrap">
+  <div class="brand">
+    <img src="pop_bw_logo_new.svg" alt="POP" class="nav-logo">
+    <div>
+      <div class="brand-text">Admin</div>
+      <div class="brand-sub">POP Creators</div>
     </div>
-    <div style="text-align:center;color:var(--smoke);font-size:13px;margin-bottom:32px;text-transform:uppercase;letter-spacing:0.1em">Admin Gateway</div>
-    
+  </div>
+
+  <div class="login-box">
+    <h2 class="login-title">Welcome <i>back.</i></h2>
+    <p class="login-sub">Admin access restricted to<br><strong style="color:rgba(255,255,255,0.5)">@popclub.co</strong> accounts only.</p>
+
+    <div class="msg-box" id="msgBox"></div>
+
+    <!-- Google Sign In -->
+    <button class="btn-google" id="googleBtn" onclick="signInWithGoogle()">
+      <svg width="18" height="18" viewBox="0 0 18 18">
+        <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
+        <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/>
+        <path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/>
+        <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/>
+      </svg>
+      Continue with Google
+    </button>
+
+    <div class="divider">
+      <div class="divider-line"></div>
+      <div class="divider-text">Or email</div>
+      <div class="divider-line"></div>
+    </div>
+
+    <!-- Email + Password -->
     <div class="f-group">
-      <label class="f-label">Admin Email</label>
-      <input type="email" class="f-input" placeholder="admin@pop.in" id="adminEmail">
+      <label class="f-label">Email</label>
+      <input type="email" class="f-input" id="emailInput" placeholder="rahul@popclub.co" autocomplete="email">
     </div>
     <div class="f-group">
       <label class="f-label">Password</label>
-      <input type="password" class="f-input" placeholder="••••••••" id="adminPass">
+      <input type="password" class="f-input" id="passInput" placeholder="••••••••" autocomplete="current-password"
+             onkeydown="if(event.key==='Enter') signInWithEmail()">
     </div>
-    <button class="btn-flame" onclick="adminLogin()">Authenticate</button>
-  </div>
+    <button class="btn-login" id="emailBtn" onclick="signInWithEmail()">Sign In</button>
 
-  <script>
-    function adminLogin() {
-      // Dummy logic for now. Will connect to Supabase admin table later.
-      const email = document.getElementById('adminEmail').value;
-      if(email.includes('@pop')) {
-        window.location.href = 'admin.html';
-      } else {
-        alert('Unauthorized email domain.');
-      }
+    <div class="domain-note">
+      Only <strong>@popclub.co</strong> accounts are permitted.<br>
+      Contact Rahul to get access.
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL  = 'https://fxuinuxyjhjxygdhskfn.supabase.co';
+const SUPABASE_ANON = 'sb_publishable_Mgh-fEqB3IVF4iTvV0-rjw_GkfftY_5';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON, {
+  auth: { storageKey: 'pop-admin-auth' } // separate storage key from creator portal
+});
+
+const ALLOWED_DOMAIN = 'popclub.co';
+
+// ── On load: if already authenticated admin, go straight to admin panel ──
+async function checkExistingSession() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session?.user) {
+    await verifyAndRedirect(session.user);
+  }
+}
+
+// ── Google OAuth ──────────────────────────────────────────────
+async function signInWithGoogle() {
+  const btn = document.getElementById('googleBtn');
+  btn.innerHTML = `<span class="spinner"></span> Connecting…`;
+  btn.disabled = true;
+
+  const { error } = await sb.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: 'https://srahulds.github.io/pop-studio/admin-login.html',
+      queryParams: { hd: ALLOWED_DOMAIN } // hint Google to show @popclub.co accounts
     }
-  </script>
+  });
+
+  if (error) {
+    showMsg(error.message, 'error');
+    btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg> Continue with Google`;
+    btn.disabled = false;
+  }
+}
+
+// ── Email + Password ──────────────────────────────────────────
+async function signInWithEmail() {
+  const email    = document.getElementById('emailInput').value.trim().toLowerCase();
+  const password = document.getElementById('passInput').value;
+  const btn      = document.getElementById('emailBtn');
+
+  if (!email || !password) return showMsg('Enter your email and password.', 'error');
+
+  // Domain check before even hitting the server
+  if (!email.endsWith('@' + ALLOWED_DOMAIN)) {
+    return showMsg(`Only @${ALLOWED_DOMAIN} accounts are permitted.`, 'error');
+  }
+
+  btn.innerHTML = `<span class="spinner"></span>`;
+  btn.disabled  = true;
+
+  const { data, error } = await sb.auth.signInWithPassword({ email, password });
+
+  if (error) {
+    showMsg(error.message, 'error');
+    btn.innerHTML = 'Sign In';
+    btn.disabled  = false;
+    return;
+  }
+
+  await verifyAndRedirect(data.user);
+}
+
+// ── Verify admin table + domain, then redirect ────────────────
+async function verifyAndRedirect(user) {
+  showMsg('Verifying access…', 'info');
+
+  const email = user.email?.toLowerCase() || '';
+
+  // 1. Domain check
+  if (!email.endsWith('@' + ALLOWED_DOMAIN)) {
+    await sb.auth.signOut();
+    showMsg(`Access denied. Only @${ALLOWED_DOMAIN} accounts are permitted.`, 'error');
+    return;
+  }
+
+  // 2. Check admins table
+  const { data: adminRow, error } = await sb
+    .from('admins')
+    .select('id, name, role')
+    .eq('email', email)
+    .maybeSingle();
+
+  if (error || !adminRow) {
+    await sb.auth.signOut();
+    showMsg(`${email} is not registered as an admin. Contact Rahul to get access.`, 'error');
+    return;
+  }
+
+  // 3. Store admin info in sessionStorage for admin.html to read
+  sessionStorage.setItem('pop_admin', JSON.stringify({
+    email,
+    name: adminRow.name,
+    role: adminRow.role
+  }));
+
+  // 4. Redirect to admin panel
+  window.location.href = 'admin.html';
+}
+
+// ── Handle OAuth return ───────────────────────────────────────
+sb.auth.onAuthStateChange(async (event, session) => {
+  if (event === 'SIGNED_IN' && session?.user) {
+    await verifyAndRedirect(session.user);
+  }
+});
+
+function showMsg(text, type = 'error') {
+  const el = document.getElementById('msgBox');
+  el.textContent = text;
+  el.className   = `msg-box ${type}`;
+  el.style.display = 'block';
+}
+
+// Check on page load
+checkExistingSession();
+</script>
 </body>
 </html>
