@@ -11,18 +11,28 @@
 body{background:var(--deep);color:#fff;font-family:'Outfit',sans-serif;min-height:100vh;}
 body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:0.7}
 
-nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:14px 0;background:rgba(10,10,10,0.92);backdrop-filter:blur(40px);border-bottom:1px solid rgba(255,255,255,0.04);}
-nav a{color:#fff;text-decoration:none;margin:0 18px;font-weight:600;font-size:13px;transition:color 0.2s}
-nav a:hover,nav a.active{color:var(--flame)}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:16px 48px;background:rgba(10,10,10,0.85);backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px);border-bottom:1px solid rgba(255,255,255,0.04);transition:all 0.3s}
+nav.scrolled{padding:12px 48px;background:rgba(10,10,10,0.97)}
+.nav-brand{display:flex;align-items:center;gap:12px;text-decoration:none}
+.nav-logo{height:32px;width:32px;border-radius:8px;object-fit:cover;box-shadow:0 4px 12px rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1);background:#fff}
+.nav-tag{font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--ash);font-weight:600;border:1px solid rgba(255,255,255,0.1);padding:4px 10px;border-radius:100px}
+.nav-mid{display:flex;gap:32px;list-style:none;align-items:center}
+.nav-mid a{color:var(--smoke);text-decoration:none;font-size:13px;font-weight:400;letter-spacing:0.03em;transition:color 0.2s}
+.nav-mid a:hover{color:var(--flame)}
+.nav-right{display:flex;gap:12px;align-items:center}
+.hamburger{display:none;background:transparent;border:none;color:#fff;font-size:24px;cursor:pointer}
+.mob-menu-overlay{position:fixed;inset:0;background:rgba(10,10,10,0.98);backdrop-filter:blur(20px);z-index:999;display:flex;flex-direction:column;justify-content:center;align-items:center;opacity:0;pointer-events:none;transition:opacity 0.3s ease}
+.mob-menu-overlay.show{opacity:1;pointer-events:auto}
+.mob-menu-close{position:absolute;top:24px;right:24px;background:rgba(255,255,255,0.05);border:none;width:40px;height:40px;border-radius:50%;color:#fff;font-size:18px;cursor:pointer}
+.mob-menu-links{display:flex;flex-direction:column;gap:32px;text-align:center}
+.mob-menu-links a{font-family:'Playfair Display',serif;font-size:32px;color:#fff;text-decoration:none;transition:0.2s}
+.mob-menu-links a:hover{color:var(--flame)}
+@media(max-width:768px){nav{padding:14px 20px}.nav-mid{display:none}.hamburger{display:block}}
 
 .container{max-width:1100px;margin:0 auto;padding:96px 5% 60px;}
-.page-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;margin-bottom:40px;}
+.page-header{margin-bottom:40px;}
 .page-title{font-family:'Playfair Display',serif;font-size:clamp(28px,4vw,40px);font-weight:400;}
 .page-title i{font-style:italic;color:var(--flame)}
-.user-pill{display:flex;align-items:center;gap:12px;}
-.avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--flame),var(--honey));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
-.logout-btn{background:none;border:1px solid var(--ghost);color:var(--smoke);padding:6px 14px;border-radius:100px;cursor:pointer;font-size:10px;text-transform:uppercase;letter-spacing:0.08em;font-family:'Outfit',sans-serif;transition:0.2s}
-.logout-btn:hover{border-color:var(--flame);color:var(--flame)}
 
 .s-label{font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--ember);margin-bottom:20px;display:flex;align-items:center;gap:10px}
 .s-label::before{content:'';width:16px;height:1px;background:var(--ember)}
@@ -74,25 +84,40 @@ nav a:hover,nav a.active{color:var(--flame)}
 </head>
 <body>
 
-<nav>
-  <a href="pop-studio.html">Home</a>
-  <a href="dashboard.html" class="active">Dashboard</a>
-  <a href="all-campaigns.html">All Campaigns</a>
-  <a href="admin-login.html">Admin Login</a>
-  <a href="admin.html">Admin Control</a>
+<nav id="mainNav">
+  <a href="pop-studio.html" class="nav-brand">
+    <img src="pop_bw_logo_new.svg" alt="POP Logo" class="nav-logo">
+    <span class="nav-tag">Studio</span>
+  </a>
+  <ul class="nav-mid">
+    <li><a href="all-campaigns.html">All Campaigns</a></li>
+    <li><a href="pop-studio.html#rewards">How it Works</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+  <div class="nav-right" id="navRight">
+    <!-- Populated by JS once user loads -->
+  </div>
+  <button class="hamburger" onclick="toggleMobileMenu()">☰</button>
 </nav>
+
+<div class="mob-menu-overlay" id="mobMenu">
+  <button class="mob-menu-close" onclick="toggleMobileMenu()">✕</button>
+  <div class="mob-menu-links">
+    <a href="all-campaigns.html" onclick="toggleMobileMenu()">All Campaigns</a>
+    <a href="pop-studio.html#rewards" onclick="toggleMobileMenu()">How it Works</a>
+    <a href="contact.html" onclick="toggleMobileMenu()">Contact</a>
+  </div>
+</div>
 
 <div class="container">
   <div class="page-header">
     <div>
       <h1 class="page-title">Creator <i>Dashboard.</i></h1>
     </div>
-    <div class="user-pill">
-      <div class="avatar" id="userAvatar">--</div>
-      <span id="userName" style="font-size:14px;color:var(--smoke);font-weight:400">Loading…</span>
-      <button class="logout-btn" onclick="logout()">Log out</button>
-    </div>
   </div>
+  <!-- Hidden spans kept for JS reference -->
+  <span id="userName" style="display:none"></span>
+  <span id="userAvatar" style="display:none"></span>
 
   <div class="s-label">Performance</div>
   <div class="stats-grid">
@@ -148,6 +173,14 @@ async function setupUser(user) {
   const initials = fullName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
   document.getElementById('userAvatar').textContent = initials;
 
+  // Populate nav right with user pill
+  document.getElementById('navRight').innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--flame),var(--honey));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0">${initials}</div>
+      <span style="font-size:13px;color:var(--smoke);font-weight:400;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${fullName}</span>
+      <button onclick="logout()" style="background:none;border:1px solid rgba(255,255,255,0.1);color:var(--smoke);padding:6px 14px;border-radius:100px;cursor:pointer;font-size:10px;text-transform:uppercase;letter-spacing:0.08em;font-family:'Outfit',sans-serif;transition:0.2s;white-space:nowrap" onmouseover="this.style.borderColor='var(--flame)';this.style.color='var(--flame)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.color='var(--smoke)'">Log out</button>
+    </div>`;
+
   // Sync creator row
   await sb.from('creators').upsert({
     id: user.id,
@@ -160,6 +193,15 @@ async function setupUser(user) {
 
   await Promise.all([loadStats(), loadCampaigns()]);
 }
+
+function toggleMobileMenu() {
+  document.getElementById('mobMenu').classList.toggle('show');
+  document.body.style.overflow = document.getElementById('mobMenu').classList.contains('show') ? 'hidden' : '';
+}
+
+window.addEventListener('scroll', () => {
+  document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 40);
+});
 
 async function loadStats() {
   // submissions aggregate
