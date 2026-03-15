@@ -233,7 +233,7 @@ function closeAuth() {
 async function signInGoogle() {
   const { error } = await sb.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: window.location.href }
+    options: { redirectTo: 'https://srahulds.github.io/pop-studio/dashboard.html' }
   });
   if (error) showMsg(error.message);
 }

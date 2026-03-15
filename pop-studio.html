@@ -433,7 +433,7 @@ function showMsg(id, text, type = 'error') {
 async function signInWithGoogle() {
   const { error } = await sb.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: window.location.origin + '/dashboard.html' }
+    options: { redirectTo: 'https://srahulds.github.io/pop-studio/dashboard.html' }
   });
   if (error) showMsg('loginMsg', error.message);
 }
