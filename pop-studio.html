@@ -498,6 +498,16 @@ async function initAuth() {
   const { data: { session } } = await sb.auth.getSession();
   if (session?.user) {
     currentUser = session.user;
+
+    // Load avatar from DB if not cached
+    if (!localStorage.getItem('pop_avatar')) {
+      sb.from('creators').select('avatar_url, instagram_handle').eq('id', session.user.id).single().then(({ data }) => {
+        if (data?.avatar_url) localStorage.setItem('pop_avatar', data.avatar_url);
+        if (data?.instagram_handle) localStorage.setItem('pop_ig_handle', data.instagram_handle);
+        updateNavForUser(session.user);
+      });
+    }
+
     updateNavForUser(session.user);
 
     // Already logged in — if there's a returnTo, go there immediately
@@ -531,12 +541,28 @@ async function initAuth() {
 }
 
 function updateNavForUser(user) {
-  const ig       = user.user_metadata?.instagram_handle || user.user_metadata?.full_name || user.email?.split('@')[0];
+  const ig       = user.user_metadata?.instagram_handle || localStorage.getItem('pop_ig_handle') || user.user_metadata?.full_name || user.email?.split('@')[0];
   const initials = ig.substring(0, 2).toUpperCase();
-  const btn      = document.getElementById('navAuthBtn');
-  // On desktop show handle, on mobile show compact avatar + arrow
-  btn.innerHTML  = `<span class="nav-user-desktop">@${ig} → Dashboard</span><span class="nav-user-mobile">${initials} →</span>`;
-  btn.onclick    = () => window.location.href = 'dashboard.html';
+  const avatar   = localStorage.getItem('pop_avatar');
+
+  const avatarHTML = avatar
+    ? `<img src="${avatar}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1.5px solid rgba(255,82,0,0.4)" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+    : '';
+  const fallbackHTML = `<div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--flame),var(--honey));display:${avatar ? 'none' : 'flex'};align-items:center;justify-content:center;font-weight:700;font-size:11px;flex-shrink:0">${initials}</div>`;
+
+  const btn = document.getElementById('navAuthBtn');
+  btn.innerHTML = `
+    ${avatarHTML}${fallbackHTML}
+    <span class="nav-user-desktop">@${ig} → Dashboard</span>
+    <span class="nav-user-mobile">→</span>`;
+  btn.style.cssText = 'display:flex;align-items:center;gap:8px;padding:4px 12px 4px 4px;background:rgba(255,82,0,0.1);border:1px solid rgba(255,82,0,0.25);border-radius:100px;cursor:pointer;font-size:11px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#fff;transition:all 0.2s';
+  btn.onclick = () => window.location.href = 'dashboard.html';
+
+  // Also update hero button text if on homepage
+  const heroBtn = document.getElementById('heroAuthBtn');
+  if (heroBtn) {
+    heroBtn.innerHTML = `<span>@${ig} ✕ POP</span> <span style="font-size:16px;line-height:1">→</span>`;
+  }
 }
 
 function handleAuthClick() {
@@ -626,6 +652,14 @@ async function checkExistingAccount(email, fbUser) {
   if (!signInErr && signInData?.user) {
     // Returning user — session established
     currentUser = signInData.user;
+
+    // Fetch avatar and IG handle for returning user
+    sb.from('creators').select('avatar_url, instagram_handle').eq('id', signInData.user.id).single().then(({ data }) => {
+      if (data?.avatar_url) localStorage.setItem('pop_avatar', data.avatar_url);
+      if (data?.instagram_handle) localStorage.setItem('pop_ig_handle', data.instagram_handle);
+      updateNavForUser(signInData.user);
+    });
+
     updateNavForUser(signInData.user);
 
     // Update creator row with latest FB data
@@ -813,6 +847,8 @@ async function completeSignup() {
     if (!userId) throw new Error('Could not create your account. Please try again.');
 
     // Upsert creator row
+    const picUrl = badge.dataset.pic || '';
+
     await sb.from('creators').upsert({
       id:               userId,
       full_name:        fbUserData?.name || fullName,
@@ -820,8 +856,13 @@ async function completeSignup() {
       instagram_handle: handle,
       phone,
       fb_user_id:       fbId,
+      avatar_url:       picUrl,
       status:           'pending'
     }, { onConflict: 'id' });
+
+    // Store avatar in localStorage for immediate nav use
+    if (picUrl) localStorage.setItem('pop_avatar', picUrl);
+    localStorage.setItem('pop_ig_handle', handle);
 
     currentUser = sessionUser;
     if (currentUser) updateNavForUser(currentUser);
