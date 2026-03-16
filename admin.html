@@ -346,6 +346,7 @@ function getSupabase() {
 </script>
 <script>
 const sb = getSupabase();
+const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#x27;');
 let activeCampaignId   = null;
 let activeCreatorId    = null;
 let activeCampaignName = '';
@@ -437,7 +438,7 @@ async function loadOverview() {
       const daysLeft  = Math.max(0, c.days_open - Math.floor((Date.now()-new Date(c.created_at))/86400000));
       const badge     = c.status === 'active' ? `<span class="st-badge ok">Active · ${daysLeft}d left</span>` : c.status === 'ended' ? `<span class="st-badge no">Ended</span>` : `<span class="st-badge wait">Draft</span>`;
       return `<tr>
-        <td><div class="td-strong">${c.title}</div></td>
+        <td><div class="td-strong">${esc(c.title)}</div></td>
         <td>${applied??0}</td><td>${approved??0}</td><td>${submitted??0}</td><td>${live??0}</td>
         <td style="color:#fff;font-weight:500">${campViews>=100000?(campViews/100000).toFixed(1)+'L':campViews>=1000?(campViews/1000).toFixed(1)+'K':campViews||'—'}</td>
         <td>${badge}</td>
@@ -493,9 +494,9 @@ async function openCampaign(campId, campTitle) {
     const sub     = subMap[app.creator_id];
     const appBadge = app.status==='approved'?'ok':app.status==='rejected'?'no':'wait';
     return `<tr>
-      <td><div class="td-strong">${creator?.full_name||'—'}</div><div class="td-sub">@${creator?.instagram_handle||'—'}</div></td>
+      <td><div class="td-strong">${esc(creator?.full_name||'—')}</div><div class="td-sub">@${creator?.instagram_handle||'—'}</div></td>
       <td><span class="st-badge ${appBadge}">${app.status}</span></td>
-      <td>${sub?.content_url?`<a href="${sub.content_url}" target="_blank" style="color:var(--flame);text-decoration:none;font-weight:500">View ↗</a>`:'—'}</td>
+      <td>${sub?.content_url?`<a href="${esc(sub.content_url)}" target="_blank" style="color:var(--flame);text-decoration:none;font-weight:500">View ↗</a>`:'—'}</td>
       <td style="color:#fff;font-weight:500">${sub?.views_tracked?(sub.views_tracked>=100000?(sub.views_tracked/100000).toFixed(1)+'L':(sub.views_tracked/1000).toFixed(1)+'K'):'—'}</td>
       <td style="color:var(--flame)">${sub?.payout_amount?'₹'+sub.payout_amount.toLocaleString('en-IN'):'—'}</td>
       <td>${sub?`<span class="st-badge ${sub.status==='approved'?'ok':sub.status==='rejected'?'no':'wait'}">${sub.status}</span>`:'—'}</td>
@@ -531,7 +532,7 @@ async function openCreator(creatorId, creatorName) {
     <div class="prof-info">
       <div class="prof-av">${initials}</div>
       <div>
-        <h2 style="font-family:'Playfair Display',serif;font-size:28px;margin-bottom:4px">${creator?.full_name||'—'}</h2>
+        <h2 style="font-family:'Playfair Display',serif;font-size:28px;margin-bottom:4px">${esc(creator?.full_name||'—')}</h2>
         <div style="color:var(--ember);font-size:13px;margin-bottom:8px">@${creator?.instagram_handle||'—'}</div>
         <div style="margin-bottom:8px">${statusBadge}</div>
         <div style="display:flex;gap:20px;font-size:12px;color:var(--smoke);flex-wrap:wrap">
@@ -557,7 +558,7 @@ async function openCreator(creatorId, creatorName) {
         return `<tr>
           <td><div class="td-strong">${app.campaigns?.title||'—'}</div></td>
           <td><span class="st-badge ${badge}">${app.status}</span></td>
-          <td>${sub?.content_url?`<a href="${sub.content_url}" target="_blank" style="color:var(--flame);text-decoration:none;font-weight:500">View ↗</a>`:'—'}</td>
+          <td>${sub?.content_url?`<a href="${esc(sub.content_url)}" target="_blank" style="color:var(--flame);text-decoration:none;font-weight:500">View ↗</a>`:'—'}</td>
           <td>${sub?.views_tracked?(sub.views_tracked>=100000?(sub.views_tracked/100000).toFixed(1)+'L':(sub.views_tracked/1000).toFixed(1)+'K'):'—'}</td>
           <td style="color:var(--flame)">${sub?.payout_amount?'₹'+sub.payout_amount.toLocaleString('en-IN'):'—'}</td>
         </tr>`;
@@ -590,7 +591,7 @@ async function loadQueue() {
   document.getElementById('creatorAppBody').innerHTML = pendingApps?.length
     ? pendingApps.map(app => `<tr>
         <td><a href="https://www.instagram.com/${app.creators?.instagram_handle||''}" target="_blank" style="color:#fff;font-weight:500">@${app.creators?.instagram_handle||'—'} ↗</a></td>
-        <td>${app.creators?.full_name||'—'}</td>
+        <td>${esc(app.creators?.full_name||'—')}</td>
         <td style="font-size:12px;color:var(--smoke)">${app.creators?.email||'—'}</td>
         <td>${app.campaigns?.title||'—'}</td>
         <td style="font-size:12px;color:var(--ash)">${new Date(app.applied_at).toLocaleDateString('en-IN')}</td>
@@ -605,8 +606,8 @@ async function loadQueue() {
   document.getElementById('contentAppBody').innerHTML = pendingContent?.length
     ? pendingContent.map(sub => `<tr>
         <td><div class="td-strong">${sub.campaigns?.title||'—'}</div></td>
-        <td><div class="td-strong">${sub.creators?.full_name||'—'}</div><div class="td-sub">@${sub.creators?.instagram_handle||'—'}</div></td>
-        <td><a href="${sub.content_url}" target="_blank" style="color:var(--flame);text-decoration:none;font-weight:500">Review Link ↗</a></td>
+        <td><div class="td-strong">${esc(sub.creators?.full_name||'—')}</div><div class="td-sub">@${sub.creators?.instagram_handle||'—'}</div></td>
+        <td><a href="${esc(sub.content_url)}" target="_blank" style="color:var(--flame);text-decoration:none;font-weight:500">Review Link ↗</a></td>
         <td><span class="st-badge wait">Pending</span></td>
         <td><div style="display:flex;gap:8px">
           <button class="btn-g" onclick="openPayoutModal('${sub.id}','${sub.content_url}','${(sub.creators?.full_name||'Creator').replace(/'/g,"\\'")}')">Approve + Payout</button>
@@ -712,7 +713,7 @@ function renderCreatorsTable(filter) {
     const joined = c.created_at ? new Date(c.created_at).toLocaleDateString('en-IN') : '—';
     return `<tr>
       <td>
-        <div class="td-strong">${c.full_name || '—'}</div>
+        <div class="td-strong">${esc(c.full_name)}</div>
         <div style="font-size:11px;color:var(--ash);margin-top:2px">${joined}</div>
       </td>
       <td>

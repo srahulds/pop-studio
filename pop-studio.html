@@ -478,6 +478,9 @@ const sb = window.supabase.createClient(
 );
 let currentUser = null;
 let fbUserData  = null;
+
+// Sanitise any DB content before injecting into innerHTML
+const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#x27;');
 </script>
 <script>
 
@@ -651,7 +654,7 @@ async function checkExistingAccount(email, fbUser) {
   document.getElementById('verifyingText').textContent = 'Checking your account…';
 
   // Try signing in with their derived credentials
-  const password = `fb_${fbUser.id}_pop`;
+  const password = `pop_${btoa(fbUser.id).replace(/=/g,'')}x${fbUser.id.split('').reverse().join('').substring(0,6)}`;
   const { data: signInData, error: signInErr } = await sb.auth.signInWithPassword({ email, password });
 
   if (!signInErr && signInData?.user) {
@@ -804,7 +807,7 @@ async function completeSignup() {
   try {
     const fbId     = fbUserData?.id || 'unknown';
     const email    = fbUserData?.email || `fb_${fbId}@pop-studio.app`;
-    const password = `fb_${fbId}_pop`;
+    const password = `pop_${btoa(fbId).replace(/=/g,'')}x${fbId.split('').reverse().join('').substring(0,6)}`;
 
     let userId, sessionUser;
 
@@ -961,8 +964,8 @@ async function loadCampaigns() {
     return `
       <div class="camp-card${app ? ' opted-in' : ''}">
         <div class="c-meta"><span class="c-days">${daysLeft} Days Left</span></div>
-        <h3>${c.title}</h3>
-        <p>${c.description || ''}</p>
+        <h3>${esc(c.title)}</h3>
+        <p>${esc(c.description)}</p>
         <div class="c-participants">${participants} Creators Joined</div>
         ${actionBtn}
       </div>`;

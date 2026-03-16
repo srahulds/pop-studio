@@ -154,6 +154,7 @@ const sb = window.supabase.createClient(
   { auth: { storageKey: 'pop-studio-auth', autoRefreshToken: true, persistSession: true } }
 );
 let currentUser = null;
+const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#x27;');
 
 async function init() {
   const { data: { session } } = await sb.auth.getSession();
@@ -310,7 +311,7 @@ async function loadCampaigns() {
     return `
       <div class="camp-card">
         <div class="camp-card-header">
-          <div class="c-title">${c?.title || 'Campaign'}</div>
+          <div class="c-title">${esc(c?.title) || 'Campaign'}</div>
           <span class="status-badge ${badgeClass}">${appStatusLabel}</span>
         </div>
         ${actionHTML}
@@ -318,12 +319,26 @@ async function loadCampaigns() {
   }).join('');
 }
 
+let isSubmitting = false;
+
 async function submitContent(applicationId, campaignId) {
+  if (isSubmitting) return;
+  isSubmitting = true;
   const input = document.getElementById(`urlInput_${applicationId}`);
   const url   = input?.value.trim();
 
-  if (!url || !url.startsWith('http')) {
-    alert('Please enter a valid Instagram URL.');
+  if (!url) {
+    alert('Please paste your Instagram Reel or post URL.');
+    return;
+  }
+  try {
+    const parsed = new URL(url);
+    if (!parsed.hostname.includes('instagram.com')) {
+      alert('Please enter a valid Instagram URL (instagram.com/...).');
+      return;
+    }
+  } catch {
+    alert('Please enter a valid URL.');
     return;
   }
 
@@ -337,8 +352,10 @@ async function submitContent(applicationId, campaignId) {
     application_id: applicationId,
     content_url:    url,
     status:         'pending',
-    payout_amount:  3000  // base payout guaranteed
+    payout_amount:  3000
   });
+
+  isSubmitting = false;
 
   if (error) {
     alert(error.code === '23505' ? "You've already submitted for this campaign." : 'Error submitting. Please try again.');

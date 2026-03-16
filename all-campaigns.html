@@ -236,6 +236,7 @@ const sb = window.supabase.createClient(
 );
 let currentUser  = null;
 let pendingOptIn = null;
+const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#x27;');
 
 async function init() {
   const { data: { session } } = await sb.auth.getSession();
@@ -349,8 +350,8 @@ function buildAvailableCard(c) {
   return `
     <div class="camp-card available">
       <div class="c-meta"><span class="c-days">${days} Days Left</span></div>
-      <h3>${c.title}</h3>
-      <p>${c.description || ''}</p>
+      <h3>${esc(c.title)}</h3>
+      <p>${esc(c.description)}</p>
       <div class="c-participants">${count} Creators Joined</div>
       <button class="c-action-btn" onclick="handleOptIn('${c.id}','${c.title.replace(/'/g,"\\'")}')">
         Opt In →
@@ -403,8 +404,8 @@ function buildOptedInCard(c, app) {
         <span class="c-days">${days} Days Left</span>
         <span class="c-status-pill ${pillClass}">${pillLabel}</span>
       </div>
-      <h3>${c.title}</h3>
-      <p>${c.description || ''}</p>
+      <h3>${esc(c.title)}</h3>
+      <p>${esc(c.description)}</p>
       <div class="c-participants">${count} Creators Joined</div>
       ${payoutRow}
       ${actionBtn}
@@ -428,8 +429,8 @@ function buildExpiredCard(c, app) {
         <span class="c-days ended">Ended</span>
         ${app ? `<span class="c-status-pill ${app.status === 'approved' ? 'approved' : 'rejected'}">${app.status === 'approved' ? 'Participated' : 'Not Selected'}</span>` : ''}
       </div>
-      <h3>${c.title}</h3>
-      <p>${c.description || ''}</p>
+      <h3>${esc(c.title)}</h3>
+      <p>${esc(c.description)}</p>
       ${statusNote}
       <div class="c-participants dim">${count} Creators Participated</div>
       <button class="c-action-btn closed">Submissions Closed</button>
@@ -445,7 +446,17 @@ async function handleOptIn(campaignId, campaignTitle) {
   await applyToCampaign(campaignId, campaignTitle);
 }
 
+let lastApplyTime = 0;
+
 async function applyToCampaign(campaignId, campaignTitle) {
+  // Simple rate limit — 3 seconds between applications
+  const now = Date.now();
+  if (now - lastApplyTime < 3000) {
+    alert('Please wait a moment before applying to another campaign.');
+    return;
+  }
+  lastApplyTime = now;
+
   const { error } = await sb.from('applications').insert({
     campaign_id: campaignId,
     creator_id:  currentUser.id,
