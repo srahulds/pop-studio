@@ -482,6 +482,14 @@ let fbUserData  = null;
 
 // Sanitise any DB content before injecting into innerHTML
 const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#x27;');
+
+// Whitelist-based redirect — prevents open redirect attacks via localStorage
+const ALLOWED_PAGES = ['all-campaigns.html', 'dashboard.html', 'pop-studio.html'];
+function safeRedirect(url) {
+  if (!url) return 'dashboard.html';
+  const match = ALLOWED_PAGES.find(p => url === p || url.endsWith('/' + p));
+  return match || 'dashboard.html';
+}
 </script>
 <script>
 
@@ -524,7 +532,7 @@ async function initAuth() {
     const returnTo = localStorage.getItem('pop_return_to');
     if (returnTo) {
       localStorage.removeItem('pop_return_to');
-      window.location.href = returnTo;
+      window.location.href = safeRedirect(returnTo);
       return;
     }
   } else {
@@ -683,7 +691,7 @@ async function checkExistingAccount(email, fbUser) {
     if (returnTo) {
       localStorage.removeItem('pop_return_to');
       closeAuthModal();
-      window.location.href = returnTo;
+      window.location.href = safeRedirect(returnTo);
     } else {
       closeAuthModal();
       window.location.href = 'dashboard.html';
@@ -878,7 +886,7 @@ async function completeSignup() {
       const successBtn = document.querySelector('#stepSuccess .f-submit');
       if (successBtn) successBtn.textContent = 'Back to Campaigns →';
       showStep('stepSuccess');
-      setTimeout(() => window.location.href = returnTo, 1200);
+      setTimeout(() => window.location.href = safeRedirect(returnTo), 1200);
     } else {
       showStep('stepSuccess');
     }
@@ -894,7 +902,7 @@ function goAfterLogin() {
   const returnTo = localStorage.getItem('pop_return_to');
   if (returnTo) {
     localStorage.removeItem('pop_return_to');
-    window.location.href = returnTo;
+    window.location.href = safeRedirect(returnTo);
   } else {
     window.location.href = 'dashboard.html';
   }
