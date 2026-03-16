@@ -264,7 +264,6 @@ function updateNavForUser(user) {
       <button onclick="logout()" style="background:none;border:1px solid rgba(255,255,255,0.1);color:var(--smoke);padding:5px 12px;border-radius:100px;cursor:pointer;font-size:10px;text-transform:uppercase;letter-spacing:0.08em;font-family:'Outfit',sans-serif;transition:0.2s;white-space:nowrap" onmouseover="this.style.borderColor='var(--flame)';this.style.color='var(--flame)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)';this.style.color='var(--smoke)'">Log out</button>
     </div>`;
 }
-}
 
 function handleAuthClick() {
   if (currentUser) { window.location.href = 'dashboard.html'; return; }
