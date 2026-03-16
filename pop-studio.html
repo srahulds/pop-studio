@@ -22,7 +22,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 ::selection{background:var(--flame);color:#fff}
 
 nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:18px 56px;background:rgba(10,10,10,0.8);backdrop-filter:blur(40px);border-bottom:1px solid rgba(255,255,255,0.04);transition:all 0.3s}
-nav.scrolled{padding:12px 56px;background:rgba(10,10,10,0.95)}
+nav.scrolled{background:rgba(10,10,10,0.97)}
 .nav-brand{display:flex;align-items:center;gap:12px;text-decoration:none;}
 .nav-logo{height:32px;width:32px;border-radius:8px;object-fit:cover;box-shadow:0 4px 12px rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1);background:#fff}
 .nav-tag{font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.6);font-weight:600;border:1px solid rgba(255,255,255,0.18);padding:4px 10px;border-radius:100px}
@@ -220,6 +220,7 @@ footer{padding:60px 56px 40px;border-top:1px solid rgba(255,255,255,0.04);displa
     <a href="#ecosystem" onclick="toggleMobileMenu()">POP Story</a>
     <a href="#campaigns" onclick="toggleMobileMenu()">Create</a>
     <a href="#rewards" onclick="toggleMobileMenu()">Earn</a>
+    <a id="mobLogout" style="display:none;color:rgba(255,255,255,0.4);font-size:18px;cursor:pointer" onclick="signOut();toggleMobileMenu()">Log Out</a>
   </div>
 </div>
 
@@ -549,8 +550,19 @@ function updateNavForUser(user) {
   btn.style.cssText = 'display:inline-flex;align-items:center;padding:6px 14px;background:rgba(255,82,0,0.1);border:1px solid rgba(255,82,0,0.25);border-radius:100px;cursor:pointer;font-size:10px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#fff;transition:all 0.2s;white-space:nowrap';
   btn.onclick = () => window.location.href = 'dashboard.html';
 
+  // Show Log Out in hamburger
+  const mobLogout = document.getElementById('mobLogout');
+  if (mobLogout) mobLogout.style.display = 'block';
+
   const heroBtn = document.getElementById('heroAuthBtn');
   if (heroBtn) heroBtn.innerHTML = `<span>@${handleDisplay} ✕ POP</span><span style="font-size:16px;line-height:1">→</span>`;
+}
+
+async function signOut() {
+  await sb.auth.signOut();
+  localStorage.removeItem('pop_ig_handle');
+  localStorage.removeItem('pop_avatar');
+  window.location.reload();
 }
 
 function handleAuthClick() {
