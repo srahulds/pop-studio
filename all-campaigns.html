@@ -240,10 +240,9 @@ async function init() {
   const { data: { session } } = await sb.auth.getSession();
   if (session?.user) {
     currentUser = session.user;
-    // Load avatar if not cached
-    if (!localStorage.getItem('pop_avatar')) {
-      sb.from('creators').select('avatar_url, instagram_handle').eq('id', session.user.id).single().then(({ data }) => {
-        if (data?.avatar_url) localStorage.setItem('pop_avatar', data.avatar_url);
+    // Load IG handle if not cached
+    if (!localStorage.getItem('pop_ig_handle')) {
+      sb.from('creators').select('instagram_handle').eq('id', session.user.id).single().then(({ data }) => {
         if (data?.instagram_handle) localStorage.setItem('pop_ig_handle', data.instagram_handle);
         updateNavForUser(session.user);
       });

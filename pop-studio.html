@@ -500,10 +500,9 @@ async function initAuth() {
   if (session?.user) {
     currentUser = session.user;
 
-    // Load avatar from DB if not cached
-    if (!localStorage.getItem('pop_avatar')) {
-      sb.from('creators').select('avatar_url, instagram_handle').eq('id', session.user.id).single().then(({ data }) => {
-        if (data?.avatar_url) localStorage.setItem('pop_avatar', data.avatar_url);
+    // Load IG handle if not cached
+    if (!localStorage.getItem('pop_ig_handle')) {
+      sb.from('creators').select('instagram_handle').eq('id', session.user.id).single().then(({ data }) => {
         if (data?.instagram_handle) localStorage.setItem('pop_ig_handle', data.instagram_handle);
         updateNavForUser(session.user);
       });
@@ -642,9 +641,8 @@ async function checkExistingAccount(email, fbUser) {
     // Returning user — session established
     currentUser = signInData.user;
 
-    // Fetch avatar and IG handle for returning user
-    sb.from('creators').select('avatar_url, instagram_handle').eq('id', signInData.user.id).single().then(({ data }) => {
-      if (data?.avatar_url) localStorage.setItem('pop_avatar', data.avatar_url);
+    // Fetch IG handle for returning user
+    sb.from('creators').select('instagram_handle').eq('id', signInData.user.id).single().then(({ data }) => {
       if (data?.instagram_handle) localStorage.setItem('pop_ig_handle', data.instagram_handle);
       updateNavForUser(signInData.user);
     });
@@ -836,8 +834,6 @@ async function completeSignup() {
     if (!userId) throw new Error('Could not create your account. Please try again.');
 
     // Upsert creator row
-    const picUrl = badge.dataset.pic || '';
-
     await sb.from('creators').upsert({
       id:               userId,
       full_name:        fbUserData?.name || fullName,
@@ -845,12 +841,9 @@ async function completeSignup() {
       instagram_handle: handle,
       phone,
       fb_user_id:       fbId,
-      avatar_url:       picUrl,
       status:           'pending'
     }, { onConflict: 'id' });
 
-    // Store avatar in localStorage for immediate nav use
-    if (picUrl) localStorage.setItem('pop_avatar', picUrl);
     localStorage.setItem('pop_ig_handle', handle);
 
     currentUser = sessionUser;

@@ -170,10 +170,9 @@ async function setupUser(user) {
   const fullName = user.user_metadata?.full_name || user.user_metadata?.name || user.email.split('@')[0];
   const initials = fullName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
 
-  // Load avatar from DB if not cached, then re-render nav
-  if (!localStorage.getItem('pop_avatar')) {
-    sb.from('creators').select('avatar_url, instagram_handle').eq('id', user.id).single().then(({ data }) => {
-      if (data?.avatar_url) localStorage.setItem('pop_avatar', data.avatar_url);
+  // Load IG handle if not cached
+  if (!localStorage.getItem('pop_ig_handle')) {
+    sb.from('creators').select('instagram_handle').eq('id', user.id).single().then(({ data }) => {
       if (data?.instagram_handle) localStorage.setItem('pop_ig_handle', data.instagram_handle);
       renderNav(user, fullName, initials);
     });
