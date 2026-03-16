@@ -25,13 +25,19 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 nav.scrolled{padding:12px 56px;background:rgba(10,10,10,0.95)}
 .nav-brand{display:flex;align-items:center;gap:12px;text-decoration:none;}
 .nav-logo{height:32px;width:32px;border-radius:8px;object-fit:cover;box-shadow:0 4px 12px rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1);background:#fff}
-.nav-tag{font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--ash);font-weight:600;border:1px solid rgba(255,255,255,0.1);padding:4px 10px;border-radius:100px}
+.nav-tag{font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.6);font-weight:600;border:1px solid rgba(255,255,255,0.18);padding:4px 10px;border-radius:100px}
 .nav-mid{display:flex;gap:36px;list-style:none}
 .nav-mid a{color:var(--smoke);text-decoration:none;font-size:13px;font-weight:400;letter-spacing:0.03em;transition:color 0.2s}
 .nav-mid a:hover{color:var(--flame)}
 .nav-right{display:flex;gap:16px;align-items:center;}
-.nav-apply{background:var(--flame);color:#fff;padding:10px 28px;font-weight:600;font-size:12px;letter-spacing:0.08em;border:none;cursor:pointer;text-transform:uppercase;text-decoration:none;border-radius:100px;transition:all 0.25s;white-space:nowrap;}
+.nav-apply{background:var(--flame);color:#fff;padding:9px 20px;font-weight:600;font-size:11px;letter-spacing:0.06em;border:none;cursor:pointer;text-transform:uppercase;text-decoration:none;border-radius:100px;transition:all 0.25s;white-space:nowrap;}
 .nav-apply:hover{box-shadow:0 0 32px var(--glow);transform:translateY(-1px)}
+.nav-user-mobile{display:none}
+.nav-user-desktop{display:inline}
+@media(max-width:768px){
+  .nav-user-mobile{display:inline}
+  .nav-user-desktop{display:none}
+}
 .hamburger{display:none;background:transparent;border:none;color:#fff;font-size:24px;cursor:pointer;}
 
 .mob-menu-overlay{position:fixed;inset:0;background:rgba(10,10,10,0.98);backdrop-filter:blur(20px);z-index:999;display:flex;flex-direction:column;justify-content:center;align-items:center;opacity:0;pointer-events:none;transition:opacity 0.3s ease;}
@@ -113,7 +119,7 @@ nav.scrolled{padding:12px 56px;background:rgba(10,10,10,0.95)}
 .brand-pill:hover{border-color:var(--flame);color:var(--flame);background:rgba(255,82,0,0.04)}
 
 .process-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:24px;margin-top:56px}
-.p-card{padding:36px 28px 40px;border-radius:20px;background:var(--night);border:1px solid rgba(255,255,255,0.04);transition:all 0.4s;position:relative;overflow:hidden}
+.p-card{padding:36px 28px 40px;border-radius:20px;background:var(--night);border:1px solid rgba(255,255,255,0.04);transition:all 0.4s;position:relative;overflow:hidden;word-break:break-word;overflow-wrap:break-word}
 .p-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--flame),var(--honey));transform:scaleX(0);transform-origin:left;transition:transform 0.4s}
 .p-card:hover::before{transform:scaleX(1)}
 .p-card:hover{border-color:rgba(255,82,0,0.12);transform:translateY(-4px)}
@@ -173,10 +179,13 @@ footer{padding:60px 56px 40px;border-top:1px solid rgba(255,255,255,0.04);displa
 }
 @media(max-width:768px){
   .section-pad{padding:60px 20px}
-  nav{padding:14px 20px}
+  nav{padding:12px 16px}
+  .nav-tag{display:none}
   .nav-mid{display:none}
   .hamburger{display:block}
+  .nav-apply{padding:7px 14px;font-size:10px;letter-spacing:0.04em;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .hero{padding:120px 20px 60px}
+  .btn-flame{padding:13px 24px;font-size:13px}
   .camp-grid,.eco-grid,.process-grid{grid-template-columns:1fr}
   .camp-header{flex-direction:column;align-items:flex-start;gap:20px}
   .f-row{grid-template-columns:1fr}
@@ -522,10 +531,12 @@ async function initAuth() {
 }
 
 function updateNavForUser(user) {
-  const ig  = user.user_metadata?.instagram_handle || user.user_metadata?.full_name || user.email?.split('@')[0];
-  const btn = document.getElementById('navAuthBtn');
-  btn.textContent = `@${ig} → Dashboard`;
-  btn.onclick = () => window.location.href = 'dashboard.html';
+  const ig       = user.user_metadata?.instagram_handle || user.user_metadata?.full_name || user.email?.split('@')[0];
+  const initials = ig.substring(0, 2).toUpperCase();
+  const btn      = document.getElementById('navAuthBtn');
+  // On desktop show handle, on mobile show compact avatar + arrow
+  btn.innerHTML  = `<span class="nav-user-desktop">@${ig} → Dashboard</span><span class="nav-user-mobile">${initials} →</span>`;
+  btn.onclick    = () => window.location.href = 'dashboard.html';
 }
 
 function handleAuthClick() {
