@@ -29,7 +29,7 @@ nav.scrolled{background:rgba(10,10,10,0.97)}
 .nav-mid{display:flex;gap:36px;list-style:none}
 .nav-mid a{color:var(--smoke);text-decoration:none;font-size:13px;font-weight:400;letter-spacing:0.03em;transition:color 0.2s}
 .nav-mid a:hover{color:var(--flame)}
-.nav-right{display:flex;gap:16px;align-items:center;}
+.nav-right{display:flex;gap:8px;align-items:center;}
 .nav-apply{background:var(--flame);color:#fff;padding:9px 20px;font-weight:600;font-size:11px;letter-spacing:0.06em;border:none;cursor:pointer;text-transform:uppercase;text-decoration:none;border-radius:100px;transition:all 0.25s;white-space:nowrap;}
 .nav-apply:hover{box-shadow:0 0 32px var(--glow);transform:translateY(-1px)}
 .nav-user-mobile{display:none}
@@ -547,7 +547,7 @@ function updateNavForUser(user) {
 
   const btn = document.getElementById('navAuthBtn');
   btn.innerHTML = `@${handleDisplay}`;
-  btn.style.cssText = 'display:inline-flex;align-items:center;padding:6px 14px;background:rgba(255,82,0,0.1);border:1px solid rgba(255,82,0,0.25);border-radius:100px;cursor:pointer;font-size:10px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#fff;transition:all 0.2s;white-space:nowrap';
+  btn.style.cssText = 'display:inline-flex;align-items:center;padding:4px 10px;background:rgba(255,82,0,0.1);border:1px solid rgba(255,82,0,0.3);border-radius:100px;cursor:pointer;font-size:9px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:#fff;white-space:nowrap';
   btn.onclick = () => window.location.href = 'dashboard.html';
 
   // Show Log Out in hamburger

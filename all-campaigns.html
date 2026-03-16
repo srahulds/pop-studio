@@ -28,7 +28,7 @@ nav.scrolled{background:rgba(10,10,10,0.97)}
 .nav-mid{display:flex;gap:32px;list-style:none;align-items:center}
 .nav-mid a{color:var(--smoke);text-decoration:none;font-size:13px;font-weight:400;letter-spacing:0.03em;transition:color 0.2s}
 .nav-mid a:hover,.nav-mid a.active{color:var(--flame)}
-.nav-right{display:flex;gap:12px;align-items:center}
+.nav-right{display:flex;gap:8px;align-items:center}
 .nav-apply{background:var(--flame);color:#fff;padding:10px 24px;font-weight:600;font-size:12px;letter-spacing:0.08em;border:none;cursor:pointer;text-transform:uppercase;text-decoration:none;border-radius:100px;transition:all 0.25s;white-space:nowrap}
 .nav-apply:hover{box-shadow:0 0 32px var(--glow);transform:translateY(-1px)}
 .hamburger{display:none;background:transparent;border:none;color:#fff;font-size:24px;cursor:pointer}
@@ -260,7 +260,7 @@ function updateNavForUser(user) {
   const handleDisplay = ig.length > 10 ? ig.substring(0, 10) : ig;
 
   document.getElementById('navRight').innerHTML = `
-    <a href="dashboard.html" style="display:inline-flex;align-items:center;padding:6px 14px;background:rgba(255,82,0,0.1);border:1px solid rgba(255,82,0,0.25);border-radius:100px;cursor:pointer;color:#fff;text-decoration:none;font-size:10px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;white-space:nowrap">@${handleDisplay}</a>`;
+    <a href="dashboard.html" style="display:inline-flex;align-items:center;padding:4px 10px;background:rgba(255,82,0,0.1);border:1px solid rgba(255,82,0,0.3);border-radius:100px;cursor:pointer;color:#fff;text-decoration:none;font-size:9px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;white-space:nowrap">@${handleDisplay}</a>`;
 
   // Show Log Out inside hamburger menu
   const mobLogout = document.getElementById('mobLogout');
