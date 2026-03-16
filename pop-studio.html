@@ -417,7 +417,7 @@ footer{padding:60px 56px 40px;border-top:1px solid rgba(255,255,255,0.04);displa
       <h2 class="auth-title">One last <i>thing.</i></h2>
       <p class="auth-sub">Add your phone number so we can process your UPI payouts.</p>
       <div class="msg-box" id="phoneMsg"></div>
-      <div id="igVerifiedBadge" style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.15);border-radius:12px;margin-bottom:20px"></div>
+      <div id="igVerifiedBadge" style="display:none"></div>
       <div class="f-group">
         <label class="f-label">Phone Number</label>
         <input class="f-input" id="phoneInput" type="tel" placeholder="+91 XXXXX XXXXX">
@@ -726,22 +726,11 @@ async function verifyIGHandle() {
 }
 
 function showPhoneStep(handle, fullName, profilePic, isCreator) {
-  const initials = (fullName || handle)[0].toUpperCase();
-  const typeText = isCreator ? '✓ Professional account detected' : '✓ Public account — apply to be reviewed';
-
-  document.getElementById('igVerifiedBadge').innerHTML = `
-    <div style="width:40px;height:40px;border-radius:50%;overflow:hidden;flex-shrink:0;background:linear-gradient(135deg,var(--flame),var(--honey));display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:16px">
-      ${profilePic ? `<img src="${profilePic}" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none';this.parentNode.textContent='${initials}'">` : initials}
-    </div>
-    <div>
-      <div style="font-weight:600;font-size:14px;color:#fff">@${handle}</div>
-      <div style="font-size:11px;color:#22C55E;font-weight:500">${typeText}</div>
-    </div>`;
-
-  // Store handle for signup
-  document.getElementById('igVerifiedBadge').dataset.handle   = handle;
-  document.getElementById('igVerifiedBadge').dataset.fullname = fullName;
-  document.getElementById('igVerifiedBadge').dataset.pic      = profilePic || '';
+  // Store handle for completeSignup to read
+  const badge = document.getElementById('igVerifiedBadge');
+  badge.dataset.handle   = handle;
+  badge.dataset.fullname = fullName || handle;
+  badge.dataset.pic      = '';
 
   showStep('stepPhone');
 }
