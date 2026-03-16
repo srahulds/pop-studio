@@ -352,7 +352,7 @@ footer{padding:60px 56px 40px;border-top:1px solid rgba(255,255,255,0.04);displa
 
 <footer>
   <div class="ft-logo">POP Creators</div>
-  <div class="ft-links"><a href="terms.html">Creator Terms</a><a href="privacy.html">Privacy Policy</a><a href="contact.html">Contact</a><a href="https://dl.popclub.co/Get_POP" target="_blank">Download POP →</a></div>
+  <div class="ft-links"><a href="#">Creator Terms</a><a href="#">Privacy</a><a href="contact.html">Contact</a><a href="https://dl.popclub.co/Get_POP" target="_blank">Download POP →</a></div>
   <div class="ft-copy">© 2026 Poptech Growth Pvt. Ltd.</div>
 </footer>
 
@@ -716,64 +716,13 @@ async function verifyIGHandle() {
     return;
   }
 
-  // Basic format check
   if (!/^[a-zA-Z0-9._]{1,30}$/.test(handle)) {
-    showMsg('igMsg', 'That doesn\'t look like a valid Instagram username.');
+    showMsg('igMsg', "That doesn't look like a valid Instagram username.");
     return;
   }
 
-  showStep('stepVerifying');
-  document.getElementById('verifyingText').textContent = `Looking up @${handle}…`;
-
-  try {
-    let isPublic  = false;
-    let fullName  = handle;
-
-    // Use Instagram oEmbed — works for public accounts only.
-    // Private accounts return 400, non-existent accounts return 404.
-    // This is the most reliable public check available without API approval.
-    try {
-      const oembedRes = await fetch(
-        `https://www.instagram.com/api/v1/oembed/?url=https://www.instagram.com/${encodeURIComponent(handle)}/&format=json`,
-        { signal: AbortSignal.timeout(6000) }
-      );
-
-      if (oembedRes.ok) {
-        const data = await oembedRes.json();
-        // oEmbed only returns data for public accounts
-        isPublic = true;
-        fullName = data.author_name || handle;
-      } else if (oembedRes.status === 404) {
-        // Account doesn't exist
-        showStep('stepIG');
-        showMsg('igMsg', `@${handle} doesn't seem to exist on Instagram. Double-check your username.`);
-        return;
-      } else {
-        // 401/400 = private account or blocked
-        isPublic = false;
-      }
-    } catch {
-      // Network error — don't auto-pass, show a gentle retry message
-      showStep('stepIG');
-      showMsg('igMsg', 'Could not verify your account right now. Please check your username and try again.');
-      return;
-    }
-
-    if (!isPublic) {
-      document.getElementById('failedHandle').textContent = `@${handle}`;
-      showStep('stepNotCreator');
-      document.querySelector('#stepNotCreator .auth-sub').innerHTML =
-        `<strong style="color:#fff">@${handle}</strong> appears to be a private account. Your profile must be <strong style="color:#fff">public</strong> so your content views can be tracked.`;
-      return;
-    }
-
-    // Public account confirmed — proceed to phone step
-    showPhoneStep(handle, fullName, null, true);
-
-  } catch (err) {
-    showStep('stepIG');
-    showMsg('igMsg', 'Something went wrong. Please try again.');
-  }
+  // No API verification — admin reviews account on approval
+  showPhoneStep(handle, handle, null, true);
 }
 
 function showPhoneStep(handle, fullName, profilePic, isCreator) {
