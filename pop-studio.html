@@ -99,6 +99,11 @@ nav.scrolled{background:rgba(10,10,10,0.97)}
 .c-participants::before{content:'';display:inline-block;width:6px;height:6px;background:var(--success);border-radius:50%;box-shadow:0 0 8px var(--success)}
 .c-action-btn{width:100%;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);color:#fff;padding:14px;border-radius:100px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;transition:all 0.2s}
 .c-action-btn:hover{background:var(--flame);border-color:var(--flame);box-shadow:0 0 20px var(--glow)}
+.c-action-btn.opted{background:rgba(255,82,0,0.06);border-color:rgba(255,82,0,0.2);color:var(--ember);cursor:default}
+.c-action-btn.opted:hover{background:rgba(255,82,0,0.06);border-color:rgba(255,82,0,0.2);box-shadow:none}
+.c-action-btn.go-dash{background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.1);color:#fff}
+.c-action-btn.go-dash:hover{background:var(--flame);border-color:var(--flame);box-shadow:0 0 20px var(--glow)}
+.camp-card.opted-in{border-color:rgba(255,82,0,0.15);background:linear-gradient(160deg,rgba(255,82,0,0.04) 0%,var(--night) 60%)}
 
 .rewards-grid{display:grid;grid-template-columns:1fr 1.5fr;gap:80px;align-items:start}
 .rewards-text p{font-size:15px;color:var(--smoke);line-height:1.8;font-weight:300;margin-bottom:16px}
@@ -923,22 +928,48 @@ async function loadCampaigns() {
     return;
   }
 
+  // Fetch user's applications if logged in
+  let myAppMap = {};
+  if (currentUser) {
+    const { data: apps } = await sb
+      .from('applications')
+      .select('id, status, campaign_id')
+      .eq('creator_id', currentUser.id);
+    (apps || []).forEach(a => { myAppMap[a.campaign_id] = a; });
+  }
+
   grid.innerHTML = campaigns.map(c => {
     const daysLeft     = Math.max(0, c.days_open - Math.floor((Date.now() - new Date(c.created_at)) / 86400000));
     const participants = c.participants_count || 0;
+    const app          = myAppMap[c.id];
+
+    let actionBtn;
+    if (!currentUser) {
+      actionBtn = `<button class="c-action-btn" onclick="handleOptIn('${c.id}','${c.title.replace(/'/g,"\\'")}')">Opt In →</button>`;
+    } else if (!app) {
+      actionBtn = `<button class="c-action-btn" onclick="handleOptIn('${c.id}','${c.title.replace(/'/g,"\\'")}')">Opt In →</button>`;
+    } else if (app.status === 'applied') {
+      actionBtn = `<button class="c-action-btn opted" style="pointer-events:none">Application Pending</button>`;
+    } else if (app.status === 'approved') {
+      actionBtn = `<button class="c-action-btn go-dash" onclick="window.location.href='dashboard.html'">Submit Content →</button>`;
+    } else if (app.status === 'rejected') {
+      actionBtn = `<button class="c-action-btn" style="opacity:0.4;pointer-events:none">Not Selected</button>`;
+    } else {
+      actionBtn = `<button class="c-action-btn opted" style="pointer-events:none">${app.status}</button>`;
+    }
+
     return `
-      <div class="camp-card">
+      <div class="camp-card${app ? ' opted-in' : ''}">
         <div class="c-meta"><span class="c-days">${daysLeft} Days Left</span></div>
         <h3>${c.title}</h3>
         <p>${c.description || ''}</p>
         <div class="c-participants">${participants} Creators Joined</div>
-        <button class="c-action-btn" onclick="handleOptIn('${c.id}','${c.title.replace(/'/g,"\\'")}')">Opt In →</button>
+        ${actionBtn}
       </div>`;
   }).join('');
 }
 
-initAuth();
-loadCampaigns();
+initAuth().then(() => loadCampaigns());
 </script>
 </body>
 </html>
