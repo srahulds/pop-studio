@@ -542,21 +542,14 @@ async function initAuth() {
 }
 
 function updateNavForUser(user) {
-  const ig       = localStorage.getItem('pop_ig_handle') || user.user_metadata?.instagram_handle || user.user_metadata?.full_name || user.email?.split('@')[0];
-  const initials = ig.substring(0, 2).toUpperCase();
-  const avatar   = localStorage.getItem('pop_avatar');
-  // Clip handle display at 10 chars
+  const ig            = localStorage.getItem('pop_ig_handle') || user.user_metadata?.instagram_handle || user.user_metadata?.full_name || user.email?.split('@')[0];
   const handleDisplay = ig.length > 10 ? ig.substring(0, 10) : ig;
 
-  const avatarHTML   = avatar ? `<img src="${avatar}" style="width:26px;height:26px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1.5px solid rgba(255,82,0,0.5)" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : '';
-  const fallbackHTML = `<div style="width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--flame),var(--honey));display:${avatar ? 'none' : 'flex'};align-items:center;justify-content:center;font-weight:700;font-size:10px;flex-shrink:0">${initials}</div>`;
-
   const btn = document.getElementById('navAuthBtn');
-  btn.innerHTML = `${avatarHTML}${fallbackHTML}<span style="font-size:10px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase">@${handleDisplay}</span>`;
-  btn.style.cssText = 'display:inline-flex;align-items:center;gap:6px;padding:3px 10px 3px 3px;background:rgba(255,82,0,0.1);border:1px solid rgba(255,82,0,0.25);border-radius:100px;cursor:pointer;color:#fff;transition:all 0.2s;white-space:nowrap';
+  btn.innerHTML = `@${handleDisplay}`;
+  btn.style.cssText = 'display:inline-flex;align-items:center;padding:6px 14px;background:rgba(255,82,0,0.1);border:1px solid rgba(255,82,0,0.25);border-radius:100px;cursor:pointer;font-size:10px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#fff;transition:all 0.2s;white-space:nowrap';
   btn.onclick = () => window.location.href = 'dashboard.html';
 
-  // Update hero button
   const heroBtn = document.getElementById('heroAuthBtn');
   if (heroBtn) heroBtn.innerHTML = `<span>@${handleDisplay} ✕ POP</span><span style="font-size:16px;line-height:1">→</span>`;
 }
