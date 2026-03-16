@@ -106,13 +106,14 @@ nav.scrolled{background:rgba(10,10,10,0.97)}
   </ul>
   <div class="nav-right" id="navRight">
     <!-- Populated by JS once user loads -->
+    <button class="hamburger" onclick="toggleMobileMenu()">☰</button>
   </div>
-  <button class="hamburger" onclick="toggleMobileMenu()">☰</button>
 </nav>
 
 <div class="mob-menu-overlay" id="mobMenu">
   <button class="mob-menu-close" onclick="toggleMobileMenu()">✕</button>
   <div class="mob-menu-links">
+    <a href="dashboard.html" onclick="toggleMobileMenu()">Dashboard</a>
     <a href="all-campaigns.html" onclick="toggleMobileMenu()">All Campaigns</a>
     <a href="pop-studio.html#rewards" onclick="toggleMobileMenu()">How it Works</a>
     <a href="contact.html" onclick="toggleMobileMenu()">Contact</a>
