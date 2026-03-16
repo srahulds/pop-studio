@@ -726,53 +726,53 @@ async function verifyIGHandle() {
   document.getElementById('verifyingText').textContent = `Looking up @${handle}…`;
 
   try {
-    // Use Instagram oEmbed API — publicly available, no auth needed
-    // This confirms the account exists and is public
-    const oembedUrl = `https://graph.facebook.com/v19.0/instagram_oembed?url=https://www.instagram.com/${handle}/&access_token=${FB_APP_ID}|${await getAppToken()}`;
+    let isPublic  = false;
+    let fullName  = handle;
 
-    // Fallback: use public web scrape approach via allorigins proxy
-    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(`https://www.instagram.com/${handle}/?__a=1&__d=dis`)}`;
-
-    let isPublic   = false;
-    let isCreator  = false;
-    let fullName   = handle;
-    let profilePic = null;
-
+    // Use Instagram oEmbed — works for public accounts only.
+    // Private accounts return 400, non-existent accounts return 404.
+    // This is the most reliable public check available without API approval.
     try {
-      const res  = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(`https://www.instagram.com/api/v1/users/web_profile_info/?username=${handle}`)}`, {
-        headers: { 'x-ig-app-id': '936619743392459' }
-      });
-      const json = await res.json();
-      const user = json?.data?.user;
+      const oembedRes = await fetch(
+        `https://www.instagram.com/api/v1/oembed/?url=https://www.instagram.com/${encodeURIComponent(handle)}/&format=json`,
+        { signal: AbortSignal.timeout(6000) }
+      );
 
-      if (user) {
-        isPublic   = !user.is_private;
-        isCreator  = user.is_business_account || user.is_professional_account;
-        fullName   = user.full_name || handle;
-        profilePic = user.profile_pic_url_hd || user.profile_pic_url;
+      if (oembedRes.ok) {
+        const data = await oembedRes.json();
+        // oEmbed only returns data for public accounts
+        isPublic = true;
+        fullName = data.author_name || handle;
+      } else if (oembedRes.status === 404) {
+        // Account doesn't exist
+        showStep('stepIG');
+        showMsg('igMsg', `@${handle} doesn't seem to exist on Instagram. Double-check your username.`);
+        return;
+      } else {
+        // 401/400 = private account or blocked
+        isPublic = false;
       }
     } catch {
-      // If the API call fails, we treat as unverified but still proceed
-      // since account type is verified during admin review anyway
-      isPublic  = true;
-      isCreator = true; // Assume valid — admin will reject if not
+      // Network error — don't auto-pass, show a gentle retry message
+      showStep('stepIG');
+      showMsg('igMsg', 'Could not verify your account right now. Please check your username and try again.');
+      return;
     }
 
     if (!isPublic) {
       document.getElementById('failedHandle').textContent = `@${handle}`;
       showStep('stepNotCreator');
-      // Customise message for private accounts
       document.querySelector('#stepNotCreator .auth-sub').innerHTML =
-        `<strong style="color:#fff">@${handle}</strong> appears to be a private account. Your profile must be public so your views can be tracked.`;
+        `<strong style="color:#fff">@${handle}</strong> appears to be a private account. Your profile must be <strong style="color:#fff">public</strong> so your content views can be tracked.`;
       return;
     }
 
-    // Show phone step with verified badge
-    showPhoneStep(handle, fullName, profilePic, isCreator);
+    // Public account confirmed — proceed to phone step
+    showPhoneStep(handle, fullName, null, true);
 
   } catch (err) {
-    // Network error — proceed anyway, admin review catches edge cases
-    showPhoneStep(handle, handle, null, true);
+    showStep('stepIG');
+    showMsg('igMsg', 'Something went wrong. Please try again.');
   }
 }
 
@@ -798,9 +798,6 @@ function showPhoneStep(handle, fullName, profilePic, isCreator) {
 }
 
 // Helper to get app access token for oEmbed (not needed with allorigins approach but kept)
-async function getAppToken() {
-  return 'placeholder'; // Not used in allorigins flow
-}
 
 // ── STEP 3: Complete Signup ──────────────────────────────────────
 async function completeSignup() {
