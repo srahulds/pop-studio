@@ -313,7 +313,8 @@ function updateNavForUser(user) {
   const handleDisplay = ig.length > 10 ? ig.substring(0, 10) : ig;
 
   document.getElementById('navRight').innerHTML = `
-    <a href="dashboard.html" style="display:inline-flex;align-items:center;padding:4px 10px;background:rgba(255,82,0,0.1);border:1px solid rgba(255,82,0,0.3);border-radius:100px;cursor:pointer;color:#fff;text-decoration:none;font-size:9px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;white-space:nowrap">@${handleDisplay}</a>`;
+    <a href="dashboard.html" style="display:inline-flex;align-items:center;padding:4px 10px;background:rgba(255,82,0,0.1);border:1px solid rgba(255,82,0,0.3);border-radius:100px;cursor:pointer;color:#fff;text-decoration:none;font-size:9px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;white-space:nowrap">@${handleDisplay}</a>
+    <button class="hamburger" onclick="toggleMobileMenu()">☰</button>`;
 
   // Show Log Out and Dashboard inside hamburger menu
   const mobLogout = document.getElementById('mobLogout');
@@ -604,7 +605,7 @@ function closeAuth() {
 async function logout() {
   await sb.auth.signOut();
   currentUser = null;
-  document.getElementById('navRight').innerHTML = `<button class="nav-apply" id="navAuthBtn" onclick="handleAuthClick()">You ✕ POP</button>`;
+  document.getElementById('navRight').innerHTML = `<button class="nav-apply" id="navAuthBtn" onclick="handleAuthClick()">You ✕ POP</button><button class="hamburger" onclick="toggleMobileMenu()">☰</button>`;
   await renderAll();
 }
 
