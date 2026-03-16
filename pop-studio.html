@@ -180,7 +180,6 @@ footer{padding:60px 56px 40px;border-top:1px solid rgba(255,255,255,0.04);displa
 @media(max-width:768px){
   .section-pad{padding:60px 20px}
   nav{padding:12px 16px}
-  .nav-tag{display:none}
   .nav-mid{display:none}
   .hamburger{display:block}
   .nav-apply{padding:7px 14px;font-size:10px;letter-spacing:0.04em;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -192,6 +191,8 @@ footer{padding:60px 56px 40px;border-top:1px solid rgba(255,255,255,0.04);displa
   .auth-box{padding:32px 20px}
   footer{flex-direction:column;gap:24px;text-align:center;padding:40px 20px}
   .ft-links{justify-content:center}
+  .nav-user-desktop{display:none}
+  .nav-user-mobile{display:inline}
 }
 </style>
 </head>
@@ -541,28 +542,23 @@ async function initAuth() {
 }
 
 function updateNavForUser(user) {
-  const ig       = user.user_metadata?.instagram_handle || localStorage.getItem('pop_ig_handle') || user.user_metadata?.full_name || user.email?.split('@')[0];
+  const ig       = localStorage.getItem('pop_ig_handle') || user.user_metadata?.instagram_handle || user.user_metadata?.full_name || user.email?.split('@')[0];
   const initials = ig.substring(0, 2).toUpperCase();
   const avatar   = localStorage.getItem('pop_avatar');
+  // Clip handle display at 10 chars
+  const handleDisplay = ig.length > 10 ? ig.substring(0, 10) : ig;
 
-  const avatarHTML = avatar
-    ? `<img src="${avatar}" style="width:30px;height:30px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1.5px solid rgba(255,82,0,0.4)" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
-    : '';
-  const fallbackHTML = `<div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--flame),var(--honey));display:${avatar ? 'none' : 'flex'};align-items:center;justify-content:center;font-weight:700;font-size:11px;flex-shrink:0">${initials}</div>`;
+  const avatarHTML   = avatar ? `<img src="${avatar}" style="width:26px;height:26px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1.5px solid rgba(255,82,0,0.5)" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">` : '';
+  const fallbackHTML = `<div style="width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--flame),var(--honey));display:${avatar ? 'none' : 'flex'};align-items:center;justify-content:center;font-weight:700;font-size:10px;flex-shrink:0">${initials}</div>`;
 
   const btn = document.getElementById('navAuthBtn');
-  btn.innerHTML = `
-    ${avatarHTML}${fallbackHTML}
-    <span class="nav-user-desktop">@${ig} → Dashboard</span>
-    <span class="nav-user-mobile">→</span>`;
-  btn.style.cssText = 'display:flex;align-items:center;gap:8px;padding:4px 12px 4px 4px;background:rgba(255,82,0,0.1);border:1px solid rgba(255,82,0,0.25);border-radius:100px;cursor:pointer;font-size:11px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#fff;transition:all 0.2s';
+  btn.innerHTML = `${avatarHTML}${fallbackHTML}<span style="font-size:10px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase">@${handleDisplay}</span>`;
+  btn.style.cssText = 'display:inline-flex;align-items:center;gap:6px;padding:3px 10px 3px 3px;background:rgba(255,82,0,0.1);border:1px solid rgba(255,82,0,0.25);border-radius:100px;cursor:pointer;color:#fff;transition:all 0.2s;white-space:nowrap';
   btn.onclick = () => window.location.href = 'dashboard.html';
 
-  // Also update hero button text if on homepage
+  // Update hero button
   const heroBtn = document.getElementById('heroAuthBtn');
-  if (heroBtn) {
-    heroBtn.innerHTML = `<span>@${ig} ✕ POP</span> <span style="font-size:16px;line-height:1">→</span>`;
-  }
+  if (heroBtn) heroBtn.innerHTML = `<span>@${handleDisplay} ✕ POP</span><span style="font-size:16px;line-height:1">→</span>`;
 }
 
 function handleAuthClick() {
