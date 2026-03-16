@@ -20,8 +20,8 @@ body{background:var(--deep);color:#fff;font-family:'Outfit',sans-serif;overflow-
 body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:0.7}
 ::selection{background:var(--flame);color:#fff}
 
-nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:16px 48px;background:rgba(10,10,10,0.85);backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px);border-bottom:1px solid rgba(255,255,255,0.04);transition:all 0.3s}
-nav.scrolled{background:rgba(10,10,10,0.97)}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:16px 48px;background:rgba(10,10,10,0.98);backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px);border-bottom:1px solid rgba(255,255,255,0.06);transition:background 0.3s}
+nav.scrolled{background:rgba(10,10,10,1)}
 .nav-brand{display:flex;align-items:center;gap:12px;text-decoration:none}
 .nav-logo{height:32px;width:32px;border-radius:8px;object-fit:cover;box-shadow:0 4px 12px rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1);background:#fff}
 .nav-tag{font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.6);font-weight:600;border:1px solid rgba(255,255,255,0.18);padding:4px 10px;border-radius:100px}
@@ -131,6 +131,7 @@ footer{padding:60px 56px 40px;border-top:1px solid rgba(255,255,255,0.04);displa
 @media(max-width:768px){
   nav{padding:12px 16px}
   .nav-mid{display:none}
+  .nav-right{margin-left:auto}
   .hamburger{display:block}
   .nav-apply{padding:7px 14px;font-size:10px;letter-spacing:0.04em;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .header-area{padding:100px 20px 36px}
@@ -211,6 +212,52 @@ footer{padding:60px 56px 40px;border-top:1px solid rgba(255,255,255,0.04);displa
   </div>
   <div class="ft-copy">© 2026 Poptech Growth Pvt. Ltd.</div>
 </footer>
+
+<!-- CAMPAIGN BRIEF MODAL -->
+<div id="briefModal" style="display:none;position:fixed;inset:0;z-index:400;background:rgba(10,10,10,0.92);backdrop-filter:blur(12px);align-items:center;justify-content:center;padding:24px">
+  <div style="background:#1A1A1A;border:1px solid rgba(255,255,255,0.08);border-radius:24px;max-width:520px;width:100%;max-height:88vh;overflow-y:auto;padding:36px 32px;position:relative">
+    <button onclick="closeBriefModal()" style="position:absolute;top:20px;right:20px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.05);border:none;color:#fff;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center">✕</button>
+
+    <div id="briefDays" style="display:inline-block;font-size:10px;color:var(--ember);background:rgba(255,82,0,0.08);padding:4px 10px;border-radius:100px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:16px"></div>
+
+    <h2 id="briefTitle" style="font-family:'Playfair Display',serif;font-size:26px;font-weight:400;margin-bottom:12px;line-height:1.3"></h2>
+    <p id="briefDesc" style="font-size:14px;color:rgba(255,255,255,0.55);line-height:1.7;margin-bottom:24px;font-weight:300"></p>
+
+    <div id="briefObjective" style="display:none;margin-bottom:20px">
+      <div style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.3);font-weight:600;margin-bottom:8px">Objective</div>
+      <p id="briefObjectiveText" style="font-size:13px;color:rgba(255,255,255,0.6);line-height:1.6"></p>
+    </div>
+
+    <div id="briefGuide" style="display:none;margin-bottom:20px">
+      <div style="font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(255,255,255,0.3);font-weight:600;margin-bottom:8px">Content Guidelines</div>
+      <p id="briefGuideText" style="font-size:13px;color:rgba(255,255,255,0.6);line-height:1.6;white-space:pre-line"></p>
+    </div>
+
+    <div style="display:flex;gap:12px;align-items:center;padding:16px;background:rgba(255,82,0,0.04);border:1px solid rgba(255,82,0,0.1);border-radius:14px;margin-bottom:24px">
+      <div style="flex:1">
+        <div style="font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px">Base Payout</div>
+        <div id="briefPayout" style="font-family:'Playfair Display',serif;font-size:22px;color:var(--flame)"></div>
+      </div>
+      <div style="flex:1">
+        <div style="font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px">Max Payout</div>
+        <div id="briefMaxPayout" style="font-family:'Playfair Display',serif;font-size:22px;color:#fff"></div>
+      </div>
+      <div style="flex:1">
+        <div style="font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px">Days Left</div>
+        <div id="briefDaysLeft" style="font-family:'Playfair Display',serif;font-size:22px;color:#fff"></div>
+      </div>
+    </div>
+
+    <div id="briefTerms" style="display:none;font-size:11px;color:rgba(255,255,255,0.25);line-height:1.6;margin-bottom:20px;padding:12px 16px;background:rgba(255,255,255,0.02);border-radius:10px">
+      <span id="briefTermsText"></span>
+    </div>
+
+    <button id="briefOptInBtn" onclick="confirmOptIn()" style="width:100%;padding:15px;background:var(--flame);border:none;border-radius:100px;color:#fff;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;cursor:pointer;transition:all 0.2s">
+      Opt In to This Campaign →
+    </button>
+    <div style="text-align:center;margin-top:12px;font-size:12px;color:rgba(255,255,255,0.25)">You can withdraw before submitting content</div>
+  </div>
+</div>
 
 <div class="auth-overlay" id="authOverlay">
   <div class="auth-box">
@@ -437,13 +484,60 @@ function buildExpiredCard(c, app) {
     </div>`;
 }
 
+let pendingOptInId    = null;
+let pendingOptInTitle = null;
+
 async function handleOptIn(campaignId, campaignTitle) {
   if (!currentUser) {
     pendingOptIn = { id: campaignId, title: campaignTitle };
     document.getElementById('authOverlay').classList.add('show');
     return;
   }
-  await applyToCampaign(campaignId, campaignTitle);
+  // Fetch full campaign details and show brief modal
+  const { data: c } = await sb.from('campaigns').select('*').eq('id', campaignId).single();
+  if (!c) { await applyToCampaign(campaignId, campaignTitle); return; }
+
+  pendingOptInId    = campaignId;
+  pendingOptInTitle = campaignTitle;
+
+  const daysLeft = Math.max(0, c.days_open - Math.floor((Date.now() - new Date(c.created_at)) / 86400000));
+
+  document.getElementById('briefDays').textContent     = `${daysLeft} Days Left`;
+  document.getElementById('briefTitle').textContent    = c.title || '';
+  document.getElementById('briefDesc').textContent     = c.description || '';
+  document.getElementById('briefDaysLeft').textContent = daysLeft;
+  document.getElementById('briefPayout').textContent   = c.base_payout ? `₹${Number(c.base_payout).toLocaleString('en-IN')}` : '₹3,000';
+  document.getElementById('briefMaxPayout').textContent = c.max_payout ? `₹${Number(c.max_payout).toLocaleString('en-IN')}` : '—';
+
+  const objEl = document.getElementById('briefObjective');
+  if (c.objective) { document.getElementById('briefObjectiveText').textContent = c.objective; objEl.style.display = 'block'; }
+  else objEl.style.display = 'none';
+
+  const guideEl = document.getElementById('briefGuide');
+  if (c.guidelines) { document.getElementById('briefGuideText').textContent = c.guidelines; guideEl.style.display = 'block'; }
+  else guideEl.style.display = 'none';
+
+  const termsEl = document.getElementById('briefTerms');
+  if (c.terms) { document.getElementById('briefTermsText').textContent = c.terms; termsEl.style.display = 'block'; }
+  else termsEl.style.display = 'none';
+
+  document.getElementById('briefModal').style.display = 'flex';
+}
+
+function closeBriefModal() {
+  document.getElementById('briefModal').style.display = 'none';
+  pendingOptInId = pendingOptInTitle = null;
+}
+
+async function confirmOptIn() {
+  if (!pendingOptInId) return;
+  const btn = document.getElementById('briefOptInBtn');
+  btn.textContent = 'Applying…';
+  btn.disabled = true;
+  await applyToCampaign(pendingOptInId, pendingOptInTitle);
+  closeBriefModal();
+  btn.textContent = 'Opt In to This Campaign →';
+  btn.disabled = false;
 }
 
 let lastApplyTime = 0;
@@ -496,7 +590,11 @@ document.getElementById('authOverlay').addEventListener('click', e => {
   if (e.target === document.getElementById('authOverlay')) closeAuth();
 });
 
-// Handle return from login — check sessionStorage for pending opt-in
+document.getElementById('briefModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('briefModal')) closeBriefModal();
+});
+
+// Handle return from login — check localStorage for pending opt-in
 async function handleReturnFromLogin() {
   const returnTo = localStorage.getItem('pop_return_to');
   const pending  = localStorage.getItem('pop_pending_optin');
