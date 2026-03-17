@@ -134,13 +134,13 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 <div class="sidebar-overlay" id="sbOverlay" onclick="toggleSidebar()"></div>
 
 <aside id="sidebar">
-  <a href="pop-studio.html" class="brand">
+  <div class="brand">
     <img src="pop_bw_logo_new.svg" alt="POP Logo" class="nav-logo">
     <div style="display:flex;flex-direction:column;gap:5px">
       <span style="font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.6);font-weight:600;border:1px solid rgba(255,255,255,0.18);padding:3px 9px;border-radius:100px;display:inline-block;width:fit-content">Creators</span>
       <span style="font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--flame);font-weight:700;padding-left:1px">Admin</span>
     </div>
-  </a>
+  </div>
   <div class="nav-links">
     <a class="nav-link active" onclick="navTo('home')">Platform Overview</a>
     <a class="nav-link" onclick="navTo('creators')" id="creatorsNavLink">Creator Queue <span class="nav-badge" id="creatorsBadge">…</span></a>
@@ -970,7 +970,7 @@ async function init() {
       <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${adminRow.name}</div>
       <div style="font-size:10px;color:var(--ash);text-transform:uppercase;letter-spacing:0.1em">${adminRow.role}</div>
     </div>
-    <button onclick="adminLogout()" title="Log out" style="background:none;border:none;color:var(--ash);cursor:pointer;font-size:16px;padding:4px;transition:color 0.2s" onmouseover="this.style.color='var(--flame)'" onmouseout="this.style.color='var(--ash)'">↩</button>`;
+    <button onclick="adminLogout()" style="background:none;border:1px solid rgba(255,255,255,0.1);color:var(--ash);cursor:pointer;font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;padding:6px 12px;border-radius:100px;font-family:'Outfit',sans-serif;transition:all 0.2s;white-space:nowrap" onmouseover="this.style.color='var(--flame)';this.style.borderColor='rgba(255,82,0,0.3)'" onmouseout="this.style.color='var(--ash)';this.style.borderColor='rgba(255,255,255,0.1)'">Log Out</button>`;
 
   // ── Load data ───────────────────────────────────────────────
   await loadOverview();
