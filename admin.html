@@ -141,7 +141,8 @@ tr:hover td{background:rgba(255,255,255,0.02)}
   <div class="brand-sub">POP Creators — Admin</div>
   <div class="nav-links">
     <a class="nav-link active" onclick="navTo('home')">Platform Overview</a>
-    <a class="nav-link" onclick="navTo('creators')" id="creatorsNavLink">Creators <span class="nav-badge" id="creatorsBadge">…</span></a>
+    <a class="nav-link" onclick="navTo('creators')" id="creatorsNavLink">Creator Queue <span class="nav-badge" id="creatorsBadge">…</span></a>
+    <a class="nav-link" onclick="navTo('campaigns-nav')" id="campaignsNavLink">Campaign Queue</a>
     <a class="nav-link" onclick="navTo('review')" id="reviewNavLink">Content Queue <span class="nav-badge" id="queueBadge">…</span></a>
   </div>
   <div class="user-foot">
@@ -242,26 +243,48 @@ tr:hover td{background:rgba(255,255,255,0.02)}
       </div>
     </div>
 
-    <h3 style="font-family:'Playfair Display',serif;font-size:24px;font-weight:600;margin-bottom:16px">Creator Applications</h3>
+    <h3 style="font-family:'Playfair Display',serif;font-size:24px;font-weight:600;margin-bottom:6px">Draft Reviews</h3>
+    <p style="font-size:13px;color:var(--smoke);font-weight:300;margin-bottom:20px">Creators awaiting approval on their draft reel before posting.</p>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Handle</th><th>Name</th><th>Email</th><th>Campaign</th><th>Applied</th><th>Action</th></tr></thead>
-        <tbody id="creatorAppBody">
+        <thead><tr><th>Campaign</th><th>Creator</th><th>Phone</th><th>Draft Link</th><th>Submitted</th><th>Action</th></tr></thead>
+        <tbody id="draftQueueBody">
           <tr><td colspan="6"><div class="skeleton" style="height:20px;margin:4px 0"></div></td></tr>
         </tbody>
       </table>
     </div>
 
-    <h3 style="font-family:'Playfair Display',serif;font-size:24px;font-weight:600;margin-bottom:16px;margin-top:56px">Content Approvals</h3>
+    <h3 style="font-family:'Playfair Display',serif;font-size:24px;font-weight:600;margin-bottom:6px;margin-top:56px">Live Reel Reviews</h3>
+    <p style="font-size:13px;color:var(--smoke);font-weight:300;margin-bottom:20px">Creators who posted their reel and submitted the live link for final approval.</p>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Campaign</th><th>Creator</th><th>Content Link</th><th>Status</th><th>Action</th></tr></thead>
+        <thead><tr><th>Campaign</th><th>Creator</th><th>Reel Link</th><th>Status</th><th>Action</th></tr></thead>
         <tbody id="contentAppBody">
           <tr><td colspan="5"><div class="skeleton" style="height:20px;margin:4px 0"></div></td></tr>
         </tbody>
       </table>
     </div>
   </div>
+
+  <!-- ── CAMPAIGNS QUEUE ──────────────────────────────────────── -->
+  <div id="view-campaigns-nav" class="view-section">
+    <div class="header">
+      <div>
+        <div class="breadcrumb">Campaign Management</div>
+        <h1>Campaign <i>Queue.</i></h1>
+      </div>
+      <button class="btn-flame" onclick="openModal()">+ New Campaign</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Campaign</th><th>Applied</th><th>Approved</th><th>Drafts Pending</th><th>Live</th><th>Views</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody id="campaignQueueBody">
+          <tr><td colspan="8"><div class="skeleton" style="height:20px;margin:4px 0"></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
   <!-- ── CREATORS ──────────────────────────────────────────── -->
   <div id="view-creators" class="view-section">
     <div class="header">
@@ -334,6 +357,23 @@ tr:hover td{background:rgba(255,255,255,0.02)}
   </div>
 </div>
 
+<!-- REJECT WITH COMMENT MODAL -->
+<div class="modal-overlay" id="rejectModal">
+  <div class="modal-box" style="max-width:480px">
+    <button class="modal-x" onclick="closeRejectModal()">&#10005;</button>
+    <h3 style="font-family:'Playfair Display',serif;font-size:24px;margin-bottom:8px">Reject <i>with Feedback.</i></h3>
+    <p style="font-size:13px;color:var(--smoke);margin-bottom:20px" id="rejectModalSubtitle">Leave a comment explaining what needs to change.</p>
+    <div class="f-group">
+      <label class="f-label">Feedback / Reason</label>
+      <textarea class="f-input" id="rejectComment" style="height:120px;resize:vertical" placeholder="e.g. Lighting too dark, please reshoot in natural light…"></textarea>
+    </div>
+    <div style="display:flex;gap:12px;margin-top:8px">
+      <button class="btn-outline" style="flex:1" onclick="closeRejectModal()">Cancel</button>
+      <button class="btn-r" id="confirmRejectBtn" style="flex:1;padding:12px" onclick="confirmReject()">Reject &amp; Send Feedback</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const SUPABASE_URL  = 'https://fxuinuxyjhjxygdhskfn.supabase.co';
@@ -370,6 +410,9 @@ function navTo(viewId) {
   } else if (viewId === 'creators') {
     document.querySelector('#creatorsNavLink').classList.add('active');
     loadCreators();
+  } else if (viewId === 'campaigns-nav') {
+    document.querySelector('#campaignsNavLink').classList.add('active');
+    loadCampaignQueue();
   }
 }
 
@@ -574,96 +617,123 @@ async function updateCreatorStatus(creatorId, newStatus) {
   await openCreator(creatorId, '');
 }
 
-// ── Approval Queue ────────────────────────────────────────────
+// ── Content Queue ─────────────────────────────────────────────
 async function loadQueue() {
-  const [{ data: pendingApps }, { data: pendingContent }] = await Promise.all([
-    sb.from('applications').select(`
-      id, status, applied_at,
-      campaigns(title),
-      creators(full_name, instagram_handle, email)
-    `).eq('status','applied').order('applied_at'),
+  const [{ data: pendingDrafts }, { data: pendingReels }] = await Promise.all([
     sb.from('submissions').select(`
-      id, content_url, status, campaign_id,
+      id, draft_url, submitted_at,
+      campaigns(title),
+      creators(full_name, instagram_handle, phone)
+    `).eq('draft_status', 'pending').order('submitted_at'),
+    sb.from('submissions').select(`
+      id, content_url, status, submitted_at,
       campaigns(title),
       creators(full_name, instagram_handle)
-    `).eq('status','pending').order('submitted_at')
+    `).eq('draft_status', 'approved').eq('status', 'pending').not('content_url', 'is', null).order('submitted_at')
   ]);
 
-  // Creator apps table
-  document.getElementById('creatorAppBody').innerHTML = pendingApps?.length
-    ? pendingApps.map(app => `<tr>
-        <td><a href="https://www.instagram.com/${app.creators?.instagram_handle||''}" target="_blank" style="color:#fff;font-weight:500">@${app.creators?.instagram_handle||'—'} ↗</a></td>
-        <td>${esc(app.creators?.full_name||'—')}</td>
-        <td style="font-size:12px;color:var(--smoke)">${app.creators?.email||'—'}</td>
-        <td>${app.campaigns?.title||'—'}</td>
-        <td style="font-size:12px;color:var(--ash)">${new Date(app.applied_at).toLocaleDateString('en-IN')}</td>
-        <td><div style="display:flex;gap:8px">
-          <button class="btn-g" onclick="reviewApp('${app.id}','approved')">Approve</button>
-          <button class="btn-r" onclick="reviewApp('${app.id}','rejected')">Reject</button>
-        </div></td>
-      </tr>`).join('')
-    : `<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--smoke)">No pending creator applications.</td></tr>`;
+  document.getElementById('draftQueueBody').innerHTML = pendingDrafts?.length
+    ? pendingDrafts.map(sub => {
+        const name = esc(sub.creators?.full_name || '—');
+        const handle = sub.creators?.instagram_handle || '—';
+        const phone = sub.creators?.phone || '—';
+        const camp = esc(sub.campaigns?.title || '—');
+        const draft = esc(sub.draft_url || '');
+        const date = sub.submitted_at ? new Date(sub.submitted_at).toLocaleDateString('en-IN') : '—';
+        const sid = sub.id;
+        const cname = (sub.creators?.full_name || 'Creator').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+        return `<tr>
+          <td><div class="td-strong">${camp}</div></td>
+          <td><div class="td-strong">${name}</div><div class="td-sub">@${handle}</div></td>
+          <td style="font-size:13px;color:#fff">${phone}</td>
+          <td><a href="${draft}" target="_blank" style="color:var(--ember);text-decoration:none;font-weight:500">View Draft &#8599;</a></td>
+          <td style="font-size:12px;color:var(--ash)">${date}</td>
+          <td><div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn-g" onclick="approveDraft('${sid}')">Approve Draft</button>
+            <button class="btn-r" onclick="openRejectModal('draft','${sid}','${cname}')">Request Changes</button>
+          </div></td>
+        </tr>`;
+      }).join('')
+    : '<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--smoke)">No drafts pending review.</td></tr>';
 
-  // Content approvals table
-  document.getElementById('contentAppBody').innerHTML = pendingContent?.length
-    ? pendingContent.map(sub => `<tr>
-        <td><div class="td-strong">${sub.campaigns?.title||'—'}</div></td>
-        <td><div class="td-strong">${esc(sub.creators?.full_name||'—')}</div><div class="td-sub">@${sub.creators?.instagram_handle||'—'}</div></td>
-        <td><a href="${esc(sub.content_url)}" target="_blank" style="color:var(--flame);text-decoration:none;font-weight:500">Review Link ↗</a></td>
-        <td><span class="st-badge wait">Pending</span></td>
-        <td><div style="display:flex;gap:8px">
-          <button class="btn-g" onclick="openPayoutModal('${sub.id}','${sub.content_url}','${(sub.creators?.full_name||'Creator').replace(/'/g,"\\'")}')">Approve + Payout</button>
-          <button class="btn-r" onclick="reviewContent('${sub.id}','rejected')">Reject</button>
-        </div></td>
-      </tr>`).join('')
-    : `<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--smoke)">No pending content reviews.</td></tr>`;
+  document.getElementById('contentAppBody').innerHTML = pendingReels?.length
+    ? pendingReels.map(sub => {
+        const name = esc(sub.creators?.full_name || '—');
+        const handle = sub.creators?.instagram_handle || '—';
+        const camp = esc(sub.campaigns?.title || '—');
+        const reel = esc(sub.content_url || '');
+        const sid = sub.id;
+        const cname = (sub.creators?.full_name || 'Creator').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+        const reelRaw = (sub.content_url || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+        return `<tr>
+          <td><div class="td-strong">${camp}</div></td>
+          <td><div class="td-strong">${name}</div><div class="td-sub">@${handle}</div></td>
+          <td><a href="${reel}" target="_blank" style="color:var(--flame);text-decoration:none;font-weight:500">View Reel &#8599;</a></td>
+          <td><span class="st-badge wait">Pending</span></td>
+          <td><div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn-g" onclick="openPayoutModal('${sid}','${reelRaw}','${cname}')">Approve + Payout</button>
+            <button class="btn-r" onclick="openRejectModal('reel','${sid}','${cname}')">Reject</button>
+          </div></td>
+        </tr>`;
+      }).join('')
+    : '<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--smoke)">No live reels pending review.</td></tr>';
+
+  const total = (pendingDrafts?.length || 0) + (pendingReels?.length || 0);
+  document.getElementById('queueBadge').textContent = total || 0;
+}
+
+async function approveDraft(subId) {
+  const { error } = await sb.from('submissions').update({ draft_status: 'approved' }).eq('id', subId);
+  if (error) { alert('Error: ' + error.message); return; }
+  await loadQueue(); await loadOverview();
+}
+
+// ── Reject with comment ───────────────────────────────────────
+let pendingReject = null;
+
+function openRejectModal(type, id, name) {
+  pendingReject = { type, id, name };
+  const labels = {
+    draft: 'The creator will see this feedback and can resubmit their draft.',
+    reel:  'The creator will see this on their dashboard.',
+    app:   'Optional — explain why the application was rejected.'
+  };
+  document.getElementById('rejectModalSubtitle').textContent = labels[type] || '';
+  document.getElementById('rejectComment').value = '';
+  document.getElementById('rejectModal').classList.add('show');
+}
+
+function closeRejectModal() {
+  document.getElementById('rejectModal').classList.remove('show');
+  pendingReject = null;
+}
+
+async function confirmReject() {
+  if (!pendingReject) return;
+  const comment = document.getElementById('rejectComment').value.trim();
+  const btn = document.getElementById('confirmRejectBtn');
+  btn.textContent = 'Sending…'; btn.disabled = true;
+  let error;
+  if (pendingReject.type === 'draft') {
+    ({ error } = await sb.from('submissions').update({ draft_status: 'changes_requested', admin_comments: comment }).eq('id', pendingReject.id));
+  } else if (pendingReject.type === 'reel') {
+    ({ error } = await sb.from('submissions').update({ status: 'rejected', admin_comments: comment }).eq('id', pendingReject.id));
+  } else if (pendingReject.type === 'app') {
+    ({ error } = await sb.from('applications').update({ status: 'rejected', admin_comments: comment }).eq('id', pendingReject.id));
+  }
+  btn.textContent = 'Reject & Send Feedback'; btn.disabled = false;
+  if (error) { alert('Error: ' + error.message); return; }
+  closeRejectModal(); await loadQueue(); await loadOverview();
 }
 
 async function reviewApp(appId, decision) {
+  if (decision === 'rejected') { openRejectModal('app', appId, ''); return; }
   const { error } = await sb.from('applications').update({ status: decision }).eq('id', appId);
   if (error) { alert('Error: ' + error.message); return; }
-  await loadQueue();
-  await loadOverview();
+  await loadQueue(); await loadOverview();
 }
 
-// ── Content approval with payout modal ───────────────────────
-let pendingContentApproval = null;
 
-function openPayoutModal(subId, contentUrl, creatorName) {
-  pendingContentApproval = subId;
-  document.getElementById('payoutContentPreview').innerHTML = `
-    <div style="margin-bottom:4px;font-weight:500;color:#fff">${creatorName}</div>
-    <a href="${contentUrl}" target="_blank" style="color:var(--flame);text-decoration:none;font-size:12px">${contentUrl} ↗</a>`;
-  document.getElementById('payoutAmount').value = 3000;
-  document.getElementById('payoutModal').classList.add('show');
-}
-
-function closePayoutModal() {
-  document.getElementById('payoutModal').classList.remove('show');
-  pendingContentApproval = null;
-}
-
-async function confirmContentApproval() {
-  if (!pendingContentApproval) return;
-  const amount = parseInt(document.getElementById('payoutAmount').value) || 3000;
-  const { error } = await sb.from('submissions')
-    .update({ status: 'approved', payout_amount: amount })
-    .eq('id', pendingContentApproval);
-  if (error) { alert('Error: ' + error.message); return; }
-  closePayoutModal();
-  await loadQueue();
-  await loadOverview();
-}
-
-async function reviewContent(subId, decision) {
-  if (decision === 'rejected') {
-    const { error } = await sb.from('submissions').update({ status: 'rejected' }).eq('id', subId);
-    if (error) { alert('Error: ' + error.message); return; }
-    await loadQueue();
-    await loadOverview();
-  }
-  // 'approved' handled by payout modal
-}
 
 // ── Creators ──────────────────────────────────────────────────
 let allCreators = [];
@@ -755,6 +825,10 @@ document.getElementById('payoutModal').addEventListener('click', e => {
   if (e.target === document.getElementById('payoutModal')) closePayoutModal();
 });
 
+document.getElementById('rejectModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('rejectModal')) closeRejectModal();
+});
+
 async function publishCampaign() {
   const title = document.getElementById('newTitle').value.trim();
   const days  = parseInt(document.getElementById('newDays').value) || 30;
@@ -778,6 +852,48 @@ async function publishCampaign() {
   closeModal();
   alert(`"${title}" is now live!`);
   await loadOverview();
+}
+
+// ── Campaign Queue ────────────────────────────────────────────
+async function loadCampaignQueue() {
+  document.getElementById('campaignQueueBody').innerHTML =
+    '<tr><td colspan="8"><div class="skeleton" style="height:20px;margin:4px 0"></div></td></tr>';
+  const { data: camps } = await sb.from('campaigns').select('id, title, status, days_open, created_at').order('created_at', { ascending: false });
+  if (!camps?.length) {
+    document.getElementById('campaignQueueBody').innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--smoke)">No campaigns yet.</td></tr>';
+    return;
+  }
+  const rows = await Promise.all(camps.map(async camp => {
+    const [
+      { count: applied }, { count: approved }, { count: drafts },
+      { count: live }, { data: views }
+    ] = await Promise.all([
+      sb.from('applications').select('id',{count:'exact',head:true}).eq('campaign_id',camp.id),
+      sb.from('applications').select('id',{count:'exact',head:true}).eq('campaign_id',camp.id).eq('status','approved'),
+      sb.from('submissions').select('id',{count:'exact',head:true}).eq('campaign_id',camp.id).eq('draft_status','pending'),
+      sb.from('submissions').select('id',{count:'exact',head:true}).eq('campaign_id',camp.id).eq('status','approved'),
+      sb.from('submissions').select('views_tracked').eq('campaign_id',camp.id)
+    ]);
+    const campViews = (views||[]).reduce((s,r)=>s+(r.views_tracked||0),0);
+    const daysLeft  = Math.max(0, camp.days_open - Math.floor((Date.now()-new Date(camp.created_at))/86400000));
+    const badge     = camp.status === 'active'
+      ? '<span class="st-badge ok">Active &bull; ' + daysLeft + 'd</span>'
+      : '<span class="st-badge no">Ended</span>';
+    const campId    = camp.id;
+    const campTitle = esc(camp.title);
+    const campTitleQ = (camp.title||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    return '<tr>' +
+      '<td><div class="td-strong">' + campTitle + '</div></td>' +
+      '<td>' + (applied||0) + '</td>' +
+      '<td>' + (approved||0) + '</td>' +
+      '<td>' + (drafts ? '<span class="st-badge wait">' + drafts + ' pending</span>' : '&#8212;') + '</td>' +
+      '<td>' + (live||0) + '</td>' +
+      '<td style="color:#fff;font-weight:500">' + (campViews>=100000?(campViews/100000).toFixed(1)+'L':campViews>=1000?(campViews/1000).toFixed(1)+'K':campViews||'&#8212;') + '</td>' +
+      '<td>' + badge + '</td>' +
+      '<td><button class="btn-outline" onclick="openCampaign(\'' + campId + '\',\'' + campTitleQ + '\')">Details &#8594;</button></td>' +
+      '</tr>';
+  }));
+  document.getElementById('campaignQueueBody').innerHTML = rows.join('');
 }
 
 // ── Init ──────────────────────────────────────────────────────
