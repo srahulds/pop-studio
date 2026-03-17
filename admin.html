@@ -395,6 +395,7 @@ let activeCampaignName = '';
 
 // ── Navigation ────────────────────────────────────────────────
 function navTo(viewId) {
+  localStorage.setItem('pop-admin-view', viewId);
   document.getElementById('sidebar').classList.remove('open');
   document.getElementById('sbOverlay').classList.remove('show');
   document.body.style.overflow = '';
@@ -972,6 +973,12 @@ async function init() {
   // ── Load data ───────────────────────────────────────────────
   await loadOverview();
   await loadQueue();
+
+  // Restore last active view (survives refresh)
+  const savedView = localStorage.getItem('pop-admin-view');
+  if (savedView && savedView !== 'home' && document.getElementById('view-' + savedView)) {
+    navTo(savedView);
+  }
 }
 
 async function adminLogout() {
