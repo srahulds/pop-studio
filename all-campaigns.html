@@ -209,7 +209,7 @@ footer{padding:60px 56px 40px;border-top:1px solid rgba(255,255,255,0.04);displa
 <footer>
   <div class="ft-logo">POP Creators</div>
   <div class="ft-links">
-    <a href="#">Creator Terms</a><a href="#">Privacy</a>
+    <a href="terms.html">Creator Terms</a><a href="privacy.html">Privacy Policy</a>
     <a href="contact.html">Contact</a>
     <a href="https://dl.popclub.co/Get_POP" target="_blank">Download POP →</a>
   </div>
@@ -286,18 +286,19 @@ const sb = window.supabase.createClient(
 );
 let currentUser  = null;
 let pendingOptIn = null;
+let creatorStatus = null;
 const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#x27;');
 
 async function init() {
   const { data: { session } } = await sb.auth.getSession();
   if (session?.user) {
     currentUser = session.user;
-    // Load IG handle if not cached
-    if (!localStorage.getItem('pop_ig_handle')) {
-      sb.from('creators').select('instagram_handle').eq('id', session.user.id).single().then(({ data }) => {
-        if (data?.instagram_handle) localStorage.setItem('pop_ig_handle', data.instagram_handle);
-        updateNavForUser(session.user);
-      });
+    // Fetch creator status + IG handle
+    const { data: creatorRow } = await sb
+      .from('creators').select('instagram_handle, status').eq('id', session.user.id).single();
+    if (creatorRow) {
+      creatorStatus = creatorRow.status;
+      if (creatorRow.instagram_handle) localStorage.setItem('pop_ig_handle', creatorRow.instagram_handle);
     }
     updateNavForUser(session.user);
   }
@@ -496,6 +497,10 @@ async function handleOptIn(campaignId, campaignTitle) {
   if (!currentUser) {
     pendingOptIn = { id: campaignId, title: campaignTitle };
     document.getElementById('authOverlay').classList.add('show');
+    return;
+  }
+  if (creatorStatus !== 'approved') {
+    alert("Your account is pending approval. You'll be able to opt into campaigns once our team reviews your profile.");
     return;
   }
   // Fetch full campaign details and show brief modal
