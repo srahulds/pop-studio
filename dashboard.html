@@ -204,7 +204,8 @@ function renderNav(user, fullName, initials) {
   const handleDisplay = ig.length > 10 ? ig.substring(0, 10) : ig;
 
   document.getElementById('navRight').innerHTML = `
-    <div style="display:inline-flex;align-items:center;padding:4px 10px;background:rgba(255,82,0,0.1);border:1px solid rgba(255,82,0,0.3);border-radius:100px;font-size:9px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:#fff;white-space:nowrap">@${handleDisplay}</div>`;
+    <div style="display:inline-flex;align-items:center;padding:4px 10px;background:rgba(255,82,0,0.1);border:1px solid rgba(255,82,0,0.3);border-radius:100px;font-size:9px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:#fff;white-space:nowrap">@${handleDisplay}</div>
+    <button class="hamburger" onclick="toggleMobileMenu()">☰</button>`;
 }
 
 function toggleMobileMenu() {
@@ -379,5 +380,16 @@ async function logout() {
 
 init();
 </script>
+
+<footer>
+  <div class="ft-logo">POP Creators</div>
+  <div class="ft-links">
+    <a href="terms.html">Creator Terms</a>
+    <a href="privacy.html">Privacy Policy</a>
+    <a href="contact.html">Contact</a>
+    <a href="https://dl.popclub.co/Get_POP" target="_blank">Download POP →</a>
+  </div>
+  <div class="ft-copy">© 2026 Poptech Growth Pvt. Ltd.</div>
+</footer>
 </body>
 </html>
