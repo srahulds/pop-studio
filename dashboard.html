@@ -248,7 +248,7 @@ async function loadStats() {
   try {
     const { data: subs } = await sb
       .from('submissions')
-      .select('views_tracked, payout_amount, status')
+      .select('views_tracked, likes_count, comments_count, shares_count, payout_amount, status')
       .eq('creator_id', currentUser.id);
 
     const totalViews  = (subs || []).reduce((s, r) => s + (r.views_tracked || 0), 0);
@@ -279,7 +279,7 @@ async function loadCampaigns() {
     .select(`
       id, status, applied_at, admin_comments,
       campaigns ( id, title, description, status, days_open, created_at ),
-      submissions ( id, content_url, draft_url, draft_status, admin_comments, views_tracked, payout_amount, status )
+      submissions ( id, content_url, draft_url, draft_status, admin_comments, views_tracked, likes_count, comments_count, shares_count, saves_count, reach_count, payout_amount, status )
     `)
     .eq('creator_id', currentUser.id)
     .order('applied_at', { ascending: false });
@@ -373,6 +373,36 @@ async function loadCampaigns() {
         const subBadge  = { pending: 'applied', approved: 'approved', rejected: 'rejected' }[sub.status] || 'applied';
         const reelComment = (sub.status === 'rejected' && sub.admin_comments)
           ? `<div class="admin-comment" style="margin-top:12px">${esc(sub.admin_comments)}</div>` : '';
+
+        // Format metric display
+        function fmtNum(n) { return n >= 1000000 ? (n/1000000).toFixed(1)+'M' : n >= 1000 ? (n/1000).toFixed(1)+'K' : n || '0'; }
+        const views    = sub.views_tracked   || 0;
+        const likes    = sub.likes_count     || 0;
+        const cmnts    = sub.comments_count  || 0;
+        const shares   = sub.shares_count    || 0;
+        const saves    = sub.saves_count     || 0;
+        const hasMetrics = views || likes || cmnts || shares;
+
+        const metricsRow = hasMetrics ? `
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px">
+            <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:10px 12px;text-align:center">
+              <div style="font-size:11px;color:var(--ash);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px">Views</div>
+              <div style="font-family:'Playfair Display',serif;font-size:18px;color:#fff">${fmtNum(views)}</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:10px 12px;text-align:center">
+              <div style="font-size:11px;color:var(--ash);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px">Likes</div>
+              <div style="font-family:'Playfair Display',serif;font-size:18px;color:#fff">${fmtNum(likes)}</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:10px 12px;text-align:center">
+              <div style="font-size:11px;color:var(--ash);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px">Comments</div>
+              <div style="font-family:'Playfair Display',serif;font-size:18px;color:#fff">${fmtNum(cmnts)}</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:10px 12px;text-align:center">
+              <div style="font-size:11px;color:var(--ash);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px">Shares</div>
+              <div style="font-family:'Playfair Display',serif;font-size:18px;color:#fff">${fmtNum(shares)}</div>
+            </div>
+          </div>` : `<div style="margin-top:12px;font-size:12px;color:var(--ash)">Metrics will appear here once your team updates the tracker.</div>`;
+
         actionHTML = `
           <div class="stage-box">
             <div class="stage-done" style="margin-bottom:12px"><span class="check">&#10003;</span> Draft approved</div>
@@ -384,6 +414,7 @@ async function loadCampaigns() {
                 <span class="status-badge ${subBadge}">${subStatus}</span>
               </div>
             </div>
+            ${metricsRow}
             ${reelComment}
           </div>`;
       }
