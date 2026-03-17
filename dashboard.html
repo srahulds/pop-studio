@@ -93,6 +93,25 @@ nav.scrolled{background:rgba(10,10,10,0.97)}
   .content-link{max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 }
 
+/* Toast notifications */
+#toast-container{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:9000;display:flex;flex-direction:column;gap:10px;align-items:center;pointer-events:none}
+.toast{background:#1A1A1A;border:1px solid rgba(255,255,255,0.1);color:#fff;padding:13px 20px;border-radius:100px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;display:flex;align-items:center;gap:10px;box-shadow:0 8px 32px rgba(0,0,0,0.4);pointer-events:auto;animation:toastIn 0.25s ease;white-space:nowrap;max-width:90vw}
+.toast.success{border-color:rgba(34,197,94,0.3);background:rgba(34,197,94,0.08)}
+.toast.error{border-color:rgba(255,82,0,0.3);background:rgba(255,82,0,0.06)}
+@keyframes toastIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+/* Stage boxes for 2-step submission */
+.stage-box{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:18px 20px;margin-top:12px}
+.stage-box.warn{border-color:rgba(255,82,0,0.2)}
+.stage-label{font-size:10px;letter-spacing:0.14em;text-transform:uppercase;color:var(--ember);font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.stage-label::before{content:'';width:10px;height:1px;background:var(--ember)}
+.stage-label.flame{color:var(--flame)}
+.stage-label.flame::before{background:var(--flame)}
+.stage-done{display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(34,197,94,0.05);border:1px solid rgba(34,197,94,0.15);border-radius:10px;font-size:13px;color:rgba(255,255,255,0.6)}
+.stage-done .check{color:#22C55E;font-size:15px;flex-shrink:0}
+.stage-note{margin-top:10px;font-size:12px;color:var(--ash);line-height:1.6}
+.stage-desc{font-size:13px;color:var(--smoke);font-weight:300;margin-bottom:14px;line-height:1.6}
+.admin-comment{background:rgba(255,82,0,0.05);border:1px solid rgba(255,82,0,0.15);border-radius:10px;padding:12px 14px;font-size:13px;color:rgba(255,255,255,0.7);margin-bottom:14px;line-height:1.6}
+/* Footer */
 footer{padding:48px 56px 40px;border-top:1px solid rgba(255,255,255,0.04);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px}
 .ft-logo{font-family:'Playfair Display',serif;font-size:20px;font-weight:600}
 .ft-links{display:flex;gap:28px;flex-wrap:wrap}
@@ -260,7 +279,7 @@ async function loadCampaigns() {
     .select(`
       id, status, applied_at,
       campaigns ( id, title, description, status, days_open, created_at ),
-      submissions ( id, content_url, views_tracked, payout_amount, status )
+      submissions ( id, content_url, draft_url, draft_status, admin_comments, views_tracked, payout_amount, status )
     `)
     .eq('creator_id', currentUser.id)
     .order('applied_at', { ascending: false });
@@ -292,31 +311,75 @@ async function loadCampaigns() {
 
     if (app.status === 'rejected') {
       actionHTML = `<div style="color:var(--smoke);font-size:13px">Your application was not approved for this campaign.</div>`;
+
     } else if (app.status === 'applied') {
-      actionHTML = `<div style="color:var(--smoke);font-size:13px">Your application is under review. We'll notify you within 48 hours.</div>`;
+      actionHTML = `<div style="color:var(--smoke);font-size:13px;display:flex;align-items:center;gap:8px"><span style="width:6px;height:6px;border-radius:50%;background:var(--honey);display:inline-block;flex-shrink:0"></span>Application under review — you'll hear back within 48 hours.</div>`;
+
     } else if (app.status === 'approved') {
+
       if (!sub) {
-        // No submission yet — show input
+        // STAGE 1 — no submission yet, submit draft
         actionHTML = `
-          <p class="camp-desc">Post your Reel and paste the link below to begin tracking.</p>
-          <div class="submit-row">
-            <input type="url" class="submit-input" id="urlInput_${app.id}" placeholder="https://www.instagram.com/p/...">
-            <button class="submit-btn" onclick="submitContent('${app.id}','${c.id}')">Submit</button>
+          <div class="stage-box">
+            <div class="stage-label">Stage 1 — Submit Draft</div>
+            <p class="stage-desc">Upload your draft reel to Google Drive (set to "Anyone with link") and paste the link below for review before posting.</p>
+            <div class="submit-row">
+              <input type="url" class="submit-input" id="draftInput_${app.id}" placeholder="https://drive.google.com/...">
+              <button class="submit-btn" onclick="submitDraft('${app.id}','${c.id}')">Submit Draft</button>
+            </div>
           </div>`;
-      } else {
-        // Already submitted
+
+      } else if (!sub.draft_status || sub.draft_status === 'pending') {
+        // STAGE 1 — draft submitted, under review
+        actionHTML = `
+          <div class="stage-box">
+            <div class="stage-label">Stage 1 — Draft Under Review</div>
+            <div class="stage-done">
+              <span class="check">&#10003;</span>
+              <span>Draft submitted &mdash; <a href="${esc(sub.draft_url || '')}" target="_blank" style="color:var(--ember);text-decoration:none">View Draft</a></span>
+            </div>
+            <p class="stage-note">Reviewing your draft. We will notify you once approved or if changes are needed.</p>
+          </div>`;
+
+      } else if (sub.draft_status === 'changes_requested') {
+        // STAGE 1 — changes requested
+        actionHTML = `
+          <div class="stage-box warn">
+            <div class="stage-label flame">Stage 1 — Changes Requested</div>
+            <div class="admin-comment">${esc(sub.admin_comments || 'Please review and resubmit your draft.')}</div>
+            <div class="submit-row">
+              <input type="url" class="submit-input" id="draftInput_${app.id}" placeholder="https://drive.google.com/... (updated draft)">
+              <button class="submit-btn" onclick="submitDraft('${app.id}','${c.id}')">Resubmit Draft</button>
+            </div>
+          </div>`;
+
+      } else if (sub.draft_status === 'approved' && !sub.content_url) {
+        // STAGE 2 — draft approved, now post reel and submit link
+        actionHTML = `
+          <div class="stage-box">
+            <div class="stage-done" style="margin-bottom:16px"><span class="check">&#10003;</span> Draft approved &mdash; ready to post</div>
+            <div class="stage-label">Stage 2 — Post and Submit Reel</div>
+            <p class="stage-desc">Post your reel on Instagram with the paid partnership disclosure, then paste the live reel link below.</p>
+            <div class="submit-row">
+              <input type="url" class="submit-input" id="reelInput_${app.id}" placeholder="https://www.instagram.com/reel/...">
+              <button class="submit-btn" onclick="submitReel('${app.id}','${c.id}')">Submit Reel</button>
+            </div>
+          </div>`;
+
+      } else if (sub.draft_status === 'approved' && sub.content_url) {
+        // STAGE 2 — reel submitted, show final status
         const subStatus = { pending: 'Under Review', approved: 'Live', rejected: 'Rejected' }[sub.status] || sub.status;
         const subBadge  = { pending: 'applied', approved: 'approved', rejected: 'rejected' }[sub.status] || 'applied';
         actionHTML = `
-          <div class="content-submitted">
-            <div>
-              <div style="font-size:11px;color:var(--ash);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px">Submitted Content</div>
-              <a href="${sub.content_url}" target="_blank" class="content-link">${sub.content_url}</a>
-            </div>
-            <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
-              ${sub.views_tracked ? `<span style="font-size:13px;color:var(--smoke)">${(sub.views_tracked/1000).toFixed(1)}K views</span>` : ''}
-              ${sub.payout_amount ? `<span style="font-size:13px;color:var(--flame)">₹${sub.payout_amount.toLocaleString('en-IN')}</span>` : ''}
-              <span class="status-badge ${subBadge}">${subStatus}</span>
+          <div class="stage-box">
+            <div class="stage-done" style="margin-bottom:12px"><span class="check">&#10003;</span> Draft approved</div>
+            <div class="stage-label">Stage 2 — Live Reel</div>
+            <div class="content-submitted">
+              <div><a href="${esc(sub.content_url)}" target="_blank" class="content-link">${esc(sub.content_url)}</a></div>
+              <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:10px">
+                ${sub.payout_amount ? `<span style="font-size:15px;font-weight:600;color:var(--flame)">&#8377;${sub.payout_amount.toLocaleString('en-IN')}</span>` : ''}
+                <span class="status-badge ${subBadge}">${subStatus}</span>
+              </div>
             </div>
           </div>`;
       }
@@ -335,52 +398,89 @@ async function loadCampaigns() {
 
 let isSubmitting = false;
 
-async function submitContent(applicationId, campaignId) {
+function toast(msg, type, duration) {
+  if (!type) type = 'info';
+  if (!duration) duration = 3500;
+  const container = document.getElementById('toast-container');
+  if (!container) return;
+  const el = document.createElement('div');
+  const icon = type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ';
+  el.className = 'toast ' + type;
+  el.innerHTML = '<span style="font-size:16px">' + icon + '</span> ' + msg;
+  container.appendChild(el);
+  setTimeout(function() {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(10px)';
+    el.style.transition = 'all 0.3s';
+    setTimeout(function() { el.remove(); }, 300);
+  }, duration);
+}
+
+async function submitDraft(applicationId, campaignId) {
   if (isSubmitting) return;
   isSubmitting = true;
-  const input = document.getElementById(`urlInput_${applicationId}`);
-  const url   = input?.value.trim();
+  const input = document.getElementById('draftInput_' + applicationId);
+  const url   = input ? input.value.trim() : '';
 
-  if (!url) {
-    alert('Please paste your Instagram Reel or post URL.');
-    return;
+  if (!url) { toast('Please paste your Google Drive link.', 'error'); isSubmitting = false; return; }
+  try {
+    const parsed = new URL(url);
+    if (!parsed.hostname.includes('drive.google') && !parsed.hostname.includes('docs.google')) {
+      toast('Please enter a Google Drive link.', 'error'); isSubmitting = false; return;
+    }
+  } catch (e) { toast('Please enter a valid URL.', 'error'); isSubmitting = false; return; }
+
+  const btn = input.nextElementSibling;
+  btn.disabled = true; btn.textContent = 'Submitting…';
+
+  const { data: existing } = await sb.from('submissions').select('id').eq('application_id', applicationId).maybeSingle();
+  let error;
+  if (existing && existing.id) {
+    const res = await sb.from('submissions').update({ draft_url: url, draft_status: 'pending' }).eq('id', existing.id);
+    error = res.error;
+  } else {
+    const res = await sb.from('submissions').insert({
+      campaign_id: campaignId, creator_id: currentUser.id,
+      application_id: applicationId, draft_url: url, draft_status: 'pending', status: 'pending'
+    });
+    error = res.error;
   }
+
+  isSubmitting = false;
+  btn.disabled = false; btn.textContent = 'Submit Draft';
+  if (error) { toast('Could not submit. Please try again.', 'error'); return; }
+  toast("Draft submitted! We'll review it shortly.", 'success');
+  await loadCampaigns(); await loadStats();
+}
+
+async function submitReel(applicationId, campaignId) {
+  if (isSubmitting) return;
+  isSubmitting = true;
+  const input = document.getElementById('reelInput_' + applicationId);
+  const url   = input ? input.value.trim() : '';
+
+  if (!url) { toast('Please paste your Instagram reel link.', 'error'); isSubmitting = false; return; }
   try {
     const parsed = new URL(url);
     if (!parsed.hostname.includes('instagram.com')) {
-      alert('Please enter a valid Instagram URL (instagram.com/...).');
-      return;
+      toast('Please enter a valid Instagram URL.', 'error'); isSubmitting = false; return;
     }
-  } catch {
-    alert('Please enter a valid URL.');
-    return;
-  }
+  } catch (e) { toast('Please enter a valid URL.', 'error'); isSubmitting = false; return; }
 
   const btn = input.nextElementSibling;
-  btn.disabled = true;
-  btn.textContent = 'Submitting…';
+  btn.disabled = true; btn.textContent = 'Submitting…';
 
-  const { error } = await sb.from('submissions').insert({
-    campaign_id:    campaignId,
-    creator_id:     currentUser.id,
-    application_id: applicationId,
-    content_url:    url,
-    status:         'pending',
-    payout_amount:  3000
-  });
+  const res = await sb.from('submissions')
+    .update({ content_url: url, status: 'pending' })
+    .eq('application_id', applicationId)
+    .eq('creator_id', currentUser.id);
 
   isSubmitting = false;
-
-  if (error) {
-    alert(error.code === '23505' ? "You've already submitted for this campaign." : 'Error submitting. Please try again.');
-    btn.disabled = false;
-    btn.textContent = 'Submit';
-  } else {
-    await loadCampaigns();
-    await loadStats();
-  }
+  btn.disabled = false; btn.textContent = 'Submit Reel';
+  if (res.error) { toast('Could not submit. Please try again.', 'error'); return; }
+  toast('Reel submitted for final review!', 'success');
+  await loadCampaigns(); await loadStats();
 }
-
 async function logout() {
   await sb.auth.signOut();
   window.location.href = 'pop-studio.html';
@@ -399,5 +499,16 @@ init();
   </div>
   <div class="ft-copy">© 2026 Poptech Growth Pvt. Ltd.</div>
 </footer>
+<footer>
+  <div class="ft-logo">POP Creators</div>
+  <div class="ft-links">
+    <a href="all-campaigns.html">All Campaigns</a>
+    <a href="terms.html">Creator Terms</a>
+    <a href="privacy.html">Privacy Policy</a>
+    <a href="contact.html">Contact</a>
+  </div>
+  <div class="ft-copy">© 2026 Poptech Growth Pvt. Ltd.</div>
+</footer>
+<div id="toast-container"></div>
 </body>
 </html>

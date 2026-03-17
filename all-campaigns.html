@@ -143,6 +143,12 @@ footer{padding:60px 56px 40px;border-top:1px solid rgba(255,255,255,0.04);displa
   footer{flex-direction:column;gap:20px;text-align:center;padding:40px 20px}
   .ft-links{justify-content:center}
 }
+
+#toast-container{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);z-index:9000;display:flex;flex-direction:column;gap:10px;align-items:center;pointer-events:none}
+.toast{background:#1A1A1A;border:1px solid rgba(255,255,255,0.1);color:#fff;padding:13px 20px;border-radius:100px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;display:flex;align-items:center;gap:10px;box-shadow:0 8px 32px rgba(0,0,0,0.4);pointer-events:auto;animation:toastIn 0.25s ease;white-space:nowrap;max-width:90vw}
+.toast.success{border-color:rgba(34,197,94,0.3);background:rgba(34,197,94,0.08)}
+.toast.error{border-color:rgba(255,82,0,0.3);background:rgba(255,82,0,0.06)}
+@keyframes toastIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 </style>
 </head>
 <body>
@@ -288,6 +294,18 @@ let currentUser  = null;
 let pendingOptIn = null;
 let creatorStatus = null;
 const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#x27;');
+
+
+function toast(msg, type = 'info', duration = 3500) {
+  const container = document.getElementById('toast-container');
+  if (!container) return;
+  const el = document.createElement('div');
+  const icon = type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ';
+  el.className = `toast ${type}`;
+  el.innerHTML = `<span style="font-size:16px">${icon}</span> ${msg}`;
+  container.appendChild(el);
+  setTimeout(() => { el.style.opacity='0'; el.style.transform='translateY(10px)'; el.style.transition='all 0.3s'; setTimeout(() => el.remove(), 300); }, duration);
+}
 
 async function init() {
   const { data: { session } } = await sb.auth.getSession();
@@ -501,7 +519,7 @@ async function handleOptIn(campaignId, campaignTitle) {
     return;
   }
   if (creatorStatus !== 'approved') {
-    alert("Your account is pending approval. You'll be able to opt into campaigns once our team reviews your profile.");
+    toast("Account pending approval — You'll be able to opt into campaigns once our team reviews your profile.");
     return;
   }
   // Fetch full campaign details and show brief modal
@@ -557,7 +575,7 @@ async function applyToCampaign(campaignId, campaignTitle) {
   // Simple rate limit — 3 seconds between applications
   const now = Date.now();
   if (now - lastApplyTime < 3000) {
-    alert('Please wait a moment before applying to another campaign.');
+    toast('Please wait a moment before applying again.', 'error'); return;
     return;
   }
   lastApplyTime = now;
@@ -568,9 +586,9 @@ async function applyToCampaign(campaignId, campaignTitle) {
     status:      'applied'
   });
   if (error?.code === '23505') {
-    alert(`You've already applied to "${campaignTitle}".`);
+    toast('Already applied to this campaign.', 'error');
   } else if (error) {
-    alert('Something went wrong. Please try again.');
+    toast('Something went wrong. Try again.', 'error');
   } else {
     alert(`You're in! We'll review your application for "${campaignTitle}" within 48 hours.`);
     await renderAll();
@@ -622,5 +640,6 @@ async function handleReturnFromLogin() {
 
 init();
 </script>
+<div id="toast-container"></div>
 </body>
 </html>
