@@ -735,6 +735,35 @@ async function reviewApp(appId, decision) {
 
 
 
+// ── Payout modal ──────────────────────────────────────────────
+let pendingContentApproval = null;
+
+function openPayoutModal(subId, contentUrl, creatorName) {
+  pendingContentApproval = subId;
+  document.getElementById('payoutContentPreview').innerHTML =
+    '<div style="margin-bottom:4px;font-weight:500;color:#fff">' + creatorName + '</div>' +
+    '<a href="' + contentUrl + '" target="_blank" style="color:var(--flame);text-decoration:none;font-size:12px">' + contentUrl + ' &#8599;</a>';
+  document.getElementById('payoutAmount').value = 3000;
+  document.getElementById('payoutModal').classList.add('show');
+}
+
+function closePayoutModal() {
+  document.getElementById('payoutModal').classList.remove('show');
+  pendingContentApproval = null;
+}
+
+async function confirmContentApproval() {
+  if (!pendingContentApproval) return;
+  const amount = parseInt(document.getElementById('payoutAmount').value) || 3000;
+  const { error } = await sb.from('submissions')
+    .update({ status: 'approved', payout_amount: amount })
+    .eq('id', pendingContentApproval);
+  if (error) { alert('Error: ' + error.message); return; }
+  closePayoutModal();
+  await loadQueue();
+  await loadOverview();
+}
+
 // ── Creators ──────────────────────────────────────────────────
 let allCreators = [];
 let currentFilter = 'all';
