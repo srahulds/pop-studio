@@ -36,7 +36,7 @@ aside{width:260px;background:rgba(10,10,10,0.95);backdrop-filter:blur(20px);bord
 .mob-toggle{background:var(--night);border:1px solid var(--ghost);color:#fff;padding:10px 16px;border-radius:100px;cursor:pointer;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;transition:all 0.2s}
 .mob-toggle:hover{border-color:var(--flame);color:var(--flame)}
 
-main{margin-left:260px;flex:1;padding:48px 56px;position:relative;z-index:10;min-height:100vh}
+main{margin-left:260px;flex:1;padding:48px 56px;position:relative;z-index:10;min-height:100vh;opacity:0;transition:opacity 0.15s ease}
 .header{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:24px;margin-bottom:40px}
 .breadcrumb{font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ash);font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .bc-link{color:var(--ember);text-decoration:none;cursor:pointer;transition:0.2s}
@@ -979,6 +979,9 @@ async function init() {
   if (savedView && savedView !== 'home' && document.getElementById('view-' + savedView)) {
     navTo(savedView);
   }
+
+  // Reveal content now that correct view is active — no flash
+  document.querySelector('main').style.opacity = '1';
 }
 
 async function adminLogout() {
