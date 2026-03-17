@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>POP Creators — Dashboard</title>
+<link rel="icon" type="image/svg+xml" href="pop_bw_logo_new.svg">
+<link rel="shortcut icon" href="pop_bw_logo_new.svg">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
 <style>
 :root { --flame: #FF5200; --ember:#FF7A33; --honey:#FFB547; --deep: #0A0A0A; --night: #111111; --slab:#1A1A1A; --smoke: rgba(255,255,255,0.5); --ash:rgba(255,255,255,0.25); --ghost: rgba(255,255,255,0.08); --glow:rgba(255,82,0,0.35); --success:#22C55E; }
@@ -202,8 +204,7 @@ function renderNav(user, fullName, initials) {
   const handleDisplay = ig.length > 10 ? ig.substring(0, 10) : ig;
 
   document.getElementById('navRight').innerHTML = `
-    <div style="display:inline-flex;align-items:center;padding:4px 10px;background:rgba(255,82,0,0.1);border:1px solid rgba(255,82,0,0.3);border-radius:100px;font-size:9px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:#fff;white-space:nowrap">@${handleDisplay}</div>
-    <button class="hamburger" onclick="toggleMobileMenu()">☰</button>`;
+    <div style="display:inline-flex;align-items:center;padding:4px 10px;background:rgba(255,82,0,0.1);border:1px solid rgba(255,82,0,0.3);border-radius:100px;font-size:9px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;color:#fff;white-space:nowrap">@${handleDisplay}</div>`;
 }
 
 function toggleMobileMenu() {

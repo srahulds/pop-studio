@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>POP Creators — All Campaigns</title>
+<link rel="icon" type="image/svg+xml" href="pop_bw_logo_new.svg">
+<link rel="shortcut icon" href="pop_bw_logo_new.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700&family=Outfit:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -29,7 +31,7 @@ nav.scrolled{background:rgba(10,10,10,1)}
 .nav-mid a{color:var(--smoke);text-decoration:none;font-size:13px;font-weight:400;letter-spacing:0.03em;transition:color 0.2s}
 .nav-mid a:hover,.nav-mid a.active{color:var(--flame)}
 .nav-right{display:flex;gap:8px;align-items:center}
-.nav-apply{background:var(--flame);color:#fff;padding:4px 10px;font-weight:600;font-size:9px;letter-spacing:0.2em;border:none;cursor:pointer;text-transform:uppercase;text-decoration:none;border-radius:100px;transition:all 0.25s;white-space:nowrap;display:inline-flex;align-items:center;}
+.nav-apply{background:var(--flame);color:#fff;padding:10px 24px;font-weight:600;font-size:12px;letter-spacing:0.08em;border:none;cursor:pointer;text-transform:uppercase;text-decoration:none;border-radius:100px;transition:all 0.25s;white-space:nowrap}
 .nav-apply:hover{box-shadow:0 0 32px var(--glow);transform:translateY(-1px)}
 .hamburger{display:none;background:transparent;border:none;color:#fff;font-size:24px;cursor:pointer}
 .mob-menu-overlay{position:fixed;inset:0;background:rgba(10,10,10,0.98);backdrop-filter:blur(20px);z-index:999;display:flex;flex-direction:column;justify-content:center;align-items:center;opacity:0;pointer-events:none;transition:opacity 0.3s ease}
@@ -133,7 +135,7 @@ footer{padding:60px 56px 40px;border-top:1px solid rgba(255,255,255,0.04);displa
   .nav-mid{display:none}
   .nav-right{margin-left:auto}
   .hamburger{display:block}
-  .nav-apply{padding:4px 10px;font-size:9px;letter-spacing:0.2em;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .nav-apply{padding:7px 14px;font-size:10px;letter-spacing:0.04em;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .header-area{padding:100px 20px 36px}
   .campaigns{padding:48px 20px}
   .camp-grid{grid-template-columns:1fr}
@@ -282,24 +284,20 @@ const sb = window.supabase.createClient(
   'sb_publishable_Mgh-fEqB3IVF4iTvV0-rjw_GkfftY_5',
   { auth: { storageKey: 'pop-studio-auth', autoRefreshToken: true, persistSession: true } }
 );
-let currentUser    = null;
-let pendingOptIn   = null;
-let creatorStatus  = null; // 'pending' | 'approved' | 'blocked' | null (logged out)
+let currentUser  = null;
+let pendingOptIn = null;
 const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#x27;');
 
 async function init() {
   const { data: { session } } = await sb.auth.getSession();
   if (session?.user) {
     currentUser = session.user;
-    // Fetch creator status + IG handle in one call
-    const { data: creator } = await sb
-      .from('creators')
-      .select('instagram_handle, status')
-      .eq('id', session.user.id)
-      .single();
-    if (creator) {
-      creatorStatus = creator.status;
-      if (creator.instagram_handle) localStorage.setItem('pop_ig_handle', creator.instagram_handle);
+    // Load IG handle if not cached
+    if (!localStorage.getItem('pop_ig_handle')) {
+      sb.from('creators').select('instagram_handle').eq('id', session.user.id).single().then(({ data }) => {
+        if (data?.instagram_handle) localStorage.setItem('pop_ig_handle', data.instagram_handle);
+        updateNavForUser(session.user);
+      });
     }
     updateNavForUser(session.user);
   }
@@ -313,8 +311,7 @@ function updateNavForUser(user) {
   const handleDisplay = ig.length > 10 ? ig.substring(0, 10) : ig;
 
   document.getElementById('navRight').innerHTML = `
-    <a href="dashboard.html" style="display:inline-flex;align-items:center;padding:4px 10px;background:rgba(255,82,0,0.1);border:1px solid rgba(255,82,0,0.3);border-radius:100px;cursor:pointer;color:#fff;text-decoration:none;font-size:9px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;white-space:nowrap">@${handleDisplay}</a>
-    <button class="hamburger" onclick="toggleMobileMenu()">☰</button>`;
+    <a href="dashboard.html" style="display:inline-flex;align-items:center;padding:4px 10px;background:rgba(255,82,0,0.1);border:1px solid rgba(255,82,0,0.3);border-radius:100px;cursor:pointer;color:#fff;text-decoration:none;font-size:9px;font-weight:600;letter-spacing:0.2em;text-transform:uppercase;white-space:nowrap">@${handleDisplay}</a>`;
 
   // Show Log Out and Dashboard inside hamburger menu
   const mobLogout = document.getElementById('mobLogout');
@@ -402,25 +399,15 @@ function daysLeft(c) {
 function buildAvailableCard(c) {
   const days  = daysLeft(c);
   const count = c.participants_count || 0;
-
-  let actionBtn;
-  if (!currentUser) {
-    actionBtn = `<button class="c-action-btn" onclick="handleOptIn('${c.id}','${c.title.replace(/'/g,"\\'")}')">Opt In →</button>`;
-  } else if (creatorStatus === 'approved') {
-    actionBtn = `<button class="c-action-btn" onclick="handleOptIn('${c.id}','${c.title.replace(/'/g,"\\'")}')">Opt In →</button>`;
-  } else if (creatorStatus === 'blocked') {
-    actionBtn = `<button class="c-action-btn opted" disabled style="cursor:not-allowed;opacity:0.5">Account Suspended</button>`;
-  } else {
-    actionBtn = `<button class="c-action-btn opted" disabled style="cursor:not-allowed"><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:6px;height:6px;border-radius:50%;background:var(--honey);display:inline-block"></span>Awaiting Account Approval</span></button>`;
-  }
-
   return `
     <div class="camp-card available">
       <div class="c-meta"><span class="c-days">${days} Days Left</span></div>
       <h3>${esc(c.title)}</h3>
       <p>${esc(c.description)}</p>
       <div class="c-participants">${count} Creators Joined</div>
-      ${actionBtn}
+      <button class="c-action-btn" onclick="handleOptIn('${c.id}','${c.title.replace(/'/g,"\\'")}')">
+        Opt In →
+      </button>
     </div>`;
 }
 
@@ -509,11 +496,6 @@ async function handleOptIn(campaignId, campaignTitle) {
   if (!currentUser) {
     pendingOptIn = { id: campaignId, title: campaignTitle };
     document.getElementById('authOverlay').classList.add('show');
-    return;
-  }
-  // Guard — only approved creators can opt in
-  if (creatorStatus !== 'approved') {
-    alert('Your account is pending approval. You\'ll be able to opt into campaigns once our team reviews your profile.');
     return;
   }
   // Fetch full campaign details and show brief modal
@@ -605,7 +587,7 @@ function closeAuth() {
 async function logout() {
   await sb.auth.signOut();
   currentUser = null;
-  document.getElementById('navRight').innerHTML = `<button class="nav-apply" id="navAuthBtn" onclick="handleAuthClick()">You ✕ POP</button><button class="hamburger" onclick="toggleMobileMenu()">☰</button>`;
+  document.getElementById('navRight').innerHTML = `<button class="nav-apply" id="navAuthBtn" onclick="handleAuthClick()">You ✕ POP</button>`;
   await renderAll();
 }
 
