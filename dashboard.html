@@ -277,7 +277,7 @@ async function loadCampaigns() {
   const { data: apps, error } = await sb
     .from('applications')
     .select(`
-      id, status, applied_at,
+      id, status, applied_at, admin_comments,
       campaigns ( id, title, description, status, days_open, created_at ),
       submissions ( id, content_url, draft_url, draft_status, admin_comments, views_tracked, payout_amount, status )
     `)
@@ -310,7 +310,8 @@ async function loadCampaigns() {
     let actionHTML = '';
 
     if (app.status === 'rejected') {
-      actionHTML = `<div style="color:var(--smoke);font-size:13px">Your application was not approved for this campaign.</div>`;
+      const appComment = app.admin_comments ? `<div class="admin-comment" style="margin-top:10px">${esc(app.admin_comments)}</div>` : '';
+      actionHTML = `<div style="color:var(--smoke);font-size:13px">Your application was not approved for this campaign.</div>${appComment}`;
 
     } else if (app.status === 'applied') {
       actionHTML = `<div style="color:var(--smoke);font-size:13px;display:flex;align-items:center;gap:8px"><span style="width:6px;height:6px;border-radius:50%;background:var(--honey);display:inline-block;flex-shrink:0"></span>Application under review — you'll hear back within 48 hours.</div>`;
@@ -370,6 +371,8 @@ async function loadCampaigns() {
         // STAGE 2 — reel submitted, show final status
         const subStatus = { pending: 'Under Review', approved: 'Live', rejected: 'Rejected' }[sub.status] || sub.status;
         const subBadge  = { pending: 'applied', approved: 'approved', rejected: 'rejected' }[sub.status] || 'applied';
+        const reelComment = (sub.status === 'rejected' && sub.admin_comments)
+          ? `<div class="admin-comment" style="margin-top:12px">${esc(sub.admin_comments)}</div>` : '';
         actionHTML = `
           <div class="stage-box">
             <div class="stage-done" style="margin-bottom:12px"><span class="check">&#10003;</span> Draft approved</div>
@@ -381,6 +384,7 @@ async function loadCampaigns() {
                 <span class="status-badge ${subBadge}">${subStatus}</span>
               </div>
             </div>
+            ${reelComment}
           </div>`;
       }
     }
