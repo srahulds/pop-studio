@@ -18,7 +18,7 @@
 body{background:var(--deep);color:#fff;font-family:'Outfit',sans-serif;min-height:100vh;display:flex;overflow-x:hidden}
 body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:0.7}
 
-aside{width:260px;background:rgba(10,10,10,0.95);backdrop-filter:blur(20px);border-right:1px solid var(--ghost);display:flex;flex-direction:column;position:fixed;top:0;bottom:0;z-index:150;padding:24px 0}
+aside{width:260px;background:rgba(10,10,10,0.95);backdrop-filter:blur(20px);border-right:1px solid var(--ghost);display:flex;flex-direction:column;position:fixed;top:0;bottom:0;z-index:150;padding:24px 0;opacity:0;transition:opacity 0.15s ease}
 .brand{display:flex;align-items:center;gap:12px;padding:0 24px 8px;text-decoration:none}
 .nav-logo{height:32px;width:32px;border-radius:8px;object-fit:cover;border:1px solid rgba(255,255,255,0.1);background:#fff}
 .brand-sub{font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--ash);font-weight:600;padding:0 24px 32px}
@@ -136,9 +136,11 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 <aside id="sidebar">
   <a href="pop-studio.html" class="brand">
     <img src="pop_bw_logo_new.svg" alt="POP Logo" class="nav-logo">
-    <span style="font-family:'Playfair Display',serif;font-size:24px;font-weight:700;color:var(--flame)">Studio</span>
+    <div>
+      <span class="nav-tag" style="font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.6);font-weight:600;border:1px solid rgba(255,255,255,0.18);padding:4px 10px;border-radius:100px">Creators</span>
+      <div style="font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--flame);font-weight:600;margin-top:5px;padding-left:2px">Admin</div>
+    </div>
   </a>
-  <div class="brand-sub">POP Creators — Admin</div>
   <div class="nav-links">
     <a class="nav-link active" onclick="navTo('home')">Platform Overview</a>
     <a class="nav-link" onclick="navTo('creators')" id="creatorsNavLink">Creator Queue <span class="nav-badge" id="creatorsBadge">…</span></a>
@@ -982,6 +984,7 @@ async function init() {
 
   // Reveal content now that correct view is active — no flash
   document.querySelector('main').style.opacity = '1';
+  document.querySelector('aside').style.opacity = '1';
 }
 
 async function adminLogout() {
