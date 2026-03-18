@@ -799,7 +799,7 @@ async function loadQueue() {
           <td>${script ? `<a href="${script}" target="_blank" style="color:var(--ember);text-decoration:none;font-weight:500">View Script &#8599;</a>` : '<span style="color:var(--ash)">—</span>'}</td>
           <td><span class="st-badge ${sub.draft_status === 'changes_requested' ? 'no' : 'wait'}" style="font-size:9px">${sub.draft_status === 'changes_requested' ? 'Changes Req.' : 'Pending'}</span> <span style="font-size:11px;color:var(--ash)">${date}</span></td>
           <td><div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button class="btn-g" onclick="approveDraft('${sid}')">Approve</button>
+            ${sub.draft_status === 'pending' ? `<button class="btn-g" onclick="approveDraft('${sid}')">Approve</button>` : ''}
             ${sub.draft_status === 'pending' ? `<button class="btn-r" onclick="openRejectModal('draft','${sid}','${cname}')">Request Changes</button>` : `<button class="btn-outline" style="padding:8px 16px;font-size:10px" onclick="unReject('draft','${sid}')">Undo</button>`}
           </div></td>
         </tr>`;
