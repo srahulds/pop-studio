@@ -404,7 +404,7 @@ tr:hover td{background:rgba(255,255,255,0.02)}
     <p style="font-size:13px;color:var(--smoke);margin-bottom:20px" id="rejectModalSubtitle">Leave a comment explaining what needs to change.</p>
     <div class="f-group">
       <label class="f-label">Feedback / Reason</label>
-      <textarea class="f-input" id="rejectComment" style="height:120px;resize:vertical" placeholder="e.g. Script is good but delivery needs work — slow down on the CTA. / Script needs to include the cashback amount in line 3."></textarea>
+      <textarea class="f-input" id="rejectComment" style="height:120px;resize:vertical" placeholder="Leave feedback for the creator…"></textarea>
     </div>
     <div style="display:flex;gap:12px;margin-top:8px">
       <button class="btn-outline" style="flex:1" onclick="closeRejectModal()">Cancel</button>
@@ -884,9 +884,13 @@ async function confirmReject() {
   }
   btn.textContent = 'Reject & Send Feedback'; btn.disabled = false;
   if (error) { alert('Error: ' + error.message); return; }
+  // Close modal and reload immediately — log in background (non-blocking)
   const logAction = pendingReject.type === 'draft' ? 'draft_changes_requested' : pendingReject.type === 'reel' ? 'reel_rejected' : 'application_rejected';
-  await adminLog(logAction, pendingReject.type === 'app' ? 'application' : 'submission', pendingReject.id, { comment });
-  closeRejectModal(); await loadQueue(); await loadCampApps(); await loadOverview();
+  const logType   = pendingReject.type === 'app' ? 'application' : 'submission';
+  const logId     = pendingReject.id;
+  adminLog(logAction, logType, logId, { comment }); // intentionally not awaited
+  closeRejectModal();
+  await Promise.all([loadQueue(), loadCampApps(), loadOverview()]);
 }
 
 async function reviewApp(appId, decision) {
