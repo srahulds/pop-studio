@@ -413,8 +413,10 @@ function navTo(viewId) {
   document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
   document.getElementById('view-' + viewId).classList.add('active');
   window.scrollTo(0, 0);
-  if (['home','campaign','influencer'].includes(viewId)) {
+  if (['home','campaign'].includes(viewId)) {
     document.querySelector('.nav-link[onclick="navTo(\'home\')"]').classList.add('active');
+  } else if (viewId === 'influencer') {
+    document.querySelector('#creatorsNavLink').classList.add('active');
   } else if (viewId === 'review') {
     document.querySelector('#reviewNavLink').classList.add('active');
     loadQueue();
