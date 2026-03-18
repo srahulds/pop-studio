@@ -428,6 +428,21 @@ function getSupabase() {
 <script>
 const sb = getSupabase();
 const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#x27;');
+
+// ── Admin audit log ───────────────────────────────────────────
+var _adminEmail = '';
+async function adminLog(action, entityType, entityId, details) {
+  try {
+    await sb.from('admin_logs').insert({
+      admin_email: _adminEmail || 'unknown',
+      action:      action,
+      entity_type: entityType,
+      entity_id:   entityId   || null,
+      details:     details    || null
+    });
+  } catch(e) { console.warn('Log failed:', e); }
+}
+
 let activeCampaignId   = null;
 let activeCreatorId    = null;
 let activeCampaignName = '';
@@ -729,6 +744,7 @@ async function loadCreatorProfile(creatorId) {
 async function updateCreatorStatus(creatorId, newStatus) {
   const { error } = await sb.from('creators').update({ status: newStatus }).eq('id', creatorId);
   if (error) { alert('Error: ' + error.message); return; }
+  await adminLog('creator_status_' + newStatus, 'creator', creatorId, { new_status: newStatus });
   await openCreator(creatorId, '');
 }
 
@@ -829,6 +845,7 @@ async function loadQueue() {
 async function approveDraft(subId) {
   const { error } = await sb.from('submissions').update({ draft_status: 'approved' }).eq('id', subId);
   if (error) { alert('Error: ' + error.message); return; }
+  await adminLog('draft_approved', 'submission', subId, {});
   await loadQueue(); await loadOverview();
 }
 
@@ -867,14 +884,17 @@ async function confirmReject() {
   }
   btn.textContent = 'Reject & Send Feedback'; btn.disabled = false;
   if (error) { alert('Error: ' + error.message); return; }
-  closeRejectModal(); await loadQueue(); await loadOverview();
+  const logAction = pendingReject.type === 'draft' ? 'draft_changes_requested' : pendingReject.type === 'reel' ? 'reel_rejected' : 'application_rejected';
+  await adminLog(logAction, pendingReject.type === 'app' ? 'application' : 'submission', pendingReject.id, { comment });
+  closeRejectModal(); await loadQueue(); await loadCampApps(); await loadOverview();
 }
 
 async function reviewApp(appId, decision) {
   if (decision === 'rejected') { openRejectModal('app', appId, ''); return; }
   const { error } = await sb.from('applications').update({ status: decision }).eq('id', appId);
   if (error) { alert('Error: ' + error.message); return; }
-  await loadQueue(); await loadOverview();
+  await adminLog('application_approved', 'application', appId, { decision });
+  await loadQueue(); await loadCampApps(); await loadOverview();
 }
 
 
@@ -891,6 +911,7 @@ async function unReject(type, id) {
   if (!table) return;
   var res = await sb.from(table).update(updates).eq('id', id);
   if (res.error) { alert('Error: ' + res.error.message); return; }
+  await adminLog('undo_rejection', table === 'creators' ? 'creator' : table === 'applications' ? 'application' : 'submission', id, { type });
   await loadQueue();
   await loadCampApps();
   await loadOverview();
@@ -920,6 +941,7 @@ async function confirmContentApproval() {
     .update({ status: 'approved', payout_amount: amount })
     .eq('id', pendingContentApproval);
   if (error) { alert('Error: ' + error.message); return; }
+  await adminLog('reel_approved', 'submission', pendingContentApproval, { payout_amount: amount });
   closePayoutModal();
   await loadQueue();
   await loadOverview();
@@ -1001,6 +1023,7 @@ function renderCreatorsTable(filter) {
 async function setCreatorStatus(creatorId, status) {
   const { error } = await sb.from('creators').update({ status }).eq('id', creatorId);
   if (error) { alert('Error: ' + error.message); return; }
+  await adminLog('creator_status_' + status, 'creator', creatorId, { new_status: status });
   await loadCreators();
 }
 
@@ -1041,7 +1064,8 @@ async function publishCampaign() {
   if (error) { alert('Error: ' + error.message); return; }
 
   closeModal();
-  alert(`"${title}" is now live!`);
+  await adminLog('campaign_created', 'campaign', null, { title, base_payout: base, max_payout: max });
+  alert(title + ' is now live!');
   await loadOverview();
 }
 
@@ -1190,6 +1214,7 @@ async function init() {
     return;
   }
 
+  _adminEmail = email;
   // Show admin name in sidebar
   document.querySelector('.user-foot').innerHTML = `
     <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--flame),var(--honey));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:12px;flex-shrink:0">
