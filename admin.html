@@ -114,11 +114,13 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 .creator-filter-btn.active{background:rgba(255,82,0,0.1);border-color:rgba(255,82,0,0.3);color:var(--flame)}
 
 @media(max-width:1024px){
-  aside{transform:translateX(-100%);transition:transform 0.3s cubic-bezier(0.4,0,0.2,1)}
+  aside{transform:translateX(-100%);transition:transform 0.3s cubic-bezier(0.4,0,0.2,1),opacity 0.15s ease;opacity:1}
   aside.open{transform:translateX(0)}
   main{margin-left:0;padding:32px 24px}
   .mob-topbar{display:block}
   .eco-grid-3,.eco-grid-4,.metrics-small{grid-template-columns:1fr 1fr}
+  table{min-width:500px}
+  th,td{padding:12px 14px;font-size:13px}
 }
 @media(max-width:768px){
   .eco-grid-3,.eco-grid-4,.metrics-small{grid-template-columns:1fr}
@@ -126,6 +128,11 @@ tr:hover td{background:rgba(255,255,255,0.02)}
   .profile-card{padding:24px}
   .prof-info{flex-direction:column;text-align:center}
   .prof-actions{justify-content:center;width:100%}
+  main{padding:24px 16px}
+  table{min-width:400px}
+  th,td{padding:10px 12px;font-size:12px}
+  .header{flex-direction:column;gap:12px}
+  .btn-flame{width:100%;justify-content:center}
 }
 </style>
 </head>
@@ -599,7 +606,7 @@ async function openCampaign(campId, campTitle) {
       '<td>' + (sub?.content_url ? '<a href="' + esc(sub.content_url) + '" target="_blank" style="color:var(--flame);text-decoration:none;font-weight:500">View &#8599;</a>' : '—') + '</td>' +
       '<td style="color:#fff;font-weight:500">' + (sub?.views_tracked ? (sub.views_tracked>=100000?(sub.views_tracked/100000).toFixed(1)+'L':(sub.views_tracked/1000).toFixed(1)+'K') : '—') + '</td>' +
       '<td style="color:var(--flame)">' + (sub?.payout_amount ? '&#8377;' + sub.payout_amount.toLocaleString('en-IN') : '—') + '</td>' +
-      '<td><button class="btn-outline" onclick="openCreatorFromDirectory(' + JSON.stringify(crid) + ')">Profile &#8594;</button></td>' +
+      '<td><button class="btn-outline" onclick="openCreatorFromDirectory(\'' + crid + '\')">Profile &#8594;</button></td>' +
       '</tr>';
   }).join('');
 }
@@ -808,8 +815,8 @@ async function loadQueue() {
           '<td><a href="' + reel + '" target="_blank" style="color:var(--flame);text-decoration:none;font-weight:500">View Reel &#8599;</a></td>' +
           '<td style="font-size:12px;color:var(--smoke);max-width:200px">' + reason + '</td>' +
           '<td><div style="display:flex;gap:8px;flex-wrap:wrap">' +
-            '<button class="btn-g" onclick="openPayoutModal(' + JSON.stringify(sid) + ',' + JSON.stringify(reel) + ',' + JSON.stringify(cnameR) + ')">Approve + Payout</button>' +
-            '<button class="btn-outline" style="padding:8px 16px;font-size:10px" onclick="unReject(\'reel\',' + JSON.stringify(sid) + ')">Undo Reject</button>' +
+            '<button class="btn-g" onclick="openPayoutModal(\'' + sid + '\',\'' + reel + '\',\'' + cnameR + '\')">Approve + Payout</button>' +
+            '<button class="btn-outline" style="padding:8px 16px;font-size:10px" onclick="unReject(\'reel\',\'' + sid + '\')">Undo Reject</button>' +
           '</div></td>' +
         '</tr>';
       }).join('')
@@ -1100,7 +1107,7 @@ async function loadCampApps() {
             '<td style="font-size:13px;color:#fff">' + phone + '</td>' +
             '<td><div class="td-strong">' + camp + '</div></td>' +
             '<td style="font-size:12px;color:var(--smoke)">' + reason + '</td>' +
-            '<td><button class="btn-outline" style="padding:8px 16px;font-size:10px" onclick="unReject(\'app\',' + JSON.stringify(aid) + ')">Undo Reject</button></td>' +
+            '<td><button class="btn-outline" style="padding:8px 16px;font-size:10px" onclick="unReject(\'app\',\'' + aid + '\')">Undo Reject</button></td>' +
           '</tr>';
         }).join('')
       : '<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--smoke)">No recently rejected applications.</td></tr>';
@@ -1206,7 +1213,10 @@ async function init() {
 
   // Reveal content now that correct view is active — no flash
   document.querySelector('main').style.opacity = '1';
-  document.querySelector('aside').style.opacity = '1';
+  // Only animate sidebar opacity on desktop (mobile sidebar starts visible via CSS override)
+  if (window.innerWidth > 1024) {
+    document.querySelector('aside').style.opacity = '1';
+  }
 }
 
 async function adminLogout() {
