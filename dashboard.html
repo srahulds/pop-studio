@@ -219,8 +219,11 @@ async function setupUser(user) {
 
   // Load IG handle if not cached
   if (!localStorage.getItem('pop_ig_handle')) {
-    sb.from('creators').select('instagram_handle').eq('id', user.id).single().then(({ data }) => {
+    sb.from('creators').select('instagram_handle, status').eq('id', user.id).single().then(({ data }) => {
       if (data?.instagram_handle) localStorage.setItem('pop_ig_handle', data.instagram_handle);
+      if (data?.status === 'blocked') {
+        document.getElementById('campaignsList').innerHTML = '<div class="empty-state" style="border-color:rgba(220,38,38,0.2)"><p style="color:#f87171;margin-bottom:8px">&#9888; Your account has been suspended.</p><p style="font-size:13px">Please contact <a href="contact.html" style="color:var(--flame)">creators@popclub.co</a> for support.</p></div>';
+      }
       renderNav(user, fullName, initials);
     });
   }
