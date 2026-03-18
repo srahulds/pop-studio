@@ -261,6 +261,17 @@ tr:hover td{background:rgba(255,255,255,0.02)}
         </tbody>
       </table>
     </div>
+
+    <h3 style="font-family:'Playfair Display',serif;font-size:24px;font-weight:600;margin-bottom:6px;margin-top:56px">Rejected — Awaiting Re-review</h3>
+    <p style="font-size:13px;color:var(--smoke);font-weight:300;margin-bottom:20px">Creators who fixed caption/tagging issues and requested re-review, or accidental rejections to undo.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Campaign</th><th>Creator</th><th>Reel Link</th><th>Rejection Reason</th><th>Action</th></tr></thead>
+        <tbody id="rejectedReelsBody">
+          <tr><td colspan="5"><div class="skeleton" style="height:20px;margin:4px 0"></div></td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <!-- ── CAMPAIGNS QUEUE ──────────────────────────────────────── -->
@@ -280,6 +291,17 @@ tr:hover td{background:rgba(255,255,255,0.02)}
         <thead><tr><th>Creator</th><th>Instagram</th><th>Phone</th><th>Campaign</th><th>Applied</th><th>Action</th></tr></thead>
         <tbody id="campAppBody">
           <tr><td colspan="6"><div class="skeleton" style="height:20px;margin:4px 0"></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="font-family:'Playfair Display',serif;font-size:24px;font-weight:600;margin-bottom:6px;margin-top:56px">Rejected Applications — Undo</h3>
+    <p style="font-size:13px;color:var(--smoke);font-weight:300;margin-bottom:20px">Recently rejected campaign applications. Undo if rejected by mistake.</p>
+    <div class="table-wrap" style="margin-bottom:48px">
+      <table>
+        <thead><tr><th>Creator</th><th>Phone</th><th>Campaign</th><th>Rejection Reason</th><th>Action</th></tr></thead>
+        <tbody id="rejectedAppsBody">
+          <tr><td colspan="5"><div class="skeleton" style="height:20px;margin:4px 0"></div></td></tr>
         </tbody>
       </table>
     </div>
@@ -554,7 +576,7 @@ async function openCampaign(campId, campTitle) {
     // Determine stage
     let stage = '—';
     if (app.status === 'applied')  stage = '<span class="st-badge wait">Awaiting Approval</span>';
-    if (app.status === 'rejected') stage = '<span class="st-badge no">Rejected</span>';
+    if (app.status === 'rejected') { stage = '<span class="st-badge no">Rejected</span>'; }
     if (app.status === 'approved') {
       if (!sub)                                          stage = '<span class="st-badge wait">No Draft Yet</span>';
       else if (sub.draft_status === 'pending')           stage = '<span class="st-badge wait">Draft Review</span>';
@@ -705,19 +727,23 @@ async function updateCreatorStatus(creatorId, newStatus) {
 
 // ── Content Queue ─────────────────────────────────────────────
 async function loadQueue() {
-  const [{ data: pendingDrafts }, { data: pendingReels }] = await Promise.all([
+  const [{ data: pendingDrafts }, { data: pendingReels }, { data: rejectedReels }] = await Promise.all([
     sb.from('submissions').select(`
-      id, draft_url, script_url, submitted_at,
+      id, draft_url, script_url, draft_status, admin_comments, submitted_at,
       campaigns(title),
       creators(full_name, instagram_handle, phone)
-    `).eq('draft_status', 'pending').order('submitted_at'),
+    `).in('draft_status', ['pending', 'changes_requested']).order('submitted_at'),
     sb.from('submissions').select(`
       id, content_url, status, submitted_at,
       campaigns(title),
       creators(full_name, instagram_handle)
-    `).eq('draft_status', 'approved').eq('status', 'pending').not('content_url', 'is', null).order('submitted_at')
+    `).eq('draft_status', 'approved').eq('status', 'pending').not('content_url', 'is', null).order('submitted_at'),
+    sb.from('submissions').select(`
+      id, content_url, admin_comments,
+      campaigns(title),
+      creators(full_name, instagram_handle)
+    `).eq('draft_status', 'approved').eq('status', 'rejected').not('content_url', 'is', null).order('submitted_at')
   ]);
-
   document.getElementById('draftQueueBody').innerHTML = pendingDrafts?.length
     ? pendingDrafts.map(sub => {
         const name = esc(sub.creators?.full_name || '—');
@@ -735,10 +761,10 @@ async function loadQueue() {
           <td style="font-size:13px;color:#fff">${phone}</td>
           <td>${draft ? `<a href="${draft}" target="_blank" style="color:var(--ember);text-decoration:none;font-weight:500">View Draft &#8599;</a>` : '<span style="color:var(--ash)">—</span>'}</td>
           <td>${script ? `<a href="${script}" target="_blank" style="color:var(--ember);text-decoration:none;font-weight:500">View Script &#8599;</a>` : '<span style="color:var(--ash)">—</span>'}</td>
-          <td style="font-size:12px;color:var(--ash)">${date}</td>
+          <td><span class="st-badge ${sub.draft_status === 'changes_requested' ? 'no' : 'wait'}" style="font-size:9px">${sub.draft_status === 'changes_requested' ? 'Changes Req.' : 'Pending'}</span> <span style="font-size:11px;color:var(--ash)">${date}</span></td>
           <td><div style="display:flex;gap:8px;flex-wrap:wrap">
             <button class="btn-g" onclick="approveDraft('${sid}')">Approve</button>
-            <button class="btn-r" onclick="openRejectModal('draft','${sid}','${cname}')">Request Changes</button>
+            ${sub.draft_status === 'pending' ? `<button class="btn-r" onclick="openRejectModal('draft','${sid}','${cname}')">Request Changes</button>` : `<button class="btn-outline" style="padding:8px 16px;font-size:10px" onclick="unReject('draft','${sid}')">Undo</button>`}
           </div></td>
         </tr>`;
       }).join('')
@@ -766,7 +792,30 @@ async function loadQueue() {
       }).join('')
     : '<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--smoke)">No live reels pending review.</td></tr>';
 
-  const total = (pendingDrafts?.length || 0) + (pendingReels?.length || 0);
+  // Rejected reels awaiting re-review
+  document.getElementById('rejectedReelsBody').innerHTML = rejectedReels?.length
+    ? rejectedReels.map(function(sub) {
+        var name   = esc(sub.creators?.full_name || '—');
+        var handle = sub.creators?.instagram_handle || '—';
+        var camp   = esc(sub.campaigns?.title || '—');
+        var reel   = esc(sub.content_url || '');
+        var reason = esc(sub.admin_comments || '—');
+        var sid    = sub.id;
+        var cnameR = (sub.creators?.full_name || 'Creator').replace(/'/g, '');
+        return '<tr>' +
+          '<td><div class="td-strong">' + camp + '</div></td>' +
+          '<td><div class="td-strong">' + name + '</div><div class="td-sub">@' + handle + '</div></td>' +
+          '<td><a href="' + reel + '" target="_blank" style="color:var(--flame);text-decoration:none;font-weight:500">View Reel &#8599;</a></td>' +
+          '<td style="font-size:12px;color:var(--smoke);max-width:200px">' + reason + '</td>' +
+          '<td><div style="display:flex;gap:8px;flex-wrap:wrap">' +
+            '<button class="btn-g" onclick="openPayoutModal(' + JSON.stringify(sid) + ',' + JSON.stringify(reel) + ',' + JSON.stringify(cnameR) + ')">Approve + Payout</button>' +
+            '<button class="btn-outline" style="padding:8px 16px;font-size:10px" onclick="unReject(\'reel\',' + JSON.stringify(sid) + ')">Undo Reject</button>' +
+          '</div></td>' +
+        '</tr>';
+      }).join('')
+    : '<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--smoke)">No rejected reels pending re-review.</td></tr>';
+
+  const total = (pendingDrafts?.length || 0) + (pendingReels?.length || 0) + (rejectedReels?.length || 0);
   document.getElementById('queueBadge').textContent = total || 0;
 }
 
@@ -822,6 +871,23 @@ async function reviewApp(appId, decision) {
 }
 
 
+
+
+// ── Undo rejections ───────────────────────────────────────────
+async function unReject(type, id) {
+  var updates = {};
+  var table   = '';
+  if (type === 'creator') { table = 'creators';     updates = { status: 'pending' }; }
+  if (type === 'app')     { table = 'applications'; updates = { status: 'applied', admin_comments: null }; }
+  if (type === 'draft')   { table = 'submissions';  updates = { draft_status: 'pending', admin_comments: null }; }
+  if (type === 'reel')    { table = 'submissions';  updates = { status: 'pending', admin_comments: null }; }
+  if (!table) return;
+  var res = await sb.from(table).update(updates).eq('id', id);
+  if (res.error) { alert('Error: ' + res.error.message); return; }
+  await loadQueue();
+  await loadCampApps();
+  await loadOverview();
+}
 
 // ── Payout modal ──────────────────────────────────────────────
 let pendingContentApproval = null;
@@ -978,17 +1044,24 @@ async function loadCampApps() {
   if (!body) return;
   body.innerHTML = '<tr><td colspan="6"><div class="skeleton" style="height:20px;margin:4px 0"></div></td></tr>';
 
-  const { data: pendingApps } = await sb.from('applications').select(`
-    id, status, applied_at,
-    campaigns(title),
-    creators(full_name, instagram_handle, phone)
-  `).eq('status', 'applied').order('applied_at');
+  var [pendingRes, rejectedRes] = await Promise.all([
+    sb.from('applications').select(`
+      id, status, applied_at,
+      campaigns(title),
+      creators(full_name, instagram_handle, phone)
+    `).eq('status', 'applied').order('applied_at'),
+    sb.from('applications').select(`
+      id, status, applied_at, admin_comments,
+      campaigns(title),
+      creators(full_name, instagram_handle, phone)
+    `).eq('status', 'rejected').order('applied_at', { ascending: false }).limit(20)
+  ]);
+  var pendingApps  = pendingRes.data;
+  var rejectedApps = rejectedRes.data;
 
   if (!pendingApps?.length) {
     body.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--smoke)">No pending campaign applications.</td></tr>';
-    return;
-  }
-
+  } else {
   body.innerHTML = pendingApps.map(function(app) {
     var name   = esc(app.creators?.full_name || '—');
     var handle = app.creators?.instagram_handle || '—';
@@ -1008,7 +1081,30 @@ async function loadCampApps() {
         '<button class="btn-r" onclick="openRejectModal(\'app\',\'' + aid + '\',\'' + cname + '\')">Reject</button>' +
       '</div></td>' +
     '</tr>';
-  }).join('');
+    }).join('');
+  } // end else
+
+  // Render rejected apps undo section
+  var rejBody = document.getElementById('rejectedAppsBody');
+  if (rejBody) {
+    rejBody.innerHTML = rejectedApps?.length
+      ? rejectedApps.map(function(app) {
+          var name   = esc(app.creators?.full_name || '—');
+          var handle = app.creators?.instagram_handle || '—';
+          var phone  = app.creators?.phone || '—';
+          var camp   = esc(app.campaigns?.title || '—');
+          var reason = esc(app.admin_comments || '—');
+          var aid    = app.id;
+          return '<tr>' +
+            '<td><div class="td-strong">' + name + '</div><div class="td-sub">@' + handle + '</div></td>' +
+            '<td style="font-size:13px;color:#fff">' + phone + '</td>' +
+            '<td><div class="td-strong">' + camp + '</div></td>' +
+            '<td style="font-size:12px;color:var(--smoke)">' + reason + '</td>' +
+            '<td><button class="btn-outline" style="padding:8px 16px;font-size:10px" onclick="unReject(\'app\',' + JSON.stringify(aid) + ')">Undo Reject</button></td>' +
+          '</tr>';
+        }).join('')
+      : '<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--smoke)">No recently rejected applications.</td></tr>';
+  }
 }
 
 
