@@ -143,8 +143,8 @@ tr:hover td{background:rgba(255,255,255,0.02)}
   </div>
   <div class="nav-links">
     <a class="nav-link active" onclick="navTo('home')">Platform Overview</a>
-    <a class="nav-link" onclick="navTo('creators')" id="creatorsNavLink">Creator Queue <span class="nav-badge" id="creatorsBadge">…</span></a>
-    <a class="nav-link" onclick="navTo('campaigns-nav')" id="campaignsNavLink">Campaign Queue</a>
+    <a class="nav-link" onclick="navTo('creators')" id="creatorsNavLink">Creators <span class="nav-badge" id="creatorsBadge">…</span></a>
+    <a class="nav-link" onclick="navTo('campaigns-nav')" id="campaignsNavLink">Campaigns</a>
     <a class="nav-link" onclick="navTo('review')" id="reviewNavLink">Content Queue <span class="nav-badge" id="queueBadge">…</span></a>
   </div>
   <div class="user-foot">
@@ -195,18 +195,18 @@ tr:hover td{background:rgba(255,255,255,0.02)}
   <div id="view-campaign" class="view-section">
     <div class="header">
       <div>
-        <div class="breadcrumb"><a class="bc-link" onclick="navTo('home')">Overview</a> <span class="bc-sep">/</span> Campaign</div>
+        <div class="breadcrumb"><a class="bc-link" onclick="navTo('campaigns-nav')">Campaigns</a> <span class="bc-sep">/</span> <span id="campDetailBreadcrumb">Campaign</span></div>
         <h1 id="campDetailTitle">Campaign</h1>
       </div>
     </div>
     <div class="eco-grid-4" id="campDetailStats"></div>
 
-    <h3 style="font-family:'Playfair Display',serif;font-size:24px;margin-bottom:16px">Participating Creators</h3>
+    <h3 style="font-family:'Playfair Display',serif;font-size:24px;margin-bottom:16px">Creator Activity</h3>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Creator</th><th>App Status</th><th>Content Link</th><th>Views</th><th>Payout</th><th>Content Status</th><th>Action</th></tr></thead>
+        <thead><tr><th>Creator</th><th>Phone</th><th>App</th><th>Draft</th><th>Script</th><th>Stage</th><th>Live Reel</th><th>Views</th><th>Payout</th><th>Action</th></tr></thead>
         <tbody id="campDetailBody">
-          <tr><td colspan="7"><div class="skeleton" style="height:20px;margin:4px 0"></div></td></tr>
+          <tr><td colspan="10"><div class="skeleton" style="height:20px;margin:4px 0"></div></td></tr>
         </tbody>
       </table>
     </div>
@@ -217,22 +217,16 @@ tr:hover td{background:rgba(255,255,255,0.02)}
     <div class="header">
       <div>
         <div class="breadcrumb">
-          <a class="bc-link" onclick="navTo('home')">Overview</a> <span class="bc-sep">/</span>
-          <a class="bc-link" id="profBreadcrumbCamp" onclick="navTo('campaign')">Campaign</a> <span class="bc-sep">/</span>
-          Creator
+          <a class="bc-link" onclick="navTo('creators')">Creators</a> <span class="bc-sep">/</span>
+          Creator Profile
         </div>
         <h1>Creator <i>Profile.</i></h1>
       </div>
     </div>
     <div class="profile-card" id="profileCardArea"></div>
-    <h3 style="font-family:'Playfair Display',serif;font-size:24px;margin-bottom:16px">Campaign History</h3>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Campaign</th><th>App Status</th><th>Content</th><th>Views</th><th>Earned</th></tr></thead>
-        <tbody id="creatorHistoryBody">
-          <tr><td colspan="5"><div class="skeleton" style="height:20px;margin:4px 0"></div></td></tr>
-        </tbody>
-      </table>
+    <h3 style="font-family:'Playfair Display',serif;font-size:24px;margin-bottom:20px;margin-top:48px">Campaign Activity</h3>
+    <div id="creatorCampaignCards">
+      <div class="skeleton" style="height:120px;border-radius:16px;margin-bottom:12px"></div>
     </div>
   </div>
 
@@ -243,18 +237,6 @@ tr:hover td{background:rgba(255,255,255,0.02)}
         <div class="breadcrumb">Admin Actions</div>
         <h1>Approval <i>Queue.</i></h1>
       </div>
-    </div>
-
-    <!-- BLOCK 0: Campaign Applications -->
-    <h3 style="font-family:'Playfair Display',serif;font-size:24px;font-weight:600;margin-bottom:6px">Campaign Applications</h3>
-    <p style="font-size:13px;color:var(--smoke);font-weight:300;margin-bottom:20px">Creators who have opted into a campaign and are awaiting your approval.</p>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Creator</th><th>Instagram</th><th>Phone</th><th>Campaign</th><th>Applied</th><th>Action</th></tr></thead>
-        <tbody id="campAppBody">
-          <tr><td colspan="6"><div class="skeleton" style="height:20px;margin:4px 0"></div></td></tr>
-        </tbody>
-      </table>
     </div>
 
     <!-- BLOCK 1: Draft Reviews -->
@@ -286,10 +268,23 @@ tr:hover td{background:rgba(255,255,255,0.02)}
     <div class="header">
       <div>
         <div class="breadcrumb">Campaign Management</div>
-        <h1>Campaign <i>Queue.</i></h1>
+        <h1>Campaigns.</h1>
       </div>
       <button class="btn-flame" onclick="openModal()">+ New Campaign</button>
     </div>
+
+    <h3 style="font-family:'Playfair Display',serif;font-size:24px;font-weight:600;margin-bottom:6px">Pending Applications</h3>
+    <p style="font-size:13px;color:var(--smoke);font-weight:300;margin-bottom:20px">Creators who have opted into a campaign and are awaiting your approval.</p>
+    <div class="table-wrap" style="margin-bottom:48px">
+      <table>
+        <thead><tr><th>Creator</th><th>Instagram</th><th>Phone</th><th>Campaign</th><th>Applied</th><th>Action</th></tr></thead>
+        <tbody id="campAppBody">
+          <tr><td colspan="6"><div class="skeleton" style="height:20px;margin:4px 0"></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="font-family:'Playfair Display',serif;font-size:24px;font-weight:600;margin-bottom:16px">All Campaigns</h3>
     <div class="table-wrap">
       <table>
         <thead><tr><th>Campaign</th><th>Applied</th><th>Approved</th><th>Drafts Pending</th><th>Live</th><th>Views</th><th>Status</th><th>Action</th></tr></thead>
@@ -429,6 +424,7 @@ function navTo(viewId) {
   } else if (viewId === 'campaigns-nav') {
     document.querySelector('#campaignsNavLink').classList.add('active');
     loadCampaignQueue();
+    loadCampApps();
   }
 }
 
@@ -517,76 +513,105 @@ async function openCampaign(campId, campTitle) {
   activeCampaignId   = campId;
   activeCampaignName = campTitle;
   navTo('campaign');
-  document.getElementById('campDetailTitle').textContent = campTitle;
-  document.getElementById('campDetailStats').innerHTML   = '<div class="eco-card"><div class="skeleton" style="height:40px;width:80px;margin-bottom:8px"></div></div>'.repeat(4);
-  document.getElementById('campDetailBody').innerHTML    = '<tr><td colspan="7"><div class="skeleton" style="height:20px;margin:4px 0"></div></td></tr>';
+  document.getElementById('campDetailTitle').textContent     = campTitle;
+  document.getElementById('campDetailBreadcrumb').textContent = campTitle;
+  document.getElementById('campDetailStats').innerHTML = '<div class="eco-card"><div class="skeleton" style="height:40px;width:80px;margin-bottom:8px"></div></div>'.repeat(4);
+  document.getElementById('campDetailBody').innerHTML  = '<tr><td colspan="10"><div class="skeleton" style="height:20px;margin:4px 0"></div></td></tr>';
 
-  const [
-    { data: apps },
-    { data: submissions },
-    { data: camp }
-  ] = await Promise.all([
-    sb.from('applications').select('id, status, creator_id, creators(full_name, instagram_handle)').eq('campaign_id', campId),
-    sb.from('submissions').select('id, content_url, views_tracked, payout_amount, status, creator_id').eq('campaign_id', campId),
+  const [{ data: apps }, { data: camp }] = await Promise.all([
+    sb.from('applications').select(`
+      id, status, applied_at,
+      creators(id, full_name, instagram_handle, phone),
+      submissions(id, content_url, draft_url, script_url, draft_status, views_tracked, payout_amount, status)
+    `).eq('campaign_id', campId).order('applied_at'),
     sb.from('campaigns').select('*').eq('id', campId).single()
   ]);
 
-  const totalViews  = (submissions||[]).reduce((s,r)=>s+(r.views_tracked||0),0);
-  const totalSpends = (submissions||[]).filter(r=>r.status==='approved').reduce((s,r)=>s+(r.payout_amount||0),0);
-  const liveCount   = (submissions||[]).filter(r=>r.status==='approved').length;
+  const subs        = (apps||[]).flatMap(a => a.submissions||[]);
+  const totalViews  = subs.reduce((s,r)=>s+(r.views_tracked||0),0);
+  const totalSpends = subs.filter(r=>r.status==='approved').reduce((s,r)=>s+(r.payout_amount||0),0);
+  const liveCount   = subs.filter(r=>r.status==='approved').length;
   const daysLeft    = camp ? Math.max(0, camp.days_open - Math.floor((Date.now()-new Date(camp.created_at))/86400000)) : '—';
 
   document.getElementById('campDetailStats').innerHTML = `
     <div class="eco-card"><p>Total Views</p><div class="eco-num">${totalViews>=100000?(totalViews/100000).toFixed(1)+'L':totalViews>=1000?(totalViews/1000).toFixed(1)+'K':totalViews||'0'}</div></div>
-    <div class="eco-card"><p>Total Spends</p><div class="eco-num lit">₹${totalSpends.toLocaleString('en-IN')}</div></div>
+    <div class="eco-card"><p>Total Spends</p><div class="eco-num lit">&#8377;${totalSpends.toLocaleString('en-IN')}</div></div>
     <div class="eco-card"><p>Content Live</p><div class="eco-num">${liveCount}</div></div>
     <div class="eco-card"><p>Days Remaining</p><div class="eco-num" style="font-size:28px;margin-top:8px">${daysLeft}</div></div>`;
 
-  const subMap = {};
-  (submissions||[]).forEach(s => { subMap[s.creator_id] = s; });
-
   if (!apps?.length) {
-    document.getElementById('campDetailBody').innerHTML = `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--smoke)">No creators yet.</td></tr>`;
+    document.getElementById('campDetailBody').innerHTML = '<tr><td colspan="10" style="text-align:center;padding:40px;color:var(--smoke)">No creators yet.</td></tr>';
     return;
   }
 
   document.getElementById('campDetailBody').innerHTML = apps.map(app => {
-    const creator = app.creators;
-    const sub     = subMap[app.creator_id];
+    const cr  = app.creators;
+    const sub = app.submissions?.[0];
     const appBadge = app.status==='approved'?'ok':app.status==='rejected'?'no':'wait';
-    return `<tr>
-      <td><div class="td-strong">${esc(creator?.full_name||'—')}</div><div class="td-sub">@${creator?.instagram_handle||'—'}</div></td>
-      <td><span class="st-badge ${appBadge}">${app.status}</span></td>
-      <td>${sub?.content_url?`<a href="${esc(sub.content_url)}" target="_blank" style="color:var(--flame);text-decoration:none;font-weight:500">View ↗</a>`:'—'}</td>
-      <td style="color:#fff;font-weight:500">${sub?.views_tracked?(sub.views_tracked>=100000?(sub.views_tracked/100000).toFixed(1)+'L':(sub.views_tracked/1000).toFixed(1)+'K'):'—'}</td>
-      <td style="color:var(--flame)">${sub?.payout_amount?'₹'+sub.payout_amount.toLocaleString('en-IN'):'—'}</td>
-      <td>${sub?`<span class="st-badge ${sub.status==='approved'?'ok':sub.status==='rejected'?'no':'wait'}">${sub.status}</span>`:'—'}</td>
-      <td><button class="btn-outline" onclick="openCreator('${app.creator_id}','${(creator?.full_name||'').replace(/'/g,"\\'")}')">Profile →</button></td>
-    </tr>`;
+
+    // Determine stage
+    let stage = '—';
+    if (app.status === 'applied')  stage = '<span class="st-badge wait">Awaiting Approval</span>';
+    if (app.status === 'rejected') stage = '<span class="st-badge no">Rejected</span>';
+    if (app.status === 'approved') {
+      if (!sub)                                          stage = '<span class="st-badge wait">No Draft Yet</span>';
+      else if (sub.draft_status === 'pending')           stage = '<span class="st-badge wait">Draft Review</span>';
+      else if (sub.draft_status === 'changes_requested') stage = '<span class="st-badge no">Changes Requested</span>';
+      else if (sub.draft_status === 'approved' && !sub.content_url) stage = '<span class="st-badge wait">Ready to Post</span>';
+      else if (sub.draft_status === 'approved' && sub.content_url && sub.status === 'pending') stage = '<span class="st-badge wait">Reel Review</span>';
+      else if (sub.status === 'approved')                stage = '<span class="st-badge ok">Live</span>';
+      else if (sub.status === 'rejected')                stage = '<span class="st-badge no">Reel Rejected</span>';
+    }
+
+    const crid = cr?.id || '';
+    const crname = esc(cr?.full_name || '—');
+    return '<tr>' +
+      '<td><div class="td-strong">' + crname + '</div><div class="td-sub">@' + (cr?.instagram_handle||'—') + '</div></td>' +
+      '<td style="font-size:13px;color:#fff">' + (cr?.phone||'—') + '</td>' +
+      '<td><span class="st-badge ' + appBadge + '">' + app.status + '</span></td>' +
+      '<td>' + (sub?.draft_url ? '<a href="' + esc(sub.draft_url) + '" target="_blank" style="color:var(--ember);text-decoration:none;font-weight:500">Draft &#8599;</a>' : '—') + '</td>' +
+      '<td>' + (sub?.script_url ? '<a href="' + esc(sub.script_url) + '" target="_blank" style="color:var(--ember);text-decoration:none;font-weight:500">Script &#8599;</a>' : '—') + '</td>' +
+      '<td>' + stage + '</td>' +
+      '<td>' + (sub?.content_url ? '<a href="' + esc(sub.content_url) + '" target="_blank" style="color:var(--flame);text-decoration:none;font-weight:500">View &#8599;</a>' : '—') + '</td>' +
+      '<td style="color:#fff;font-weight:500">' + (sub?.views_tracked ? (sub.views_tracked>=100000?(sub.views_tracked/100000).toFixed(1)+'L':(sub.views_tracked/1000).toFixed(1)+'K') : '—') + '</td>' +
+      '<td style="color:var(--flame)">' + (sub?.payout_amount ? '&#8377;' + sub.payout_amount.toLocaleString('en-IN') : '—') + '</td>' +
+      '<td><button class="btn-outline" onclick="openCreatorFromDirectory(' + JSON.stringify(crid) + ')">Profile &#8594;</button></td>' +
+      '</tr>';
   }).join('');
 }
 
+
 // ── Creator Profile ───────────────────────────────────────────
-async function openCreator(creatorId, creatorName) {
+async function openCreatorFromDirectory(creatorId) {
+  // Called from Creators table — breadcrumb goes back to Creators
   activeCreatorId = creatorId;
   navTo('influencer');
-  document.getElementById('profBreadcrumbCamp').textContent = activeCampaignName || 'Campaign';
-  document.getElementById('profileCardArea').innerHTML   = '<div class="skeleton" style="height:80px;width:80px;border-radius:50%"></div>';
-  document.getElementById('creatorHistoryBody').innerHTML = '<tr><td colspan="5"><div class="skeleton" style="height:20px;margin:4px 0"></div></td></tr>';
+  loadCreatorProfile(creatorId);
+}
+
+async function openCreator(creatorId, creatorName) {
+  // Called from campaign detail — breadcrumb goes back to campaign
+  activeCreatorId = creatorId;
+  navTo('influencer');
+  loadCreatorProfile(creatorId);
+}
+
+async function loadCreatorProfile(creatorId) {
+  document.getElementById('profileCardArea').innerHTML      = '<div class="skeleton" style="height:80px;width:80px;border-radius:50%"></div>';
+  document.getElementById('creatorCampaignCards').innerHTML = '<div class="skeleton" style="height:120px;border-radius:16px;margin-bottom:12px"></div>';
 
   const [{ data: creator }, { data: apps }] = await Promise.all([
     sb.from('creators').select('*').eq('id', creatorId).single(),
     sb.from('applications').select(`
-      id, status, applied_at,
-      campaigns(id, title),
-      submissions(content_url, views_tracked, payout_amount, status)
+      id, status, applied_at, admin_comments,
+      campaigns(id, title, base_payout),
+      submissions(id, content_url, draft_url, script_url, draft_status, admin_comments, views_tracked, likes_count, comments_count, payout_amount, status)
     `).eq('creator_id', creatorId).order('applied_at', { ascending: false })
   ]);
 
-  const initials = (creator?.full_name||'??').split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
+  const initials    = (creator?.full_name||'??').split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
   const totalViews  = (apps||[]).flatMap(a=>a.submissions||[]).reduce((s,r)=>s+(r.views_tracked||0),0);
   const totalEarned = (apps||[]).flatMap(a=>a.submissions||[]).filter(r=>r.status==='approved').reduce((s,r)=>s+(r.payout_amount||0),0);
-
   const statusBadge = creator?.status==='approved'?'<span class="st-badge ok">Approved</span>':creator?.status==='blocked'?'<span class="st-badge no">Blocked</span>':'<span class="st-badge wait">Pending</span>';
 
   document.getElementById('profileCardArea').innerHTML = `
@@ -595,15 +620,15 @@ async function openCreator(creatorId, creatorName) {
       <div>
         <h2 style="font-family:'Playfair Display',serif;font-size:28px;margin-bottom:4px">${esc(creator?.full_name||'—')}</h2>
         <div style="color:var(--ember);font-size:13px;margin-bottom:8px">@${creator?.instagram_handle||'—'}</div>
-        <div style="margin-bottom:8px">${statusBadge}</div>
-        <div style="display:flex;gap:20px;font-size:12px;color:var(--smoke);flex-wrap:wrap">
-          <div>Email: <strong style="color:#fff">${creator?.email||'—'}</strong></div>
-          <div>Phone: <strong style="color:#fff">${creator?.phone||'—'}</strong></div>
-          <div>Location: <strong style="color:#fff">${creator?.location||'—'}</strong></div>
+        <div style="margin-bottom:12px">${statusBadge}</div>
+        <div style="display:flex;gap:24px;font-size:13px;color:var(--smoke);flex-wrap:wrap">
+          <div>&#128222; <strong style="color:#fff">${creator?.phone||'—'}</strong></div>
+          <div>&#9993; <strong style="color:#fff">${creator?.email||'—'}</strong></div>
         </div>
-        <div style="display:flex;gap:16px;font-size:12px;color:var(--smoke);margin-top:8px;flex-wrap:wrap">
+        <div style="display:flex;gap:24px;font-size:13px;color:var(--smoke);margin-top:10px;flex-wrap:wrap">
           <div>Lifetime Views: <strong style="color:#fff">${totalViews>=100000?(totalViews/100000).toFixed(1)+'L':totalViews>=1000?(totalViews/1000).toFixed(1)+'K':totalViews||'0'}</strong></div>
-          <div>Total Earned: <strong style="color:var(--flame)">₹${totalEarned.toLocaleString('en-IN')}</strong></div>
+          <div>Total Earned: <strong style="color:var(--flame)">&#8377;${totalEarned.toLocaleString('en-IN')}</strong></div>
+          <div>Campaigns: <strong style="color:#fff">${(apps||[]).length}</strong></div>
         </div>
       </div>
     </div>
@@ -612,20 +637,63 @@ async function openCreator(creatorId, creatorName) {
       ${creator?.status !== 'blocked'  ? `<button class="btn-danger" onclick="updateCreatorStatus('${creatorId}','blocked')">Block from Studio</button>` : `<button class="btn-g" onclick="updateCreatorStatus('${creatorId}','pending')">Unblock</button>`}
     </div>`;
 
-  document.getElementById('creatorHistoryBody').innerHTML = apps?.length
-    ? apps.map(app => {
-        const sub = app.submissions?.[0];
-        const badge = app.status==='approved'?'ok':app.status==='rejected'?'no':'wait';
-        return `<tr>
-          <td><div class="td-strong">${app.campaigns?.title||'—'}</div></td>
-          <td><span class="st-badge ${badge}">${app.status}</span></td>
-          <td>${sub?.content_url?`<a href="${esc(sub.content_url)}" target="_blank" style="color:var(--flame);text-decoration:none;font-weight:500">View ↗</a>`:'—'}</td>
-          <td>${sub?.views_tracked?(sub.views_tracked>=100000?(sub.views_tracked/100000).toFixed(1)+'L':(sub.views_tracked/1000).toFixed(1)+'K'):'—'}</td>
-          <td style="color:var(--flame)">${sub?.payout_amount?'₹'+sub.payout_amount.toLocaleString('en-IN'):'—'}</td>
-        </tr>`;
-      }).join('')
-    : `<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--smoke)">No history.</td></tr>`;
+  if (!apps?.length) {
+    document.getElementById('creatorCampaignCards').innerHTML = '<div style="padding:48px;text-align:center;color:var(--smoke);border:1px dashed var(--ghost);border-radius:16px">No campaign activity yet.</div>';
+    return;
+  }
+
+  document.getElementById('creatorCampaignCards').innerHTML = apps.map(app => {
+    const camp = app.campaigns;
+    const sub  = app.submissions?.[0];
+    const appBadge = app.status==='approved'?'ok':app.status==='rejected'?'no':'wait';
+    const appLabel = {applied:'Awaiting Approval', approved:'Approved', rejected:'Rejected'}[app.status] || app.status;
+
+    // Stage pill
+    let stagePill = '';
+    if (app.status === 'applied')  stagePill = '<span class="st-badge wait">Pending Approval</span>';
+    if (app.status === 'rejected') stagePill = '<span class="st-badge no">Application Rejected</span>';
+    if (app.status === 'approved') {
+      if (!sub)                                           stagePill = '<span class="st-badge wait">No Draft Submitted</span>';
+      else if (sub.draft_status === 'pending')            stagePill = '<span class="st-badge wait">Draft Under Review</span>';
+      else if (sub.draft_status === 'changes_requested')  stagePill = '<span class="st-badge no">Changes Requested</span>';
+      else if (sub.draft_status === 'approved' && !sub.content_url) stagePill = '<span class="st-badge wait">Ready to Post</span>';
+      else if (sub.content_url && sub.status === 'pending') stagePill = '<span class="st-badge wait">Reel Under Review</span>';
+      else if (sub.status === 'approved')                 stagePill = '<span class="st-badge ok">Live &#10003;</span>';
+      else if (sub.status === 'rejected')                 stagePill = '<span class="st-badge no">Reel Rejected</span>';
+    }
+
+    const adminNote = (sub?.admin_comments || app.admin_comments)
+      ? '<div style="margin-top:10px;padding:10px 14px;background:rgba(255,82,0,0.05);border:1px solid rgba(255,82,0,0.15);border-radius:8px;font-size:12px;color:rgba(255,255,255,0.6)">' + esc(sub?.admin_comments || app.admin_comments) + '</div>'
+      : '';
+
+    const metricRow = sub?.views_tracked ? `
+      <div style="display:flex;gap:20px;margin-top:12px;flex-wrap:wrap">
+        <div style="font-size:12px;color:var(--smoke)">Views: <strong style="color:#fff">${sub.views_tracked>=100000?(sub.views_tracked/100000).toFixed(1)+'L':(sub.views_tracked/1000).toFixed(1)+'K'}</strong></div>
+        ${sub.likes_count ? '<div style="font-size:12px;color:var(--smoke)">Likes: <strong style="color:#fff">' + (sub.likes_count>=1000?(sub.likes_count/1000).toFixed(1)+'K':sub.likes_count) + '</strong></div>' : ''}
+        ${sub.comments_count ? '<div style="font-size:12px;color:var(--smoke)">Comments: <strong style="color:#fff">' + sub.comments_count + '</strong></div>' : ''}
+        ${sub.payout_amount ? '<div style="font-size:12px;color:var(--smoke)">Payout: <strong style="color:var(--flame)">&#8377;' + sub.payout_amount.toLocaleString('en-IN') + '</strong></div>' : ''}
+      </div>` : '';
+
+    const linkRow = (sub?.draft_url || sub?.script_url || sub?.content_url) ? `
+      <div style="display:flex;gap:12px;margin-top:10px;flex-wrap:wrap">
+        ${sub?.draft_url  ? '<a href="' + esc(sub.draft_url)  + '" target="_blank" style="font-size:12px;color:var(--ember);text-decoration:none;font-weight:500">Draft &#8599;</a>' : ''}
+        ${sub?.script_url ? '<a href="' + esc(sub.script_url) + '" target="_blank" style="font-size:12px;color:var(--ember);text-decoration:none;font-weight:500">Script &#8599;</a>' : ''}
+        ${sub?.content_url? '<a href="' + esc(sub.content_url)+ '" target="_blank" style="font-size:12px;color:var(--flame);text-decoration:none;font-weight:600">Live Reel &#8599;</a>' : ''}
+      </div>` : '';
+
+    return '<div style="background:var(--night);border:1px solid var(--ghost);border-radius:16px;padding:20px 24px;margin-bottom:12px">' +
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">' +
+        '<div>' +
+          '<div style="font-family:Playfair Display,serif;font-size:18px;margin-bottom:6px">' + esc(camp?.title||'—') + '</div>' +
+          '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">' + stagePill + '</div>' +
+        '</div>' +
+        (camp?.base_payout ? '<div style="font-size:13px;color:var(--smoke)">Base payout: <strong style="color:var(--flame)">&#8377;' + camp.base_payout.toLocaleString('en-IN') + '</strong></div>' : '') +
+      '</div>' +
+      linkRow + metricRow + adminNote +
+    '</div>';
+  }).join('');
 }
+
 
 async function updateCreatorStatus(creatorId, newStatus) {
   const { error } = await sb.from('creators').update({ status: newStatus }).eq('id', creatorId);
@@ -635,12 +703,7 @@ async function updateCreatorStatus(creatorId, newStatus) {
 
 // ── Content Queue ─────────────────────────────────────────────
 async function loadQueue() {
-  const [{ data: pendingApps }, { data: pendingDrafts }, { data: pendingReels }] = await Promise.all([
-    sb.from('applications').select(`
-      id, status, applied_at,
-      campaigns(title),
-      creators(full_name, instagram_handle, phone, email)
-    `).eq('status', 'applied').order('applied_at'),
+  const [{ data: pendingDrafts }, { data: pendingReels }] = await Promise.all([
     sb.from('submissions').select(`
       id, draft_url, script_url, submitted_at,
       campaigns(title),
@@ -652,30 +715,6 @@ async function loadQueue() {
       creators(full_name, instagram_handle)
     `).eq('draft_status', 'approved').eq('status', 'pending').not('content_url', 'is', null).order('submitted_at')
   ]);
-
-  // Campaign application approvals
-  document.getElementById('campAppBody').innerHTML = pendingApps?.length
-    ? pendingApps.map(app => {
-        const name   = esc(app.creators?.full_name || '—');
-        const handle = app.creators?.instagram_handle || '—';
-        const phone  = app.creators?.phone || '—';
-        const camp   = esc(app.campaigns?.title || '—');
-        const date   = app.applied_at ? new Date(app.applied_at).toLocaleDateString('en-IN') : '—';
-        const aid    = app.id;
-        const cname = (app.creators?.full_name || 'Creator').replace(/'/g, '');
-        return `<tr>
-          <td><div class="td-strong">${name}</div></td>
-          <td><a href="https://www.instagram.com/${handle}" target="_blank" style="color:var(--flame);text-decoration:none;font-weight:500">@${handle} &#8599;</a></td>
-          <td style="font-size:13px;color:#fff">${phone}</td>
-          <td><div class="td-strong">${camp}</div></td>
-          <td style="font-size:12px;color:var(--ash)">${date}</td>
-          <td><div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button class="btn-g" onclick="reviewApp('${aid}','approved')">Approve</button>
-            <button class="btn-r" onclick="openRejectModal('app','${aid}','${cname}')">Reject</button>
-          </div></td>
-        </tr>`;
-      }).join('')
-    : '<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--smoke)">No pending campaign applications.</td></tr>';
 
   document.getElementById('draftQueueBody').innerHTML = pendingDrafts?.length
     ? pendingDrafts.map(sub => {
@@ -725,7 +764,7 @@ async function loadQueue() {
       }).join('')
     : '<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--smoke)">No live reels pending review.</td></tr>';
 
-  const total = (pendingApps?.length || 0) + (pendingDrafts?.length || 0) + (pendingReels?.length || 0);
+  const total = (pendingDrafts?.length || 0) + (pendingReels?.length || 0);
   document.getElementById('queueBadge').textContent = total || 0;
 }
 
@@ -875,6 +914,7 @@ function renderCreatorsTable(filter) {
       <td><span class="st-badge ${badge}">${c.status || 'pending'}</span></td>
       <td>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn-outline" onclick="openCreatorFromDirectory('${c.id}')">Profile →</button>
           ${c.status !== 'approved' ? `<button class="btn-g" onclick="setCreatorStatus('${c.id}','approved')">Approve</button>` : ''}
           ${c.status !== 'blocked'  ? `<button class="btn-r" onclick="setCreatorStatus('${c.id}','blocked')">Block</button>` : `<button class="btn-outline" style="padding:6px 14px;font-size:10px" onclick="setCreatorStatus('${c.id}','pending')">Unblock</button>`}
         </div>
@@ -929,6 +969,46 @@ async function publishCampaign() {
   alert(`"${title}" is now live!`);
   await loadOverview();
 }
+
+// ── Load campaign applications (for Campaign Queue tab) ────────
+async function loadCampApps() {
+  const body = document.getElementById('campAppBody');
+  if (!body) return;
+  body.innerHTML = '<tr><td colspan="6"><div class="skeleton" style="height:20px;margin:4px 0"></div></td></tr>';
+
+  const { data: pendingApps } = await sb.from('applications').select(`
+    id, status, applied_at,
+    campaigns(title),
+    creators(full_name, instagram_handle, phone)
+  `).eq('status', 'applied').order('applied_at');
+
+  if (!pendingApps?.length) {
+    body.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--smoke)">No pending campaign applications.</td></tr>';
+    return;
+  }
+
+  body.innerHTML = pendingApps.map(function(app) {
+    var name   = esc(app.creators?.full_name || '—');
+    var handle = app.creators?.instagram_handle || '—';
+    var phone  = app.creators?.phone || '—';
+    var camp   = esc(app.campaigns?.title || '—');
+    var date   = app.applied_at ? new Date(app.applied_at).toLocaleDateString('en-IN') : '—';
+    var aid    = app.id;
+    var cname  = (app.creators?.full_name || 'Creator').replace(/'/g, '');
+    return '<tr>' +
+      '<td><div class="td-strong">' + name + '</div></td>' +
+      '<td><a href="https://www.instagram.com/' + handle + '" target="_blank" style="color:var(--flame);text-decoration:none;font-weight:500">@' + handle + ' &#8599;</a></td>' +
+      '<td style="font-size:13px;color:#fff">' + phone + '</td>' +
+      '<td><div class="td-strong">' + camp + '</div></td>' +
+      '<td style="font-size:12px;color:var(--ash)">' + date + '</td>' +
+      '<td><div style="display:flex;gap:8px;flex-wrap:wrap">' +
+        '<button class="btn-g" onclick="reviewApp(\'' + aid + '\',\'approved\')">Approve</button>' +
+        '<button class="btn-r" onclick="openRejectModal(\'app\',\'' + aid + '\',\'' + cname + '\')">Reject</button>' +
+      '</div></td>' +
+    '</tr>';
+  }).join('');
+}
+
 
 // ── Campaign Queue ────────────────────────────────────────────
 async function loadCampaignQueue() {
