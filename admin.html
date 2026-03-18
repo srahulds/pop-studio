@@ -6,7 +6,20 @@
 <title>POP Creators — Admin Control</title>
 <link rel="icon" type="image/svg+xml" href="pop_bw_logo_new.svg">
 <link rel="shortcut icon" href="pop_bw_logo_new.svg">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+@font-face {
+  font-family: 'Awesome Serif';
+  src: url('AwesomeSerifItalic-MdExraTall_copy.otf') format('opentype');
+  font-weight: 500;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'Awesome Serif';
+  src: url('AwesomeSerifItalic-SmExraTall_copy.otf') format('opentype');
+  font-weight: 600;
+  font-style: italic;
+}
+</style>
 <style>
 :root {
   --flame: #FF5200; --ember: #FF7A33; --honey: #FFB547;
@@ -15,7 +28,7 @@
   --ghost: rgba(255,255,255,0.08); --glow: rgba(255,82,0,0.35);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--deep);color:#fff;font-family:'Outfit',sans-serif;min-height:100vh;display:flex;overflow-x:hidden}
+body{background:var(--deep);color:#fff;font-family:'Figtree',sans-serif;min-height:100vh;display:flex;overflow-x:hidden}
 body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:0.7}
 
 aside{width:260px;background:rgba(10,10,10,0.95);backdrop-filter:blur(20px);border-right:1px solid var(--ghost);display:flex;flex-direction:column;position:fixed;top:0;bottom:0;z-index:150;padding:24px 0;opacity:0;transition:opacity 0.15s ease}
@@ -33,7 +46,7 @@ aside{width:260px;background:rgba(10,10,10,0.95);backdrop-filter:blur(20px);bord
 .sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:140;display:none;backdrop-filter:blur(4px)}
 .sidebar-overlay.show{display:block}
 .mob-topbar{display:none;margin-bottom:32px}
-.mob-toggle{background:var(--night);border:1px solid var(--ghost);color:#fff;padding:10px 16px;border-radius:100px;cursor:pointer;font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;transition:all 0.2s}
+.mob-toggle{background:var(--night);border:1px solid var(--ghost);color:#fff;padding:10px 16px;border-radius:100px;cursor:pointer;font-family:'Figtree',sans-serif;font-size:13px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;transition:all 0.2s}
 .mob-toggle:hover{border-color:var(--flame);color:var(--flame)}
 
 main{margin-left:260px;flex:1;padding:48px 56px;position:relative;z-index:10;min-height:100vh;opacity:0;transition:opacity 0.15s ease}
@@ -42,7 +55,7 @@ main{margin-left:260px;flex:1;padding:48px 56px;position:relative;z-index:10;min
 .bc-link{color:var(--ember);text-decoration:none;cursor:pointer;transition:0.2s}
 .bc-link:hover{color:var(--flame)}
 .bc-sep{color:var(--ghost)}
-h1{font-family:'Playfair Display',serif;font-size:clamp(32px,5vw,40px);font-weight:400;line-height:1.2;margin-bottom:8px}
+h1{font-family:'Awesome Serif',serif;font-size:clamp(32px,5vw,40px);font-weight:400;line-height:1.2;margin-bottom:8px}
 h1 i{font-style:italic;color:var(--flame)}
 
 .view-section{display:none;animation:fadeIn 0.3s ease}
@@ -53,7 +66,7 @@ h1 i{font-style:italic;color:var(--flame)}
 .eco-grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,0.04);border-radius:20px;overflow:hidden;margin-bottom:40px}
 .eco-card{padding:32px 24px;background:var(--night);transition:all 0.3s}
 .eco-card:hover{background:var(--slab)}
-.eco-num{font-family:'Playfair Display',serif;font-size:40px;font-weight:700;line-height:1;margin-bottom:8px}
+.eco-num{font-family:'Awesome Serif',serif;font-size:40px;font-weight:700;line-height:1;margin-bottom:8px}
 .eco-num.lit{background:linear-gradient(135deg,var(--flame),var(--honey));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .eco-card p{font-size:12px;color:var(--smoke);font-weight:300;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px}
 .eco-sub{font-size:11px;color:var(--ash);font-weight:300}
@@ -61,17 +74,17 @@ h1 i{font-style:italic;color:var(--flame)}
 .metrics-small{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:48px}
 .m-sm-card{padding:16px 24px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:16px;display:flex;justify-content:space-between;align-items:center}
 .m-sm-label{font-size:11px;color:var(--ash);text-transform:uppercase;letter-spacing:0.1em;font-weight:500}
-.m-sm-val{font-family:'Playfair Display',serif;font-size:24px;font-weight:600}
+.m-sm-val{font-family:'Awesome Serif',serif;font-size:24px;font-weight:600}
 
-.btn-flame{background:var(--flame);color:#fff;padding:12px 24px;font-weight:600;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;border:none;cursor:pointer;border-radius:100px;font-family:'Outfit',sans-serif;transition:all 0.3s;display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.btn-flame{background:var(--flame);color:#fff;padding:12px 24px;font-weight:600;font-size:11px;letter-spacing:0.08em;text-transform:uppercase;border:none;cursor:pointer;border-radius:100px;font-family:'Figtree',sans-serif;transition:all 0.3s;display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
 .btn-flame:hover{box-shadow:0 0 24px var(--glow);transform:translateY(-2px)}
 .btn-outline{color:var(--smoke);font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;border:1px solid rgba(255,255,255,0.12);padding:10px 20px;border-radius:100px;cursor:pointer;background:transparent;transition:all 0.2s;text-decoration:none;white-space:nowrap}
 .btn-outline:hover{border-color:var(--flame);color:var(--flame)}
 .btn-danger{color:#EF4444;font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;border:1px solid rgba(239,68,68,0.2);padding:10px 20px;border-radius:100px;cursor:pointer;background:rgba(239,68,68,0.05);transition:all 0.2s;white-space:nowrap}
 .btn-danger:hover{background:#EF4444;color:#fff}
-.btn-g{padding:8px 20px;font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;border:none;cursor:pointer;border-radius:100px;font-family:'Outfit',sans-serif;background:rgba(34,197,94,0.08);color:#22C55E;border:1px solid rgba(34,197,94,0.15);transition:all 0.2s;white-space:nowrap}
+.btn-g{padding:8px 20px;font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;border:none;cursor:pointer;border-radius:100px;font-family:'Figtree',sans-serif;background:rgba(34,197,94,0.08);color:#22C55E;border:1px solid rgba(34,197,94,0.15);transition:all 0.2s;white-space:nowrap}
 .btn-g:hover{background:#22C55E;color:#fff}
-.btn-r{padding:8px 20px;font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;border:none;cursor:pointer;border-radius:100px;font-family:'Outfit',sans-serif;background:rgba(220,38,38,0.05);color:#DC2626;border:1px solid rgba(220,38,38,0.1);transition:all 0.2s;white-space:nowrap}
+.btn-r{padding:8px 20px;font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;border:none;cursor:pointer;border-radius:100px;font-family:'Figtree',sans-serif;background:rgba(220,38,38,0.05);color:#DC2626;border:1px solid rgba(220,38,38,0.1);transition:all 0.2s;white-space:nowrap}
 .btn-r:hover{background:#DC2626;color:#fff}
 
 .table-wrap{background:var(--night);border:1px solid var(--ghost);border-radius:20px;overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:48px}
@@ -100,7 +113,7 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 .modal-x:hover{background:rgba(255,82,0,0.1);color:var(--flame)}
 .f-group{margin-bottom:16px;display:flex;flex-direction:column;gap:6px}
 .f-label{font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:var(--ash);font-weight:600}
-.f-input{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);color:#fff;padding:14px 18px;font-family:'Outfit',sans-serif;font-size:14px;border-radius:12px;outline:none;transition:all 0.2s;font-weight:300}
+.f-input{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);color:#fff;padding:14px 18px;font-family:'Figtree',sans-serif;font-size:14px;border-radius:12px;outline:none;transition:all 0.2s;font-weight:300}
 .f-input:focus{border-color:var(--flame);background:rgba(255,82,0,0.03)}
 @keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 
@@ -109,7 +122,7 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 
 /* Creator filter tabs */
-.creator-filter-btn{padding:8px 18px;border-radius:100px;font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;border:1px solid rgba(255,255,255,0.1);background:transparent;color:var(--smoke);font-family:'Outfit',sans-serif;transition:all 0.2s}
+.creator-filter-btn{padding:8px 18px;border-radius:100px;font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;border:1px solid rgba(255,255,255,0.1);background:transparent;color:var(--smoke);font-family:'Figtree',sans-serif;transition:all 0.2s}
 .creator-filter-btn:hover{border-color:var(--flame);color:var(--flame)}
 .creator-filter-btn.active{background:rgba(255,82,0,0.1);border-color:rgba(255,82,0,0.3);color:var(--flame)}
 
@@ -187,7 +200,7 @@ tr:hover td{background:rgba(255,255,255,0.02)}
       <div class="m-sm-card"><div class="m-sm-label">Pending Content</div><div class="m-sm-val" id="ovPendingContent">—</div></div>
     </div>
 
-    <h3 style="font-family:'Playfair Display',serif;font-size:24px;margin-bottom:16px">Campaign Directory</h3>
+    <h3 style="font-family:'Awesome Serif',serif;font-size:24px;margin-bottom:16px">Campaign Directory</h3>
     <div class="table-wrap">
       <table>
         <thead><tr><th>Campaign</th><th>Applied</th><th>Approved</th><th>Submitted</th><th>Live</th><th>Views</th><th>Status</th><th>Action</th></tr></thead>
@@ -208,7 +221,7 @@ tr:hover td{background:rgba(255,255,255,0.02)}
     </div>
     <div class="eco-grid-4" id="campDetailStats"></div>
 
-    <h3 style="font-family:'Playfair Display',serif;font-size:24px;margin-bottom:16px">Creator Activity</h3>
+    <h3 style="font-family:'Awesome Serif',serif;font-size:24px;margin-bottom:16px">Creator Activity</h3>
     <div class="table-wrap">
       <table>
         <thead><tr><th>Creator</th><th>Phone</th><th>App</th><th>Draft</th><th>Script</th><th>Stage</th><th>Live Reel</th><th>Views</th><th>Payout</th><th>Action</th></tr></thead>
@@ -231,7 +244,7 @@ tr:hover td{background:rgba(255,255,255,0.02)}
       </div>
     </div>
     <div class="profile-card" id="profileCardArea"></div>
-    <h3 style="font-family:'Playfair Display',serif;font-size:24px;margin-bottom:20px;margin-top:48px">Campaign Activity</h3>
+    <h3 style="font-family:'Awesome Serif',serif;font-size:24px;margin-bottom:20px;margin-top:48px">Campaign Activity</h3>
     <div id="creatorCampaignCards">
       <div class="skeleton" style="height:120px;border-radius:16px;margin-bottom:12px"></div>
     </div>
@@ -247,7 +260,7 @@ tr:hover td{background:rgba(255,255,255,0.02)}
     </div>
 
     <!-- BLOCK 1: Draft Reviews -->
-    <h3 style="font-family:'Playfair Display',serif;font-size:24px;font-weight:600;margin-bottom:6px;margin-top:56px">Draft Reviews</h3>
+    <h3 style="font-family:'Awesome Serif',serif;font-size:24px;font-weight:600;margin-bottom:6px;margin-top:56px">Draft Reviews</h3>
     <p style="font-size:13px;color:var(--smoke);font-weight:300;margin-bottom:20px">Creators awaiting approval on their draft reel before posting.</p>
     <div class="table-wrap">
       <table>
@@ -258,7 +271,7 @@ tr:hover td{background:rgba(255,255,255,0.02)}
       </table>
     </div>
 
-    <h3 style="font-family:'Playfair Display',serif;font-size:24px;font-weight:600;margin-bottom:6px;margin-top:56px">Live Reel Reviews</h3>
+    <h3 style="font-family:'Awesome Serif',serif;font-size:24px;font-weight:600;margin-bottom:6px;margin-top:56px">Live Reel Reviews</h3>
     <p style="font-size:13px;color:var(--smoke);font-weight:300;margin-bottom:20px">Creators who posted their reel and submitted the live link for final approval.</p>
     <div class="table-wrap">
       <table>
@@ -269,7 +282,7 @@ tr:hover td{background:rgba(255,255,255,0.02)}
       </table>
     </div>
 
-    <h3 style="font-family:'Playfair Display',serif;font-size:24px;font-weight:600;margin-bottom:6px;margin-top:56px">Rejected — Awaiting Re-review</h3>
+    <h3 style="font-family:'Awesome Serif',serif;font-size:24px;font-weight:600;margin-bottom:6px;margin-top:56px">Rejected — Awaiting Re-review</h3>
     <p style="font-size:13px;color:var(--smoke);font-weight:300;margin-bottom:20px">Creators who fixed caption/tagging issues and requested re-review, or accidental rejections to undo.</p>
     <div class="table-wrap">
       <table>
@@ -291,7 +304,7 @@ tr:hover td{background:rgba(255,255,255,0.02)}
       <button class="btn-flame" onclick="openModal()">+ New Campaign</button>
     </div>
 
-    <h3 style="font-family:'Playfair Display',serif;font-size:24px;font-weight:600;margin-bottom:6px">Pending Applications</h3>
+    <h3 style="font-family:'Awesome Serif',serif;font-size:24px;font-weight:600;margin-bottom:6px">Pending Applications</h3>
     <p style="font-size:13px;color:var(--smoke);font-weight:300;margin-bottom:20px">Creators who have opted into a campaign and are awaiting your approval.</p>
     <div class="table-wrap" style="margin-bottom:48px">
       <table>
@@ -302,7 +315,7 @@ tr:hover td{background:rgba(255,255,255,0.02)}
       </table>
     </div>
 
-    <h3 style="font-family:'Playfair Display',serif;font-size:24px;font-weight:600;margin-bottom:6px;margin-top:56px">Rejected Applications — Undo</h3>
+    <h3 style="font-family:'Awesome Serif',serif;font-size:24px;font-weight:600;margin-bottom:6px;margin-top:56px">Rejected Applications — Undo</h3>
     <p style="font-size:13px;color:var(--smoke);font-weight:300;margin-bottom:20px">Recently rejected campaign applications. Undo if rejected by mistake.</p>
     <div class="table-wrap" style="margin-bottom:48px">
       <table>
@@ -313,7 +326,7 @@ tr:hover td{background:rgba(255,255,255,0.02)}
       </table>
     </div>
 
-    <h3 style="font-family:'Playfair Display',serif;font-size:24px;font-weight:600;margin-bottom:16px">All Campaigns</h3>
+    <h3 style="font-family:'Awesome Serif',serif;font-size:24px;font-weight:600;margin-bottom:16px">All Campaigns</h3>
     <div class="table-wrap">
       <table>
         <thead><tr><th>Campaign</th><th>Applied</th><th>Approved</th><th>Drafts Pending</th><th>Live</th><th>Views</th><th>Status</th><th>Action</th></tr></thead>
@@ -357,7 +370,7 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 <div class="modal-overlay" id="payoutModal">
   <div class="modal-box" style="max-width:440px">
     <button class="modal-x" onclick="closePayoutModal()">✕</button>
-    <h3 style="font-family:'Playfair Display',serif;font-size:24px;margin-bottom:8px">Approve <i>Content.</i></h3>
+    <h3 style="font-family:'Awesome Serif',serif;font-size:24px;margin-bottom:8px">Approve <i>Content.</i></h3>
     <p style="font-size:13px;color:var(--smoke);margin-bottom:24px">Set the payout amount for this submission.</p>
     <div id="payoutContentPreview" style="padding:12px 16px;background:rgba(255,255,255,0.02);border:1px solid var(--ghost);border-radius:12px;margin-bottom:20px;font-size:13px;color:var(--smoke)"></div>
     <div class="f-group">
@@ -365,10 +378,10 @@ tr:hover td{background:rgba(255,255,255,0.02)}
       <input type="number" class="f-input" id="payoutAmount" placeholder="3000" value="3000">
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
-      <button style="padding:10px;background:rgba(255,255,255,0.03);border:1px solid var(--ghost);border-radius:100px;color:var(--smoke);cursor:pointer;font-size:11px;font-family:'Outfit',sans-serif" onclick="document.getElementById('payoutAmount').value=3000">₹3,000 Base</button>
-      <button style="padding:10px;background:rgba(255,255,255,0.03);border:1px solid var(--ghost);border-radius:100px;color:var(--smoke);cursor:pointer;font-size:11px;font-family:'Outfit',sans-serif" onclick="document.getElementById('payoutAmount').value=10000">₹10,000 (100K)</button>
-      <button style="padding:10px;background:rgba(255,255,255,0.03);border:1px solid var(--ghost);border-radius:100px;color:var(--smoke);cursor:pointer;font-size:11px;font-family:'Outfit',sans-serif" onclick="document.getElementById('payoutAmount').value=30000">₹30,000 (500K)</button>
-      <button style="padding:10px;background:rgba(255,255,255,0.03);border:1px solid var(--ghost);border-radius:100px;color:var(--smoke);cursor:pointer;font-size:11px;font-family:'Outfit',sans-serif" onclick="document.getElementById('payoutAmount').value=100000">₹1,00,000 (1M)</button>
+      <button style="padding:10px;background:rgba(255,255,255,0.03);border:1px solid var(--ghost);border-radius:100px;color:var(--smoke);cursor:pointer;font-size:11px;font-family:'Figtree',sans-serif" onclick="document.getElementById('payoutAmount').value=3000">₹3,000 Base</button>
+      <button style="padding:10px;background:rgba(255,255,255,0.03);border:1px solid var(--ghost);border-radius:100px;color:var(--smoke);cursor:pointer;font-size:11px;font-family:'Figtree',sans-serif" onclick="document.getElementById('payoutAmount').value=10000">₹10,000 (100K)</button>
+      <button style="padding:10px;background:rgba(255,255,255,0.03);border:1px solid var(--ghost);border-radius:100px;color:var(--smoke);cursor:pointer;font-size:11px;font-family:'Figtree',sans-serif" onclick="document.getElementById('payoutAmount').value=30000">₹30,000 (500K)</button>
+      <button style="padding:10px;background:rgba(255,255,255,0.03);border:1px solid var(--ghost);border-radius:100px;color:var(--smoke);cursor:pointer;font-size:11px;font-family:'Figtree',sans-serif" onclick="document.getElementById('payoutAmount').value=100000">₹1,00,000 (1M)</button>
     </div>
     <button class="btn-flame" style="width:100%;justify-content:center;margin-top:20px" onclick="confirmContentApproval()">Approve & Set Payout</button>
   </div>
@@ -378,7 +391,7 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 <div class="modal-overlay" id="campModal">
   <div class="modal-box">
     <button class="modal-x" onclick="closeModal()">✕</button>
-    <h3 style="font-family:'Playfair Display',serif;font-size:28px;margin-bottom:24px">Draft Campaign</h3>
+    <h3 style="font-family:'Awesome Serif',serif;font-size:28px;margin-bottom:24px">Draft Campaign</h3>
     <div class="f-group"><label class="f-label">Campaign Title</label><input type="text" class="f-input" id="newTitle" placeholder="e.g. The Spring Collection"></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
       <div class="f-group"><label class="f-label">Platform</label><div class="f-input" style="color:var(--smoke);pointer-events:none">Instagram (Default)</div></div>
@@ -400,7 +413,7 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 <div class="modal-overlay" id="rejectModal">
   <div class="modal-box" style="max-width:480px">
     <button class="modal-x" onclick="closeRejectModal()">&#10005;</button>
-    <h3 style="font-family:'Playfair Display',serif;font-size:24px;margin-bottom:8px">Reject <i>with Feedback.</i></h3>
+    <h3 style="font-family:'Awesome Serif',serif;font-size:24px;margin-bottom:8px">Reject <i>with Feedback.</i></h3>
     <p style="font-size:13px;color:var(--smoke);margin-bottom:20px" id="rejectModalSubtitle">Leave a comment explaining what needs to change.</p>
     <div class="f-group">
       <label class="f-label">Feedback / Reason</label>
@@ -664,7 +677,7 @@ async function loadCreatorProfile(creatorId) {
     <div class="prof-info">
       <div class="prof-av">${initials}</div>
       <div>
-        <h2 style="font-family:'Playfair Display',serif;font-size:28px;margin-bottom:4px">${esc(creator?.full_name||'—')}</h2>
+        <h2 style="font-family:'Awesome Serif',serif;font-size:28px;margin-bottom:4px">${esc(creator?.full_name||'—')}</h2>
         <div style="color:var(--ember);font-size:13px;margin-bottom:8px">@${creator?.instagram_handle||'—'}</div>
         <div style="margin-bottom:12px">${statusBadge}</div>
         <div style="display:flex;gap:24px;font-size:13px;color:var(--smoke);flex-wrap:wrap">
@@ -730,7 +743,7 @@ async function loadCreatorProfile(creatorId) {
     return '<div style="background:var(--night);border:1px solid var(--ghost);border-radius:16px;padding:20px 24px;margin-bottom:12px">' +
       '<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">' +
         '<div>' +
-          '<div style="font-family:Playfair Display,serif;font-size:18px;margin-bottom:6px">' + esc(camp?.title||'—') + '</div>' +
+          '<div style="font-family:Awesome Serif,serif;font-size:18px;margin-bottom:6px">' + esc(camp?.title||'—') + '</div>' +
           '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">' + stagePill + '</div>' +
         '</div>' +
         (camp?.base_payout ? '<div style="font-size:13px;color:var(--smoke)">Base payout: <strong style="color:var(--flame)">&#8377;' + camp.base_payout.toLocaleString('en-IN') + '</strong></div>' : '') +
@@ -1228,7 +1241,7 @@ async function init() {
       <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${adminRow.name}</div>
       <div style="font-size:10px;color:var(--ash);text-transform:uppercase;letter-spacing:0.1em">${adminRow.role}</div>
     </div>
-    <button onclick="adminLogout()" style="background:none;border:1px solid rgba(255,255,255,0.1);color:var(--ash);cursor:pointer;font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;padding:6px 12px;border-radius:100px;font-family:'Outfit',sans-serif;transition:all 0.2s;white-space:nowrap" onmouseover="this.style.color='var(--flame)';this.style.borderColor='rgba(255,82,0,0.3)'" onmouseout="this.style.color='var(--ash)';this.style.borderColor='rgba(255,255,255,0.1)'">Log Out</button>`;
+    <button onclick="adminLogout()" style="background:none;border:1px solid rgba(255,255,255,0.1);color:var(--ash);cursor:pointer;font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;padding:6px 12px;border-radius:100px;font-family:'Figtree',sans-serif;transition:all 0.2s;white-space:nowrap" onmouseover="this.style.color='var(--flame)';this.style.borderColor='rgba(255,82,0,0.3)'" onmouseout="this.style.color='var(--ash)';this.style.borderColor='rgba(255,255,255,0.1)'">Log Out</button>`;
 
   // ── Load data ───────────────────────────────────────────────
   await loadOverview();

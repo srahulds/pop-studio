@@ -7,7 +7,20 @@
 <link rel="icon" type="image/svg+xml" href="pop_bw_logo_new.svg">
 <link rel="shortcut icon" href="pop_bw_logo_new.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+@font-face {
+  font-family: 'Awesome Serif';
+  src: url('AwesomeSerifItalic-MdExraTall_copy.otf') format('opentype');
+  font-weight: 500;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'Awesome Serif';
+  src: url('AwesomeSerifItalic-SmExraTall_copy.otf') format('opentype');
+  font-weight: 600;
+  font-style: italic;
+}
+</style>
 <style>
 :root {
   --flame: #FF5200; --honey: #FFB547;
@@ -16,7 +29,7 @@
   --ghost: rgba(255,255,255,0.08); --glow: rgba(255,82,0,0.35);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--deep);color:#fff;font-family:'Outfit',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;}
+body{background:var(--deep);color:#fff;font-family:'Figtree',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;}
 body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:0.7}
 
 /* Subtle background glow */
@@ -26,16 +39,16 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 
 .brand{display:flex;align-items:center;gap:14px;justify-content:center;margin-bottom:40px}
 .nav-logo{height:44px;width:44px;border-radius:10px;object-fit:cover;border:1px solid rgba(255,255,255,0.1);background:#fff}
-.brand-text{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--flame)}
+.brand-text{font-family:'Awesome Serif',serif;font-size:28px;font-weight:700;color:var(--flame)}
 .brand-sub{font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--ash);font-weight:600;margin-top:2px}
 
 .login-box{background:var(--slab);border:1px solid rgba(255,255,255,0.07);border-radius:24px;padding:40px 36px;box-shadow:0 32px 80px rgba(0,0,0,0.4)}
 
-.login-title{font-family:'Playfair Display',serif;font-size:26px;font-weight:400;margin-bottom:6px;text-align:center}
+.login-title{font-family:'Awesome Serif',serif;font-size:26px;font-weight:400;margin-bottom:6px;text-align:center}
 .login-title i{font-style:italic;color:var(--flame)}
 .login-sub{font-size:13px;color:var(--smoke);text-align:center;margin-bottom:32px;font-weight:300;line-height:1.5}
 
-.btn-google{background:#fff;color:#1a1a1a;width:100%;padding:14px;font-weight:600;font-size:14px;border:none;cursor:pointer;border-radius:100px;font-family:'Outfit',sans-serif;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:20px}
+.btn-google{background:#fff;color:#1a1a1a;width:100%;padding:14px;font-weight:600;font-size:14px;border:none;cursor:pointer;border-radius:100px;font-family:'Figtree',sans-serif;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:20px}
 .btn-google:hover{box-shadow:0 4px 24px rgba(255,255,255,0.15);transform:translateY(-1px)}
 .btn-google:disabled{opacity:0.6;cursor:not-allowed;transform:none;box-shadow:none}
 

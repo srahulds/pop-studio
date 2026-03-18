@@ -7,11 +7,24 @@
 <link rel="icon" type="image/svg+xml" href="pop_bw_logo_new.svg">
 <link rel="shortcut icon" href="pop_bw_logo_new.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+@font-face {
+  font-family: 'Awesome Serif';
+  src: url('AwesomeSerifItalic-MdExraTall_copy.otf') format('opentype');
+  font-weight: 500;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'Awesome Serif';
+  src: url('AwesomeSerifItalic-SmExraTall_copy.otf') format('opentype');
+  font-weight: 600;
+  font-style: italic;
+}
+</style>
 <style>
 :root{--flame:#FF5200;--ember:#FF7A33;--deep:#0A0A0A;--night:#111;--smoke:rgba(255,255,255,0.5);--ash:rgba(255,255,255,0.25);--ghost:rgba(255,255,255,0.08)}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--deep);color:#fff;font-family:'Outfit',sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased}
+body{background:var(--deep);color:#fff;font-family:'Figtree',sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased}
 nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;padding:14px 48px;background:rgba(10,10,10,0.98);backdrop-filter:blur(40px);border-bottom:1px solid var(--ghost)}
 .nav-brand{display:flex;align-items:center;gap:12px;text-decoration:none}
 .nav-logo{height:32px;width:32px;border-radius:8px;object-fit:cover;border:1px solid rgba(255,255,255,0.1);background:#fff}
@@ -19,10 +32,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:cen
 .wrap{max-width:720px;margin:0 auto;padding:120px 24px 80px}
 .label{font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--ember);font-weight:600;display:flex;align-items:center;gap:10px;margin-bottom:24px}
 .label::before{content:'';width:16px;height:1px;background:var(--ember)}
-h1{font-family:'Playfair Display',serif;font-size:clamp(36px,6vw,52px);font-weight:400;line-height:1.1;margin-bottom:12px}
+h1{font-family:'Awesome Serif',serif;font-size:clamp(36px,6vw,52px);font-weight:400;line-height:1.1;margin-bottom:12px}
 h1 i{font-style:italic;color:var(--flame)}
 .updated{font-size:12px;color:var(--ash);margin-bottom:56px}
-h2{font-family:'Playfair Display',serif;font-size:22px;font-weight:400;margin:48px 0 16px;color:#fff;padding-bottom:12px;border-bottom:1px solid var(--ghost)}
+h2{font-family:'Awesome Serif',serif;font-size:22px;font-weight:400;margin:48px 0 16px;color:#fff;padding-bottom:12px;border-bottom:1px solid var(--ghost)}
 p{color:var(--smoke);font-size:15px;font-weight:300;margin-bottom:16px}
 ul{color:var(--smoke);font-size:15px;font-weight:300;padding-left:20px;margin-bottom:16px}
 ul li{margin-bottom:8px}
@@ -32,7 +45,7 @@ strong{color:#fff;font-weight:500}
 .highlight{padding:20px 24px;background:rgba(255,82,0,0.04);border:1px solid rgba(255,82,0,0.12);border-radius:14px;margin-bottom:24px}
 .highlight p{margin-bottom:0}
 footer{padding:40px 48px;border-top:1px solid var(--ghost);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
-.ft-logo{font-family:'Playfair Display',serif;font-size:18px;font-weight:600}
+.ft-logo{font-family:'Awesome Serif',serif;font-size:18px;font-weight:600}
 .ft-copy{font-size:12px;color:var(--ash)}
 .ft-links{display:flex;gap:24px}
 .ft-links a{font-size:13px;color:var(--smoke);text-decoration:none;transition:color 0.2s}
@@ -131,7 +144,7 @@ footer{padding:40px 48px;border-top:1px solid var(--ghost);display:flex;justify-
     <li>Your content quality or engagement falls below acceptable standards</li>
     <li>We receive credible complaints about your conduct</li>
   </ul>
-  <p>You may close your account at any time by emailing creators@popclub.co. Pending approved payouts will be processed before closure.</p>
+  <p>You may close your account at any time by emailing <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="6b08190e0a1f0419182b1b041b08071e09450804">[email&#160;protected]</a>. Pending approved payouts will be processed before closure.</p>
 
   <h2>10. Limitation of Liability</h2>
   <p>POP's total liability to you for any claim arising from your participation in the platform shall not exceed the total amount paid to you in the 3 months preceding the claim.</p>
@@ -144,7 +157,7 @@ footer{padding:40px 48px;border-top:1px solid var(--ghost);display:flex;justify-
   <p>We may update these terms as our platform evolves. We will notify active creators of material changes by email at least 14 days before they take effect. Continued use of the platform after changes take effect constitutes acceptance.</p>
 
   <h2>13. Contact</h2>
-  <p>For any questions about these terms, email us at creators@popclub.co.</p>
+  <p>For any questions about these terms, email us at <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="2340514642574c515063534c53404f56410d404c">[email&#160;protected]</a>.</p>
 
 </div>
 
@@ -153,12 +166,4 @@ footer{padding:40px 48px;border-top:1px solid var(--ghost);display:flex;justify-
   <div class="ft-links">
     <a href="privacy.html">Privacy Policy</a>
     <a href="terms.html">Creator Terms</a>
-    <a href="data-deletion.html">Data Deletion</a>
-    <a href="contact.html">Contact</a>
-    <a href="https://dl.popclub.co/Get_POP" target="_blank">Download POP →</a>
-  </div>
-  <div class="ft-copy">© 2026 Poptech Growth Pvt. Ltd.</div>
-</footer>
-
-</body>
-</html>
+    <a href="data-deleti
