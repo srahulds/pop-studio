@@ -262,7 +262,7 @@ tr:hover td{background:rgba(255,255,255,0.02)}
     <p style="font-size:13px;color:var(--smoke);font-weight:300;margin-bottom:20px">Creators awaiting approval on their draft reel before posting.</p>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Campaign</th><th>Creator</th><th>Phone</th><th>Draft Link</th><th>Submitted</th><th>Action</th></tr></thead>
+        <thead><tr><th>Campaign</th><th>Creator</th><th>Phone</th><th>Draft Video</th><th>Script</th><th>Submitted</th><th>Action</th></tr></thead>
         <tbody id="draftQueueBody">
           <tr><td colspan="6"><div class="skeleton" style="height:20px;margin:4px 0"></div></td></tr>
         </tbody>
@@ -380,7 +380,7 @@ tr:hover td{background:rgba(255,255,255,0.02)}
     <p style="font-size:13px;color:var(--smoke);margin-bottom:20px" id="rejectModalSubtitle">Leave a comment explaining what needs to change.</p>
     <div class="f-group">
       <label class="f-label">Feedback / Reason</label>
-      <textarea class="f-input" id="rejectComment" style="height:120px;resize:vertical" placeholder="e.g. Lighting too dark, please reshoot in natural light…"></textarea>
+      <textarea class="f-input" id="rejectComment" style="height:120px;resize:vertical" placeholder="e.g. Script is good but delivery needs work — slow down on the CTA. / Script needs to include the cashback amount in line 3."></textarea>
     </div>
     <div style="display:flex;gap:12px;margin-top:8px">
       <button class="btn-outline" style="flex:1" onclick="closeRejectModal()">Cancel</button>
@@ -642,7 +642,7 @@ async function loadQueue() {
       creators(full_name, instagram_handle, phone, email)
     `).eq('status', 'applied').order('applied_at'),
     sb.from('submissions').select(`
-      id, draft_url, submitted_at,
+      id, draft_url, script_url, submitted_at,
       campaigns(title),
       creators(full_name, instagram_handle, phone)
     `).eq('draft_status', 'pending').order('submitted_at'),
@@ -662,7 +662,7 @@ async function loadQueue() {
         const camp   = esc(app.campaigns?.title || '—');
         const date   = app.applied_at ? new Date(app.applied_at).toLocaleDateString('en-IN') : '—';
         const aid    = app.id;
-        const cname  = (app.creators?.full_name || 'Creator').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+        const cname = (app.creators?.full_name || 'Creator').replace(/'/g, '');
         return `<tr>
           <td><div class="td-strong">${name}</div></td>
           <td><a href="https://www.instagram.com/${handle}" target="_blank" style="color:var(--flame);text-decoration:none;font-weight:500">@${handle} &#8599;</a></td>
@@ -683,18 +683,20 @@ async function loadQueue() {
         const handle = sub.creators?.instagram_handle || '—';
         const phone = sub.creators?.phone || '—';
         const camp = esc(sub.campaigns?.title || '—');
-        const draft = esc(sub.draft_url || '');
+        const draft  = esc(sub.draft_url  || '');
+        const script = esc(sub.script_url || '');
         const date = sub.submitted_at ? new Date(sub.submitted_at).toLocaleDateString('en-IN') : '—';
         const sid = sub.id;
-        const cname = (sub.creators?.full_name || 'Creator').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+        const cname = (sub.creators?.full_name || 'Creator').replace(/'/g, '');
         return `<tr>
           <td><div class="td-strong">${camp}</div></td>
           <td><div class="td-strong">${name}</div><div class="td-sub">@${handle}</div></td>
           <td style="font-size:13px;color:#fff">${phone}</td>
-          <td><a href="${draft}" target="_blank" style="color:var(--ember);text-decoration:none;font-weight:500">View Draft &#8599;</a></td>
+          <td>${draft ? `<a href="${draft}" target="_blank" style="color:var(--ember);text-decoration:none;font-weight:500">View Draft &#8599;</a>` : '<span style="color:var(--ash)">—</span>'}</td>
+          <td>${script ? `<a href="${script}" target="_blank" style="color:var(--ember);text-decoration:none;font-weight:500">View Script &#8599;</a>` : '<span style="color:var(--ash)">—</span>'}</td>
           <td style="font-size:12px;color:var(--ash)">${date}</td>
           <td><div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button class="btn-g" onclick="approveDraft('${sid}')">Approve Draft</button>
+            <button class="btn-g" onclick="approveDraft('${sid}')">Approve</button>
             <button class="btn-r" onclick="openRejectModal('draft','${sid}','${cname}')">Request Changes</button>
           </div></td>
         </tr>`;
@@ -708,7 +710,7 @@ async function loadQueue() {
         const camp = esc(sub.campaigns?.title || '—');
         const reel = esc(sub.content_url || '');
         const sid = sub.id;
-        const cname = (sub.creators?.full_name || 'Creator').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+        const cname = (sub.creators?.full_name || 'Creator').replace(/'/g, '');
         const reelRaw = (sub.content_url || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
         return `<tr>
           <td><div class="td-strong">${camp}</div></td>
@@ -739,7 +741,7 @@ let pendingReject = null;
 function openRejectModal(type, id, name) {
   pendingReject = { type, id, name };
   const labels = {
-    draft: 'The creator will see this feedback and can resubmit their draft.',
+    draft: 'The creator will see this feedback. Mention if the script needs changes, the video acting needs changes, or both.',
     reel:  'The creator will see this on their dashboard.',
     app:   'Optional — explain why the application was rejected.'
   };

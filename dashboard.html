@@ -279,7 +279,7 @@ async function loadCampaigns() {
     .select(`
       id, status, applied_at, admin_comments,
       campaigns ( id, title, description, status, days_open, created_at ),
-      submissions ( id, content_url, draft_url, draft_status, admin_comments, views_tracked, likes_count, comments_count, shares_count, saves_count, reach_count, payout_amount, status )
+      submissions ( id, content_url, draft_url, script_url, draft_status, admin_comments, views_tracked, likes_count, comments_count, shares_count, saves_count, reach_count, payout_amount, status )
     `)
     .eq('creator_id', currentUser.id)
     .order('applied_at', { ascending: false });
@@ -319,27 +319,40 @@ async function loadCampaigns() {
     } else if (app.status === 'approved') {
 
       if (!sub) {
-        // STAGE 1 — no submission yet, submit draft
+        // STAGE 1 — no submission yet, submit draft + script
         actionHTML = `
           <div class="stage-box">
-            <div class="stage-label">Stage 1 — Submit Draft</div>
-            <p class="stage-desc">Upload your draft reel to Google Drive (set to "Anyone with link") and paste the link below for review before posting.</p>
-            <div class="submit-row">
-              <input type="url" class="submit-input" id="draftInput_${app.id}" placeholder="https://drive.google.com/...">
-              <button class="submit-btn" onclick="submitDraft('${app.id}','${c.id}')">Submit Draft</button>
+            <div class="stage-label">Stage 1 — Submit Draft &amp; Script</div>
+            <div class="stage-desc">
+              <strong style="color:#fff;font-weight:600">Before filming:</strong> Your draft does not need perfect location, outfit or lighting. Focus on accurately delivering the script — every word, every action exactly as written.<br><br>
+              Upload both your <strong style="color:#fff;font-weight:600">draft video</strong> and <strong style="color:#fff;font-weight:600">script document</strong> to Google Drive (set each to "Anyone with link") and paste the links below.
             </div>
+            <div style="margin-bottom:8px">
+              <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--ash);font-weight:600;margin-bottom:6px">Draft Video (Google Drive)</div>
+              <div class="submit-row">
+                <input type="url" class="submit-input" id="draftInput_${app.id}" placeholder="https://drive.google.com/file/...">
+              </div>
+            </div>
+            <div style="margin-bottom:14px">
+              <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--ash);font-weight:600;margin-bottom:6px">Script Document (Google Drive / Docs)</div>
+              <div class="submit-row">
+                <input type="url" class="submit-input" id="scriptInput_${app.id}" placeholder="https://drive.google.com/file/... or https://docs.google.com/...">
+              </div>
+            </div>
+            <button class="submit-btn" style="width:100%;padding:13px" onclick="submitDraft('${app.id}','${c.id}')">Submit Draft &amp; Script</button>
           </div>`;
 
       } else if (!sub.draft_status || sub.draft_status === 'pending') {
         // STAGE 1 — draft submitted, under review
         actionHTML = `
           <div class="stage-box">
-            <div class="stage-label">Stage 1 — Draft Under Review</div>
-            <div class="stage-done">
+            <div class="stage-label">Stage 1 — Draft &amp; Script Under Review</div>
+            <div class="stage-done" style="margin-bottom:8px">
               <span class="check">&#10003;</span>
-              <span>Draft submitted &mdash; <a href="${esc(sub.draft_url || '')}" target="_blank" style="color:var(--ember);text-decoration:none">View Draft</a></span>
+              <span>Draft video &mdash; <a href="${esc(sub.draft_url || '')}" target="_blank" style="color:var(--ember);text-decoration:none">View Draft &#8599;</a></span>
             </div>
-            <p class="stage-note">Reviewing your draft. We will notify you once approved or if changes are needed.</p>
+            ${sub.script_url ? `<div class="stage-done" style="margin-bottom:8px"><span class="check">&#10003;</span><span>Script &mdash; <a href="${esc(sub.script_url)}" target="_blank" style="color:var(--ember);text-decoration:none">View Script &#8599;</a></span></div>` : ''}
+            <p class="stage-note">Reviewing your draft and script. We will notify you once approved or if changes are needed.</p>
           </div>`;
 
       } else if (sub.draft_status === 'changes_requested') {
@@ -347,11 +360,16 @@ async function loadCampaigns() {
         actionHTML = `
           <div class="stage-box warn">
             <div class="stage-label flame">Stage 1 — Changes Requested</div>
-            <div class="admin-comment">${esc(sub.admin_comments || 'Please review and resubmit your draft.')}</div>
-            <div class="submit-row">
-              <input type="url" class="submit-input" id="draftInput_${app.id}" placeholder="https://drive.google.com/... (updated draft)">
-              <button class="submit-btn" onclick="submitDraft('${app.id}','${c.id}')">Resubmit Draft</button>
+            <div class="admin-comment">${esc(sub.admin_comments || 'Please review the feedback and resubmit.')}</div>
+            <div style="margin-bottom:8px">
+              <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--ash);font-weight:600;margin-bottom:6px">Updated Draft Video</div>
+              <input type="url" class="submit-input" id="draftInput_${app.id}" placeholder="https://drive.google.com/file/... (updated draft)" style="width:100%">
             </div>
+            <div style="margin-bottom:14px">
+              <div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--ash);font-weight:600;margin-bottom:6px">Updated Script (if changed)</div>
+              <input type="url" class="submit-input" id="scriptInput_${app.id}" placeholder="https://drive.google.com/... (updated script, if changed)" style="width:100%">
+            </div>
+            <button class="submit-btn" style="width:100%;padding:13px" onclick="submitDraft('${app.id}','${c.id}')">Resubmit Draft &amp; Script</button>
           </div>`;
 
       } else if (sub.draft_status === 'approved' && !sub.content_url) {
@@ -454,37 +472,44 @@ function toast(msg, type, duration) {
 async function submitDraft(applicationId, campaignId) {
   if (isSubmitting) return;
   isSubmitting = true;
-  const input = document.getElementById('draftInput_' + applicationId);
-  const url   = input ? input.value.trim() : '';
 
-  if (!url) { toast('Please paste your Google Drive link.', 'error'); isSubmitting = false; return; }
-  try {
-    const parsed = new URL(url);
-    if (!parsed.hostname.includes('drive.google') && !parsed.hostname.includes('docs.google')) {
-      toast('Please enter a Google Drive link.', 'error'); isSubmitting = false; return;
-    }
-  } catch (e) { toast('Please enter a valid URL.', 'error'); isSubmitting = false; return; }
+  const draftInput  = document.getElementById('draftInput_'  + applicationId);
+  const scriptInput = document.getElementById('scriptInput_' + applicationId);
+  const draftUrl    = draftInput  ? draftInput.value.trim()  : '';
+  const scriptUrl   = scriptInput ? scriptInput.value.trim() : '';
 
-  const btn = input.nextElementSibling;
-  btn.disabled = true; btn.textContent = 'Submitting…';
+  if (!draftUrl)  { toast('Please paste your draft video link.', 'error');  isSubmitting = false; return; }
+  if (!scriptUrl) { toast('Please paste your script document link.', 'error'); isSubmitting = false; return; }
 
-  const { data: existing } = await sb.from('submissions').select('id').eq('application_id', applicationId).maybeSingle();
-  let error;
+  function isGDrive(url) {
+    try { var h = new URL(url).hostname; return h.includes('drive.google') || h.includes('docs.google'); }
+    catch(e) { return false; }
+  }
+  if (!isGDrive(draftUrl))  { toast('Draft video must be a Google Drive link.', 'error');  isSubmitting = false; return; }
+  if (!isGDrive(scriptUrl)) { toast('Script must be a Google Drive or Docs link.', 'error'); isSubmitting = false; return; }
+
+  var submitBtns = document.querySelectorAll('.submit-btn');
+  var btn = null;
+  submitBtns.forEach(function(b) { if (b.getAttribute('onclick') && b.getAttribute('onclick').indexOf(applicationId) > -1 && b.textContent.indexOf('Script') > -1) btn = b; });
+  if (btn) { btn.disabled = true; btn.textContent = 'Submitting...'; }
+
+  var existing = (await sb.from('submissions').select('id').eq('application_id', applicationId).maybeSingle()).data;
+  var error;
   if (existing && existing.id) {
-    const res = await sb.from('submissions').update({ draft_url: url, draft_status: 'pending' }).eq('id', existing.id);
+    var res = await sb.from('submissions').update({ draft_url: draftUrl, script_url: scriptUrl, draft_status: 'pending' }).eq('id', existing.id);
     error = res.error;
   } else {
-    const res = await sb.from('submissions').insert({
+    var res = await sb.from('submissions').insert({
       campaign_id: campaignId, creator_id: currentUser.id,
-      application_id: applicationId, draft_url: url, draft_status: 'pending', status: 'pending'
+      application_id: applicationId, draft_url: draftUrl, script_url: scriptUrl, draft_status: 'pending', status: 'pending'
     });
     error = res.error;
   }
 
   isSubmitting = false;
-  btn.disabled = false; btn.textContent = 'Submit Draft';
+  if (btn) { btn.disabled = false; btn.textContent = 'Submit Draft & Script'; }
   if (error) { toast('Could not submit. Please try again.', 'error'); return; }
-  toast("Draft submitted! We'll review it shortly.", 'success');
+  toast("Draft & script submitted! We'll review them shortly.", 'success');
   await loadCampaigns(); await loadStats();
 }
 
